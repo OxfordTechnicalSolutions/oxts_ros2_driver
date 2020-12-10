@@ -17,8 +17,12 @@
 #include <memory>
 #include <string>
 
+// ROS includes
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+
+// gad-sdk includes
+#include "nav/NComRxC.h"
 
 using namespace std::chrono_literals;
 
@@ -51,6 +55,8 @@ private:
 
 int main(int argc, char * argv[])
 {
+  NComRxC *nrx;
+
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();

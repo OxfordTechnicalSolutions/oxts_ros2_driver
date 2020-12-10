@@ -27,6 +27,7 @@ add_executable(ncom_publisher src/ncom_publisher.cpp)
 ament_target_dependencies(ncom_publisher rclcpp std_msgs)
 target_include_directories(ncom_publisher PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/nav>
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS ncom_publisher
