@@ -6,14 +6,15 @@ A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Inc
 
 Build instructions will look something like this:
 
-cd <colcon_ws>/src
-git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
-cd ros-driver
-rosdep update
-rosdep install --from-path .
-cd ../..
-colcon build
-source install/setup.bash
+1. cd <colcon_ws>/src
+2. git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
+3. cd ros-driver
+4. rosdep update
+5. rosdep install --from-path .
+6. cd ../..
+7. colcon build
+8. source install/setup.bash
+
 
 ## Driver Configuration
 
