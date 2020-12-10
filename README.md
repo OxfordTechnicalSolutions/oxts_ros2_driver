@@ -2,7 +2,20 @@
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Includes NCOM decoding and GAD encoding functionality. Where ROS is mentioned in this document this is in reference to ROS2. References to ROS1 will be explicit.
 
-## Configuration
+## Build from source
+
+Build instructions will look something like this:
+
+cd <colcon_ws>/src
+git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
+cd ros-driver
+rosdep update
+rosdep install --from-path .
+cd ../..
+colcon build
+source install/setup.bash
+
+## Driver Configuration
 
 
 ## Output ROS messages
@@ -17,4 +30,7 @@ The subscriber node included in this driver listens for particular ROS topics to
 
 ROS1 and ROS2 are not directly compatible, as a result of breaking changes between the two. As such, ROS2 messages cannot be consumed directly by ROS1 nodes. To get around this, the ROS1 bridge can be used to convert messages and send them on.
 
-LINK - ROS1 bridge GitHub
+LINK - https://github.com/ros2/ros1_bridge
+
+
+
