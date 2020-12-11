@@ -21,44 +21,62 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
+// Boost includes
+#include <boost/asio.hpp>
+
 // gad-sdk includes
 #include "nav/NComRxC.h"
 
+// Other includes
+#include "ncom_publisher_node.hpp"
+
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
- * member function as a callback from the timer. */
-
-class MinimalPublisher : public rclcpp::Node
+class OxtsDevice
 {
-public:
-  MinimalPublisher()
-  : Node("minimal_publisher"), count_(0)
-  {
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    timer_ = this->create_wall_timer(
-      500ms, std::bind(&MinimalPublisher::timer_callback, this));
-  }
+  int port = 3000;
+  std::string ip = "192.168.25.34";
+  // Socket itself
 
-private:
-  void timer_callback()
-  {
-    auto message = std_msgs::msg::String();
-    message.data = "Hello, world! " + std::to_string(count_++);
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-    publisher_->publish(message);
-  }
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-  size_t count_;
+
 };
+
 
 int main(int argc, char * argv[])
 {
-  NComRxC *nrx;
-
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalPublisher>());
+
+  auto pub_node = std::make_shared<NComPublisherNode>();
+
+  // Initialise publishers for all supported (and configured) messages
+  // rclcpp::Publisher <msg>_publisher.advertise<sensor_msgs::NavSatFix>("gps/fix",2);
+
+  // Initialise NCom decoder
+  NComRxC *nrx;
+  nrx = NComCreateNComRxC();
+  if (nrx == NULL)
+    RCLCPP_ERROR(pub_node->get_logger(), "Failed to create NCom decoder");
+  
+  // Open socket
+
+
+  while (rclcpp::ok())
+  {
+    // Read socket for next packet
+
+    // Read NCom from buffer (temp variables, replace when socket is implemented)
+    unsigned char *temp = NULL;
+    int packetLength = 72;
+    NComNewChars(nrx, &temp, packetLength);
+    // Do any preprocessing that's required (GpsDiffAge)
+    preProcess(nrx);
+
+    pub_node.ncom_callback(nrx); // 
+
+    rclcpp::spin_some(pub_node);
+  }
+
+
   rclcpp::shutdown();
   return 0;
 }
