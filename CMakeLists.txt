@@ -23,7 +23,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(ncom_publisher src/ncom_publisher.cpp include/nav/NComRxC.c src/ncom_publisher_node.cpp)
+add_executable(ncom_publisher src/ncom_publisher.cpp include/nav/NComRxC.c src/ncom_publisher_node.cpp src/oxts_device.cpp)
 ament_target_dependencies(ncom_publisher rclcpp std_msgs)
 target_include_directories(ncom_publisher PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

@@ -34,6 +34,7 @@ public:
     timer_ = this->create_wall_timer(
       500ms, std::bind(&NComPublisherNode::timer_callback, this)); // Initialise timer, which causes timer_callback to be called twice a second
   }
+  int ncom_callback(NComRxC* nrx);
 
 private:
   void timer_callback() // Sets data in message and does the publishing
@@ -45,7 +46,6 @@ private:
     publisher2_->publish(message);
   }
   
-  int ncom_callback(NComRxC* nrx);
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;

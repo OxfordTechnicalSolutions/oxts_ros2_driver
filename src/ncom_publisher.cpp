@@ -29,6 +29,8 @@
 
 // Other includes
 #include "ncom_publisher_node.hpp"
+#include "oxts_device.hpp"
+
 
 using namespace std::chrono_literals;
 
@@ -67,11 +69,10 @@ int main(int argc, char * argv[])
     // Read NCom from buffer (temp variables, replace when socket is implemented)
     unsigned char *temp = NULL;
     int packetLength = 72;
-    NComNewChars(nrx, &temp, packetLength);
-    // Do any preprocessing that's required (GpsDiffAge)
-    preProcess(nrx);
+    NComNewChars(nrx, temp, packetLength);
 
-    pub_node.ncom_callback(nrx); // 
+    pub_node->ncom_callback(nrx); 
+    // 
 
     rclcpp::spin_some(pub_node);
   }
