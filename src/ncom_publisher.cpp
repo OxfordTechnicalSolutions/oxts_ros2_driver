@@ -21,27 +21,15 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
-// Boost includes
-#include <boost/asio.hpp>
+// Other includes
+#include "ncom_publisher_node.hpp"
+//#include "oxts_device.hpp"
+#include "udp_server_client.h"
 
 // gad-sdk includes
 #include "nav/NComRxC.h"
 
-// Other includes
-#include "ncom_publisher_node.hpp"
-#include "oxts_device.hpp"
-
-
 using namespace std::chrono_literals;
-
-class OxtsDevice
-{
-  int port = 3000;
-  std::string ip = "192.168.25.34";
-  // Socket itself
-
-
-};
 
 
 int main(int argc, char * argv[])
@@ -58,23 +46,32 @@ int main(int argc, char * argv[])
   nrx = NComCreateNComRxC();
   if (nrx == NULL)
     RCLCPP_ERROR(pub_node->get_logger(), "Failed to create NCom decoder");
-  
-  // Open socket
 
 
+//==============================================================================
+// Create UDP client to receive NCom data from unit
+  networking_udp::client local_client                   (3000); // receive to
+
+  auto unit_endpoint = boost::asio::ip::udp::endpoint(
+      boost::asio::ip::address::from_string("192.168.25.34"), 5001); //received from
+
+  unsigned char buff[1024];
+
+//==============================================================================
+
+  RCLCPP_INFO(pub_node->get_logger(), "Spinning up node");
   while (rclcpp::ok())
   {
-    // Read socket for next packet
+    std::size_t size = local_client.receive_from(buff, 72, unit_endpoint); // retreive data from unit_endpoint on the port we specify in the constructor of local_client
 
-    // Read NCom from buffer (temp variables, replace when socket is implemented)
-    unsigned char *temp = NULL;
-    int packetLength = 72;
-    NComNewChars(nrx, temp, packetLength);
+    //NComNewChars(nrx, buff, size); // add data to decoder
 
-    pub_node->ncom_callback(nrx); 
-    // 
+    RCLCPP_ERROR(pub_node->get_logger(), "New Packet\n");
+    RCLCPP_ERROR(pub_node->get_logger(), "%s", buff);
 
-    rclcpp::spin_some(pub_node);
+    // Take data from ncom and publish it in ROS messages
+    //pub_node->ncom_callback(nrx); 
+
   }
 
 
