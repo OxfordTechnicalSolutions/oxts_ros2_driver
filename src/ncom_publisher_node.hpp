@@ -31,8 +31,7 @@ public:
   {
     publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10); // Initialise the publisher with the string message type, topic name "topic", and queue size limit
     publisher2_ = this->create_publisher<std_msgs::msg::String>("topic2", 10); //
-    timer_ = this->create_wall_timer(
-      500ms, std::bind(&NComPublisherNode::timer_callback, this)); // Initialise timer, which causes timer_callback to be called twice a second
+
   }
   int ncom_callback(NComRxC* nrx);
 
