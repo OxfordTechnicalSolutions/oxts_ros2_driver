@@ -3285,9 +3285,9 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Ab, 3, 1, Com->mAx, Com->mAy, Com->mAz);
 			MatMultRAB(&ComI->Al, &ComI->C_oh, &ComI->Ab);
-			NComSetAf(Com, e(&ComI->Al, 0, 0));
-			NComSetAl(Com, e(&ComI->Al, 1, 0));
-			NComSetAd(Com, e(&ComI->Al, 2, 0));
+			NComSetAf(Com, ele(&ComI->Al, 0, 0));
+			NComSetAl(Com, ele(&ComI->Al, 1, 0));
+			NComSetAd(Com, ele(&ComI->Al, 2, 0));
 		}
 
 		// Filtered acceleration in FLD frame.
@@ -3295,9 +3295,9 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Ab, 3, 1, Com->mFiltAx, Com->mFiltAy, Com->mFiltAz);
 			MatMultRAB(&ComI->Al, &ComI->C_oh, &ComI->Ab);
-			NComSetFiltAf(Com, e(&ComI->Al, 0, 0));
-			NComSetFiltAl(Com, e(&ComI->Al, 1, 0));
-			NComSetFiltAd(Com, e(&ComI->Al, 2, 0));
+			NComSetFiltAf(Com, ele(&ComI->Al, 0, 0));
+			NComSetFiltAl(Com, ele(&ComI->Al, 1, 0));
+			NComSetFiltAd(Com, ele(&ComI->Al, 2, 0));
 		}
 
 		// Angular rate in FLD frame.
@@ -3305,9 +3305,9 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Wb, 3, 1, Com->mWx, Com->mWy, Com->mWz);
 			MatMultRAB(&ComI->Wl, &ComI->C_oh, &ComI->Wb);
-			NComSetWf(Com, e(&ComI->Wl, 0, 0));
-			NComSetWl(Com, e(&ComI->Wl, 1, 0));
-			NComSetWd(Com, e(&ComI->Wl, 2, 0));
+			NComSetWf(Com, ele(&ComI->Wl, 0, 0));
+			NComSetWl(Com, ele(&ComI->Wl, 1, 0));
+			NComSetWd(Com, ele(&ComI->Wl, 2, 0));
 		}
 
 		// Velocity in FLD frame.
@@ -3315,8 +3315,8 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Vn, 3, 1, Com->mVn, Com->mVe, Com->mVd);
 			MatMultRAtB(&ComI->Vl, &ComI->C_hn, &ComI->Vn);
-			NComSetVf(Com, e(&ComI->Vl, 0, 0));
-			NComSetVl(Com, e(&ComI->Vl, 1, 0));
+			NComSetVf(Com, ele(&ComI->Vl, 0, 0));
+			NComSetVl(Com, ele(&ComI->Vl, 1, 0));
 			// Vd already known!
 		}
 
@@ -3325,9 +3325,9 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Yb, 3, 1, Com->mYx, Com->mYy, Com->mYz);
 			MatMultRAB(&ComI->Yl, &ComI->C_oh, &ComI->Yb);
-			NComSetYf(Com, e(&ComI->Yl, 0, 0));
-			NComSetYl(Com, e(&ComI->Yl, 1, 0));
-			NComSetYd(Com, e(&ComI->Yl, 2, 0));
+			NComSetYf(Com, ele(&ComI->Yl, 0, 0));
+			NComSetYl(Com, ele(&ComI->Yl, 1, 0));
+			NComSetYd(Com, ele(&ComI->Yl, 2, 0));
 		}
 
 		// Filtered angular acceleration in FLD frame.
@@ -3335,9 +3335,9 @@ static void RotateOutputsCompute(NComRxC *Com)
 		{
 			MatFillR(&ComI->Yb, 3, 1, Com->mFiltYx, Com->mFiltYy, Com->mFiltYz);
 			MatMultRAB(&ComI->Yl, &ComI->C_oh, &ComI->Yb);
-			NComSetFiltYf(Com, e(&ComI->Yl, 0, 0));
-			NComSetFiltYl(Com, e(&ComI->Yl, 1, 0));
-			NComSetFiltYd(Com, e(&ComI->Yl, 2, 0));
+			NComSetFiltYf(Com, ele(&ComI->Yl, 0, 0));
+			NComSetFiltYl(Com, ele(&ComI->Yl, 1, 0));
+			NComSetFiltYd(Com, ele(&ComI->Yl, 2, 0));
 		}
 
 		// Orientation with respect to reference surface.
@@ -3348,11 +3348,11 @@ static void RotateOutputsCompute(NComRxC *Com)
 			Euler2DirCos(&ComI->C_sn, &ComI->E);
 			MatMultRAtB(&ComI->C_os, &ComI->C_sn, &ComI->C_on);
 			DirCos2Euler(&ComI->E, &ComI->C_os);
-			d = e(&ComI->E, 0, 0) * RAD2DEG;
+			d = ele(&ComI->E, 0, 0) * RAD2DEG;
 			if (d < 0.0) d += 360.0;
 			NComSetSurf2OutHeading(Com, d);
-			NComSetSurf2OutPitch  (Com, e(&ComI->E, 1, 0) * RAD2DEG);
-			NComSetSurf2OutRoll   (Com, e(&ComI->E, 2, 0) * RAD2DEG);
+			NComSetSurf2OutPitch  (Com, ele(&ComI->E, 1, 0) * RAD2DEG);
+			NComSetSurf2OutRoll   (Com, ele(&ComI->E, 2, 0) * RAD2DEG);
 		}
 	}
 }
@@ -3434,9 +3434,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 			// ISO earth-fixed system velocity.
 
 			// V_ni = C_noni V_no
-			NComSetIsoVnX(Com, e(&v_en, 1, 0));
-			NComSetIsoVnY(Com, e(&v_en, 0, 0));
-			NComSetIsoVnZ(Com, -e(&v_en, 2, 0));
+			NComSetIsoVnX(Com, ele(&v_en, 1, 0));
+			NComSetIsoVnY(Com, ele(&v_en, 0, 0));
+			NComSetIsoVnZ(Com, -ele(&v_en, 2, 0));
 
 
 			// ISO intermediate system velocity.
@@ -3444,9 +3444,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 			{
 				// V_hi = C_hohi V_ho, V_ho = C_noho V_no
 				MatMultRAtB(&v_eh, &ComI->C_hn, &v_en);
-				NComSetIsoVhX(Com, e(&v_eh, 0, 0));
-				NComSetIsoVhY(Com, -e(&v_eh, 1, 0));
-				NComSetIsoVhZ(Com, -e(&v_eh, 2, 0));
+				NComSetIsoVhX(Com, ele(&v_eh, 0, 0));
+				NComSetIsoVhY(Com, ele(&v_eh, 1, 0));
+				NComSetIsoVhZ(Com, ele(&v_eh, 2, 0));
 			}
 
 			// ISO vehicle system velocity.
@@ -3454,9 +3454,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 			{
 				// V_oi = C_oooi V_oo, V_oo = C_hooo V_ho
 				MatMultRAtB(&v_eb, &ComI->C_oh, &v_eh);
-				NComSetIsoVoX(Com,  e(&v_eb, 0, 0));
-				NComSetIsoVoY(Com, -e(&v_eb, 1, 0));
-				NComSetIsoVoZ(Com, -e(&v_eb, 2, 0));
+				NComSetIsoVoX(Com,  ele(&v_eb, 0, 0));
+				NComSetIsoVoY(Com, ele(&v_eb, 1, 0));
+				NComSetIsoVoZ(Com, ele(&v_eb, 2, 0));
 			}
 		}
 
@@ -3474,9 +3474,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 
 				//ISO earth-fixed system acceleration.
 				//A_ni = C_noni A_no
-				NComSetIsoAnX(Com, e(&tmp_nbn, 1, 0));
-				NComSetIsoAnY(Com, e(&tmp_nbn, 0, 0));
-				NComSetIsoAnZ(Com, -e(&tmp_nbn, 2, 0));
+				NComSetIsoAnX(Com, ele(&tmp_nbn, 1, 0));
+				NComSetIsoAnY(Com, ele(&tmp_nbn, 0, 0));
+				NComSetIsoAnZ(Com, ele(&tmp_nbn, 2, 0));
 
 
 				// // ISO intermediate system acceleration.
@@ -3484,9 +3484,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// A_hi = C_hohi A_ho, A_ho = C_noho A_no
 					MatMultRAtB(&tmp_nbh, &ComI->C_hn, &tmp_nbn);
-					NComSetIsoAhX(Com, e(&tmp_nbh, 0, 0));
-					NComSetIsoAhY(Com,-e(&tmp_nbh, 1, 0));
-					NComSetIsoAhZ(Com,-e(&tmp_nbh, 2, 0));
+					NComSetIsoAhX(Com, ele(&tmp_nbh, 0, 0));
+					NComSetIsoAhY(Com,ele(&tmp_nbh, 1, 0));
+					NComSetIsoAhZ(Com,ele(&tmp_nbh, 2, 0));
 				}
 
 				// ISO vehicle system acceleration.
@@ -3494,9 +3494,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// A_oi = C_oooi A_oo, A_oo = C_hooo A_ho
 					MatMultRAtB(&tmp_nbb, &ComI->C_oh, &tmp_nbh);
-					NComSetIsoAoX(Com, e(&tmp_nbb, 0, 0));
-					NComSetIsoAoY(Com,-e(&tmp_nbb, 1, 0));
-					NComSetIsoAoZ(Com,-e(&tmp_nbb, 2, 0));
+					NComSetIsoAoX(Com, ele(&tmp_nbb, 0, 0));
+					NComSetIsoAoY(Com,ele(&tmp_nbb, 1, 0));
+					NComSetIsoAoZ(Com,ele(&tmp_nbb, 2, 0));
 				}
 			}
 
@@ -3509,18 +3509,18 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 
 				// Filtered ISO earth-fixed system acceleration.
 					// A_ni = C_noni A_no
-					NComSetFiltIsoAnX(Com, e(&tmp_nbn, 1, 0));
-					NComSetFiltIsoAnX(Com, e(&tmp_nbn, 0, 0));
-					NComSetFiltIsoAnX(Com,-e(&tmp_nbn, 2, 0));
+					NComSetFiltIsoAnX(Com, ele(&tmp_nbn, 1, 0));
+					NComSetFiltIsoAnX(Com, ele(&tmp_nbn, 0, 0));
+					NComSetFiltIsoAnX(Com,ele(&tmp_nbn, 2, 0));
 
 				// Filtered ISO intermediate system acceleration.
 				if (ComI->C_hn_valid)
 				{
 					// A_hi = C_hohi A_ho, A_ho = C_noho A_no
 					MatMultRAtB(&tmp_nbh, &ComI->C_hn, &tmp_nbn);
-					NComSetFiltIsoAhX(Com, e(&tmp_nbh, 0, 0));
-					NComSetFiltIsoAhY(Com,-e(&tmp_nbh, 1, 0));
-					NComSetFiltIsoAhZ(Com,-e(&tmp_nbh, 2, 0));
+					NComSetFiltIsoAhX(Com, ele(&tmp_nbh, 0, 0));
+					NComSetFiltIsoAhY(Com,ele(&tmp_nbh, 1, 0));
+					NComSetFiltIsoAhZ(Com,ele(&tmp_nbh, 2, 0));
 				}
 
 				// Filtered ISO vehicle system acceleration.
@@ -3528,9 +3528,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// A_oi = C_oooi A_oo, A_oo = C_hooo A_ho
 					MatMultRAtB(&tmp_nbb, &ComI->C_oh, &tmp_nbh);
-					NComSetFiltIsoAoX(Com, e(&tmp_nbb, 0, 0));
-					NComSetFiltIsoAoY(Com,-e(&tmp_nbb, 1, 0));
-					NComSetFiltIsoAoZ(Com,-e(&tmp_nbb, 2, 0));
+					NComSetFiltIsoAoX(Com, ele(&tmp_nbb, 0, 0));
+					NComSetFiltIsoAoY(Com,ele(&tmp_nbb, 1, 0));
+					NComSetFiltIsoAoZ(Com,ele(&tmp_nbb, 2, 0));
 				}
 			}
 		}
@@ -3549,9 +3549,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 
 				// // ISO vehicle system angular velocity.
 				// W_oi = C_oooi W_oo
-				NComSetIsoWoX(Com, e(&tmp_nbb, 0, 0));
-				NComSetIsoWoY(Com,-e(&tmp_nbb, 1, 0));
-				NComSetIsoWoZ(Com,-e(&tmp_nbb, 2, 0));
+				NComSetIsoWoX(Com, ele(&tmp_nbb, 0, 0));
+				NComSetIsoWoY(Com,ele(&tmp_nbb, 1, 0));
+				NComSetIsoWoZ(Com,ele(&tmp_nbb, 2, 0));
 
 
 				// ISO intermediate system angular velocity.
@@ -3559,9 +3559,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// W_hi = C_hohi W_ho, W_ho = C_ooho W_oo
 					MatMultRAB(&tmp_nbh, &ComI->C_oh, &tmp_nbb);
-					NComSetIsoWhX(Com, e(&tmp_nbh, 0, 0));
-					NComSetIsoWhY(Com,-e(&tmp_nbh, 1, 0));
-					NComSetIsoWhZ(Com,-e(&tmp_nbh, 2, 0));
+					NComSetIsoWhX(Com, ele(&tmp_nbh, 0, 0));
+					NComSetIsoWhY(Com,ele(&tmp_nbh, 1, 0));
+					NComSetIsoWhZ(Com,ele(&tmp_nbh, 2, 0));
 				}
 
 				// ISO earth-fixed system angular velocity.
@@ -3569,9 +3569,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// W_ni = C_noni W_no, W_no = C_hono W_ho
 					MatMultRAB(&tmp_nbn, &ComI->C_hn, &tmp_nbh);
-					NComSetIsoWnX(Com, e(&tmp_nbn, 1, 0));
-					NComSetIsoWnY(Com, e(&tmp_nbn, 0, 0));
-					NComSetIsoWnZ(Com,-e(&tmp_nbn, 2, 0));
+					NComSetIsoWnX(Com, ele(&tmp_nbn, 1, 0));
+					NComSetIsoWnY(Com, ele(&tmp_nbn, 0, 0));
+					NComSetIsoWnZ(Com,ele(&tmp_nbn, 2, 0));
 				}
 			}
 		}
@@ -3591,9 +3591,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				// ISO vehicle system angular velocity.
 
 					// Y_oi = C_oooi Y_oo
-					NComSetIsoYoX(Com, e(&tmp_nbb, 0, 0));
-					NComSetIsoYoY(Com,-e(&tmp_nbb, 1, 0));
-					NComSetIsoYoZ(Com,-e(&tmp_nbb, 2, 0));
+					NComSetIsoYoX(Com, ele(&tmp_nbb, 0, 0));
+					NComSetIsoYoY(Com,ele(&tmp_nbb, 1, 0));
+					NComSetIsoYoZ(Com,ele(&tmp_nbb, 2, 0));
 
 
 				// ISO intermediate system angular velocity.
@@ -3601,9 +3601,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// Y_hi = C_hohi Y_ho, Y_ho = C_ooho Y_oo
 					MatMultRAB(&tmp_nbh, &ComI->C_oh, &tmp_nbb);
-					NComSetIsoYhX(Com, e(&tmp_nbh, 0, 0));
-					NComSetIsoYhY(Com,-e(&tmp_nbh, 1, 0));
-					NComSetIsoYhZ(Com,-e(&tmp_nbh, 2, 0));
+					NComSetIsoYhX(Com, ele(&tmp_nbh, 0, 0));
+					NComSetIsoYhY(Com,ele(&tmp_nbh, 1, 0));
+					NComSetIsoYhZ(Com,ele(&tmp_nbh, 2, 0));
 				}
 
 				// ISO earth-fixed system angular velocity.
@@ -3611,9 +3611,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// Y_ni = C_noni Y_no, Y_no = C_hono Y_ho
 					MatMultRAB(&tmp_nbn, &ComI->C_hn, &tmp_nbh);
-					NComSetIsoYnX(Com, e(&tmp_nbn, 1, 0));
-					NComSetIsoYnY(Com, e(&tmp_nbn, 0, 0));
-					NComSetIsoYnZ(Com,-e(&tmp_nbn, 2, 0));
+					NComSetIsoYnX(Com, ele(&tmp_nbn, 1, 0));
+					NComSetIsoYnY(Com, ele(&tmp_nbn, 0, 0));
+					NComSetIsoYnZ(Com,ele(&tmp_nbn, 2, 0));
 				}
 			}
 
@@ -3624,9 +3624,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 
 				// ISO vehicle system angular velocity.
 					// Y_oi = C_oooi Y_oo
-					NComSetFiltIsoYoX(Com, e(&tmp_nbb, 0, 0));
-					NComSetFiltIsoYoY(Com,-e(&tmp_nbb, 1, 0));
-					NComSetFiltIsoYoZ(Com,-e(&tmp_nbb, 2, 0));
+					NComSetFiltIsoYoX(Com, ele(&tmp_nbb, 0, 0));
+					NComSetFiltIsoYoY(Com,ele(&tmp_nbb, 1, 0));
+					NComSetFiltIsoYoZ(Com,ele(&tmp_nbb, 2, 0));
 
 
 				// ISO intermediate system angular velocity.
@@ -3634,9 +3634,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// Y_hi = C_hohi Y_ho, Y_ho = C_ooho Y_oo
 					MatMultRAB(&tmp_nbh, &ComI->C_oh, &tmp_nbb);
-					NComSetFiltIsoYhX(Com, e(&tmp_nbh, 0, 0));
-					NComSetFiltIsoYhY(Com,-e(&tmp_nbh, 1, 0));
-					NComSetFiltIsoYhZ(Com,-e(&tmp_nbh, 2, 0));
+					NComSetFiltIsoYhX(Com, ele(&tmp_nbh, 0, 0));
+					NComSetFiltIsoYhY(Com,ele(&tmp_nbh, 1, 0));
+					NComSetFiltIsoYhZ(Com,ele(&tmp_nbh, 2, 0));
 				}
 
 				// ISO earth-fixed system angular velocity.
@@ -3644,9 +3644,9 @@ static void Iso8855OutputsCompute(NComRxC *Com)
 				{
 					// Y_ni = C_noni Y_no, Y_no = C_hono Y_ho
 					MatMultRAB(&tmp_nbn, &ComI->C_hn, &tmp_nbh);
-					NComSetFiltIsoYnX(Com, e(&tmp_nbn, 1, 0));
-					NComSetFiltIsoYnY(Com, e(&tmp_nbn, 0, 0));
-					NComSetFiltIsoYnZ(Com,-e(&tmp_nbn, 2, 0));
+					NComSetFiltIsoYnX(Com, ele(&tmp_nbn, 1, 0));
+					NComSetFiltIsoYnY(Com, ele(&tmp_nbn, 0, 0));
+					NComSetFiltIsoYnZ(Com,ele(&tmp_nbn, 2, 0));
 				}
 			}
 		}
@@ -6435,7 +6435,7 @@ static int MatFillR(Mat *R, long r, long c, ...)
    va_start(ap, c);
    for(i = 0; i < r; i++)
       for(j = 0; j < c; j++)
-         e(R,i,j) = (MatElement)va_arg(ap, double);
+         ele(R,i,j) = (MatElement)va_arg(ap, double);
    va_end(ap);
 
    return 0;
@@ -6613,9 +6613,9 @@ static int MatCrossProduct(Mat *r, const Mat *u, const Mat *v)
 {
    r->r = 3;
    r->c = 1;
-   e(r, 0, 0) = e(u, 1, 0) * e(v, 2, 0) - e(u, 2, 0) * e(v, 1, 0);
-   e(r, 1, 0) = e(u, 2, 0) * e(v, 0, 0) - e(u, 0, 0) * e(v, 2, 0);
-   e(r, 2, 0) = e(u, 0, 0) * e(v, 1, 0) - e(u, 1, 0) * e(v, 0, 0);
+   ele(r, 0, 0) = ele(u, 1, 0) * ele(v, 2, 0) - ele(u, 2, 0) * ele(v, 1, 0);
+   ele(r, 1, 0) = ele(u, 2, 0) * ele(v, 0, 0) - ele(u, 0, 0) * ele(v, 2, 0);
+   ele(r, 2, 0) = ele(u, 0, 0) * ele(v, 1, 0) - ele(u, 1, 0) * ele(v, 0, 0);
 
    return 0;
 }
@@ -6628,24 +6628,24 @@ static int Euler2DirCos(Mat *C, const Mat *E)
 {
    double sin_h, cos_h, sin_p, cos_p, sin_r, cos_r;
 
-   sin_h = sin(e(E,0,0));
-   cos_h = cos(e(E,0,0));
-   sin_p = sin(e(E,1,0));
-   cos_p = cos(e(E,1,0));
-   sin_r = sin(e(E,2,0));
-   cos_r = cos(e(E,2,0));
+   sin_h = sin(ele(E,0,0));
+   cos_h = cos(ele(E,0,0));
+   sin_p = sin(ele(E,1,0));
+   cos_p = cos(ele(E,1,0));
+   sin_r = sin(ele(E,2,0));
+   cos_r = cos(ele(E,2,0));
 
    C->r = 3;
    C->c = 3;
-   e(C,0,0) = cos_h * cos_p;
-   e(C,1,0) = sin_h * cos_p;
-   e(C,2,0) = -sin_p;
-   e(C,0,1) = cos_h * sin_p * sin_r - sin_h * cos_r;
-   e(C,1,1) = sin_h * sin_p * sin_r + cos_h * cos_r;
-   e(C,2,1) = cos_p * sin_r;
-   e(C,0,2) = cos_h * sin_p * cos_r + sin_h * sin_r;
-   e(C,1,2) = sin_h * sin_p * cos_r - cos_h * sin_r;
-   e(C,2,2) = cos_p * cos_r;
+   ele(C,0,0) = cos_h * cos_p;
+   ele(C,1,0) = sin_h * cos_p;
+   ele(C,2,0) = -sin_p;
+   ele(C,0,1) = cos_h * sin_p * sin_r - sin_h * cos_r;
+   ele(C,1,1) = sin_h * sin_p * sin_r + cos_h * cos_r;
+   ele(C,2,1) = cos_p * sin_r;
+   ele(C,0,2) = cos_h * sin_p * cos_r + sin_h * sin_r;
+   ele(C,1,2) = sin_h * sin_p * cos_r - cos_h * sin_r;
+   ele(C,2,2) = cos_p * cos_r;
 
    return 0;
 }
@@ -6660,22 +6660,22 @@ static int Euler2DirCos2(Mat *C, Mat *E)
 {
    double sin_p, cos_p, sin_r, cos_r;
 
-   sin_p = sin(e(E,1,0));
-   cos_p = cos(e(E,1,0));
-   sin_r = sin(e(E,2,0));
-   cos_r = cos(e(E,2,0));
+   sin_p = sin(ele(E,1,0));
+   cos_p = cos(ele(E,1,0));
+   sin_r = sin(ele(E,2,0));
+   cos_r = cos(ele(E,2,0));
 
    C->r = 3;
    C->c = 3;
-   e(C,0,0) = cos_p;
-   e(C,1,0) = 0.0;
-   e(C,2,0) = -sin_p;
-   e(C,0,1) = sin_p * sin_r;
-   e(C,1,1) = cos_r;
-   e(C,2,1) = cos_p * sin_r;
-   e(C,0,2) = sin_p * cos_r;
-   e(C,1,2) = -sin_r;
-   e(C,2,2) = cos_p * cos_r;
+   ele(C,0,0) = cos_p;
+   ele(C,1,0) = 0.0;
+   ele(C,2,0) = -sin_p;
+   ele(C,0,1) = sin_p * sin_r;
+   ele(C,1,1) = cos_r;
+   ele(C,2,1) = cos_p * sin_r;
+   ele(C,0,2) = sin_p * cos_r;
+   ele(C,1,2) = -sin_r;
+   ele(C,2,2) = cos_p * cos_r;
 
    return 0;
 }
@@ -6688,20 +6688,20 @@ static int Euler2DirCosH(Mat *C, Mat *E)
 {
    double sin_h, cos_h;
 
-   sin_h = sin(e(E,0,0));
-   cos_h = cos(e(E,0,0));
+   sin_h = sin(ele(E,0,0));
+   cos_h = cos(ele(E,0,0));
 
    C->r = 3;
    C->c = 3;
-   e(C,0,0) = cos_h;
-   e(C,1,0) = sin_h;
-   e(C,2,0) = 0.0;
-   e(C,0,1) = -sin_h;
-   e(C,1,1) = cos_h;
-   e(C,2,1) = 0.0;
-   e(C,0,2) = 0.0;
-   e(C,1,2) = 0.0;
-   e(C,2,2) = 1.0;
+   ele(C,0,0) = cos_h;
+   ele(C,1,0) = sin_h;
+   ele(C,2,0) = 0.0;
+   ele(C,0,1) = -sin_h;
+   ele(C,1,1) = cos_h;
+   ele(C,2,1) = 0.0;
+   ele(C,0,2) = 0.0;
+   ele(C,1,2) = 0.0;
+   ele(C,2,2) = 1.0;
 
    return 0;
 }
@@ -6718,114 +6718,114 @@ int DirCos2Euler(Mat *E, const Mat *C)
    E->r = 3;
    E->c = 1;
    // compute the pitch angle
-   if (e(C, 2, 0) <= -1.0)
-      e(E, 1, 0) = M_PI_2;
-   else if (e(C, 2, 0) >= 1.0)
-      e(E, 1, 0) = -M_PI_2;
+   if (ele(C, 2, 0) <= -1.0)
+      ele(E, 1, 0) = M_PI_2;
+   else if (ele(C, 2, 0) >= 1.0)
+      ele(E, 1, 0) = -M_PI_2;
    else
-      e(E, 1, 0) = asin(-e(C, 2, 0));
+      ele(E, 1, 0) = asin(ele(C, 2, 0));
    // Estimate the cosine of the pitch angle from the DCM
-   cos_ph2 = e(C, 0, 0) * e(C, 0, 0) + e(C, 1, 0) * e(C, 1, 0);
-   cos_pr2 = e(C, 2, 1) * e(C, 2, 1) + e(C, 2, 2) * e(C, 2, 2);
+   cos_ph2 = ele(C, 0, 0) * ele(C, 0, 0) + ele(C, 1, 0) * ele(C, 1, 0);
+   cos_pr2 = ele(C, 2, 1) * ele(C, 2, 1) + ele(C, 2, 2) * ele(C, 2, 2);
    if ((cos_ph2 > TINY)||(cos_pr2 > TINY))
       // use the standard formulae
    {
-      e(E, 0, 0) = atan2(e(C, 1, 0), e(C, 0, 0));
-      e(E, 2, 0) = atan2(e(C, 2, 1), e(C, 2, 2));
+      ele(E, 0, 0) = atan2(ele(C, 1, 0), ele(C, 0, 0));
+      ele(E, 2, 0) = atan2(ele(C, 2, 1), ele(C, 2, 2));
    }
    else if (cos_ph2 >= cos_pr2)
       // assume the heading angle estimate is better conditioned
    {
-      if (e(E, 1, 0) > 0.0) // the pitch is close to PI/2
+      if (ele(E, 1, 0) > 0.0) // the pitch is close to PI/2
       {
          // estimate the difference between heading and roll
-         x = atan2(e(C, 1, 2) - e(C, 0, 1), e(C, 0, 2) + e(C, 1, 1));
+         x = atan2(ele(C, 1, 2) - ele(C, 0, 1), ele(C, 0, 2) + ele(C, 1, 1));
          if (cos_ph2 == 0.0)
          {
             // set the roll angle to 0
-            e(E, 2, 0) = 0.0;
-            e(E, 0, 0) = x;
+            ele(E, 2, 0) = 0.0;
+            ele(E, 0, 0) = x;
          }
          else
          {
             // estimate the heading
-            e(E, 0, 0) = atan2(e(C, 1, 0), e(C, 0, 0));
-            e(E, 2, 0) = e(E, 0, 0) - x;
+            ele(E, 0, 0) = atan2(ele(C, 1, 0), ele(C, 0, 0));
+            ele(E, 2, 0) = ele(E, 0, 0) - x;
             // relocate the roll onto the ]-PI, PI] interval
-            if (e(E, 2, 0) > M_PI)
-               e(E, 2, 0) -= 2.0 * M_PI;
-            else if (e(E, 2, 0) <= -M_PI)
-               e(E, 2, 0) += 2.0 * M_PI;
+            if (ele(E, 2, 0) > M_PI)
+               ele(E, 2, 0) -= 2.0 * M_PI;
+            else if (ele(E, 2, 0) <= -M_PI)
+               ele(E, 2, 0) += 2.0 * M_PI;
          }
       }
       else // the pitch angle is close to -PI/2
       {
          // estimate the sum of heading and roll
-         x = atan2(- e(C, 1, 2) - e(C, 0, 1), e(C, 1, 1) - e(C, 0, 2));
+         x = atan2(- ele(C, 1, 2) - ele(C, 0, 1), ele(C, 1, 1) - ele(C, 0, 2));
          if (cos_ph2 == 0.0)
          {
             // set the roll angle to 0
-            e(E, 2, 0) = 0.0;
-            e(E, 0, 0) = x;
+            ele(E, 2, 0) = 0.0;
+            ele(E, 0, 0) = x;
          }
          else
          {
             // estimate the heading
-            e(E, 0, 0) = atan2(e(C, 1, 0), e(C, 0, 0));
-            e(E, 2, 0) = x - e(E, 0, 0);
+            ele(E, 0, 0) = atan2(ele(C, 1, 0), ele(C, 0, 0));
+            ele(E, 2, 0) = x - ele(E, 0, 0);
             // relocate the roll onto the ]-PI, PI] interval
-            if (e(E, 2, 0) > M_PI)
-               e(E, 2, 0) -= 2.0 * M_PI;
-            else if (e(E, 2, 0) <= -M_PI)
-               e(E, 2, 0) += 2.0 * M_PI;
+            if (ele(E, 2, 0) > M_PI)
+               ele(E, 2, 0) -= 2.0 * M_PI;
+            else if (ele(E, 2, 0) <= -M_PI)
+               ele(E, 2, 0) += 2.0 * M_PI;
          }
       }
    }
    else
       // assume the roll angle estimate is better conditioned
    {
-      if (e(E, 1, 0) > 0.0) // the pitch is close to PI/2
+      if (ele(E, 1, 0) > 0.0) // the pitch is close to PI/2
       {
          // estimate the difference between heading and roll
-         x = atan2(e(C, 1, 2) - e(C, 0, 1), e(C, 0, 2) + e(C, 1, 1));
+         x = atan2(ele(C, 1, 2) - ele(C, 0, 1), ele(C, 0, 2) + ele(C, 1, 1));
          if (cos_pr2 == 0.0)
          {
             // set the heading angle to 0
-            e(E, 2, 0) = - x;
-            e(E, 0, 0) = 0.0;
+            ele(E, 2, 0) = - x;
+            ele(E, 0, 0) = 0.0;
          }
          else
          {
             // estimate the roll
-            e(E, 2, 0) = atan2(e(C, 2, 1), e(C, 2, 2));
-            e(E, 0, 0) = x + e(E, 2, 0);
+            ele(E, 2, 0) = atan2(ele(C, 2, 1), ele(C, 2, 2));
+            ele(E, 0, 0) = x + ele(E, 2, 0);
             // relocate the heading onto the ]-PI, PI] interval
-            if (e(E, 0, 0) > M_PI)
-               e(E, 0, 0) -= 2.0 * M_PI;
-            else if (e(E, 0, 0) <= -M_PI)
-               e(E, 0, 0) += 2.0 * M_PI;
+            if (ele(E, 0, 0) > M_PI)
+               ele(E, 0, 0) -= 2.0 * M_PI;
+            else if (ele(E, 0, 0) <= -M_PI)
+               ele(E, 0, 0) += 2.0 * M_PI;
          }
       }
       else // the pitch angle is close to -PI/2
       {
          // estimate the sum of heading and roll
-         x = atan2(- e(C, 1, 2) - e(C, 0, 1), e(C, 1, 1) - e(C, 0, 2));
+         x = atan2(- ele(C, 1, 2) - ele(C, 0, 1), ele(C, 1, 1) - ele(C, 0, 2));
          if (cos_pr2 == 0.0)
          {
             // set the heading angle to 0
-            e(E, 2, 0) = x;
-            e(E, 0, 0) = 0.0;
+            ele(E, 2, 0) = x;
+            ele(E, 0, 0) = 0.0;
          }
          else
          {
             // estimate the roll
-            e(E, 2, 0) = atan2(e(C, 2, 1), e(C, 2, 2));
-            e(E, 0, 0) = x - e(E, 2, 0);
+            ele(E, 2, 0) = atan2(ele(C, 2, 1), ele(C, 2, 2));
+            ele(E, 0, 0) = x - ele(E, 2, 0);
             // relocate the heading onto the ]-PI, PI] interval
-            if (e(E, 0, 0) > M_PI)
-               e(E, 0, 0) -= 2.0 * M_PI;
-            else if (e(E, 0, 0) <= -M_PI)
-               e(E, 0, 0) += 2.0 * M_PI;
+            if (ele(E, 0, 0) > M_PI)
+               ele(E, 0, 0) -= 2.0 * M_PI;
+            else if (ele(E, 0, 0) <= -M_PI)
+               ele(E, 0, 0) += 2.0 * M_PI;
          }
       }
    }
@@ -6901,10 +6901,10 @@ static int Lib__compute_local_gravity(Mat *g_n, double lat, double depth)
 {
    g_n->r = 3;
    g_n->c = 1;
-   e(g_n, 0, 0) = 0.0;
-   e(g_n, 1, 0) = 0.0;
+   ele(g_n, 0, 0) = 0.0;
+   ele(g_n, 1, 0) = 0.0;
 
-   return Lib__compute_local_gravity_magnitude(&(e(g_n, 2, 0)), lat, depth);
+   return Lib__compute_local_gravity_magnitude(&(ele(g_n, 2, 0)), lat, depth);
 }
 
 //============================================================================================================
@@ -6932,9 +6932,9 @@ static int Lib__compute_transport_rate(Mat *w_enn, double lat, double de, const 
    MatElement tmp;
 
    tmp = rho_n - de;
-   e(w_enn, 0, 0) =   e(v_en, 1, 0) / tmp;
-   e(w_enn, 1, 0) = - e(v_en, 0, 0) / (rho_e - de);
-   e(w_enn, 2, 0) = - e(v_en, 1, 0) * tan(lat) / tmp;
+   ele(w_enn, 0, 0) =   ele(v_en, 1, 0) / tmp;
+   ele(w_enn, 1, 0) = - ele(v_en, 0, 0) / (rho_e - de);
+   ele(w_enn, 2, 0) = - ele(v_en, 1, 0) * tan(lat) / tmp;
    w_enn->r = 3;
    w_enn->c = 1;
 
