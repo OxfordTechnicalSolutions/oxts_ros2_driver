@@ -36,11 +36,6 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-  auto pub_node = std::make_shared<NComPublisherNode>();
-
-  // Initialise publishers for all supported (and configured) messages
-  // rclcpp::Publisher <msg>_publisher.advertise<sensor_msgs::NavSatFix>("gps/fix",2);
-
 //==============================================================================
 // Set up the UDP connection to the INS device
 
@@ -49,10 +44,12 @@ int main(int argc, char * argv[])
 
   OxtsDevice device(unitEndpointAddress);
   device.udpClient.set_local_port(unitEndpointPort);
-
+  
+  // Initialise publishers for all supported (and configured) messages
+  // rclcpp::Publisher <msg>_publisher.advertise<sensor_msgs::NavSatFix>("gps/fix",2);
 //==============================================================================
 
-  RCLCPP_INFO(pub_node->get_logger(), "Spinning up node");
+  RCLCPP_INFO(device.ncomPublisherNode.get_logger(), "Starting up node");
   while (rclcpp::ok())
   {
     device.handle_ncom();
