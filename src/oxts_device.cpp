@@ -3,7 +3,7 @@
 int OxtsDevice::handle_ncom()
 {
   // Read from open socket
-  std::size_t size = this->udpClient.receive_from(this->buff, 72, this->unitEndpoint);
+  std::size_t size = this->udpClient.receive_from(this->buff, 72, this->unitEndpointNCom);
   // Add data to decoder
   NComNewChars(nrx, buff, size); 
   // Run callback function to publish configured ROS messages
@@ -11,3 +11,6 @@ int OxtsDevice::handle_ncom()
 
   return 0;
 }
+
+
+

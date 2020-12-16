@@ -21,11 +21,9 @@
 class OxtsDevice
 {
 private:
-
   // Config
 
 public:
-  std::string unitIp;
 
   /**
    * NCom decoder class
@@ -39,23 +37,26 @@ public:
   // Sockets
   unsigned char buff[1024];
   networking_udp::client udpClient;
-  boost::asio::ip::udp::endpoint unitEndpoint;
+  boost::asio::ip::udp::endpoint unitEndpointNCom;
 
-  // member functions
-  OxtsDevice()
+  /**
+   * Constructor
+   */
+  OxtsDevice(std::string deviceIp = "0.0.0.0")
   {
-    unitIp = "192.168.25.34";     // Change to 0.0.0.0 once proper setup is made
     nrx = NComCreateNComRxC();
-    unitEndpoint = boost::asio::ip::udp::endpoint(
-      boost::asio::ip::address::from_string(unitIp), 3000);
 
-    udpClient.set_local_port(3000);
+    unitEndpointNCom = boost::asio::ip::udp::endpoint(
+      boost::asio::ip::address::from_string(deviceIp), 3000);
+
   }
 
   //~OxtsDevice();
 
 
-  //!> Look for new NCom packet. Decode, then publish ROS messages if there is
+  /**
+   *  Look for new NCom packet. Decode, then publish ROS messages if there is
+   */
   int handle_ncom();   
 
 

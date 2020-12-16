@@ -23,7 +23,7 @@
 
 // Other includes
 #include "ncom_publisher_node.hpp"
-//#include "oxts_device.hpp"
+#include "oxts_device.hpp"
 #include "udp_server_client.h"
 
 // gad-sdk includes
@@ -41,39 +41,22 @@ int main(int argc, char * argv[])
   // Initialise publishers for all supported (and configured) messages
   // rclcpp::Publisher <msg>_publisher.advertise<sensor_msgs::NavSatFix>("gps/fix",2);
 
-  // Initialise NCom decoder
-  NComRxC *nrx;
-  nrx = NComCreateNComRxC();
-  if (nrx == NULL)
-    RCLCPP_ERROR(pub_node->get_logger(), "Failed to create NCom decoder");
-
-
 //==============================================================================
-// Create UDP client to receive NCom data from unit
-  networking_udp::client local_client                   (3000); // receive to
+// Set up the UDP connection to the INS device
 
-  auto unit_endpoint = boost::asio::ip::udp::endpoint(
-      boost::asio::ip::address::from_string("192.168.25.34"), 5001); //received from
+  std::string unitEndpointAddress = "192.168.25.34";
+  short       unitEndpointPort    = 3000;
 
-  unsigned char buff[1024];
+  OxtsDevice device(unitEndpointAddress);
+  device.udpClient.set_local_port(unitEndpointPort);
 
 //==============================================================================
 
   RCLCPP_INFO(pub_node->get_logger(), "Spinning up node");
   while (rclcpp::ok())
   {
-    std::size_t size = local_client.receive_from(buff, 72, unit_endpoint); // retreive data from unit_endpoint on the port we specify in the constructor of local_client
-
-    //NComNewChars(nrx, buff, size); // add data to decoder
-
-    RCLCPP_ERROR(pub_node->get_logger(), "New Packet\n");
-    RCLCPP_ERROR(pub_node->get_logger(), "%s", buff);
-
-    // Take data from ncom and publish it in ROS messages
-    //pub_node->ncom_callback(nrx); 
-
+    device.handle_ncom();
   }
-
 
   rclcpp::shutdown();
   return 0;
