@@ -19,9 +19,9 @@
 #include "sensor_msgs/msg/imu.hpp"
 
 // OxTS includes
-#include "NComRxC.h"
-#include "nav_const.hpp"
-#include "conversions.hpp"
+#include "nav/NComRxC.h"
+#include "ros-driver/nav_const.hpp"
+#include "ros-driver/conversions.hpp"
 
 /**
  * Functions to convert data from the NCom decoder to ROS messages

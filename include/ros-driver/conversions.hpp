@@ -9,7 +9,7 @@
 #include <vector>
 #include <math.h>
 
-#include "nav_const.hpp"
+#include "ros-driver/nav_const.hpp"
 
 namespace Conversions
 {

@@ -23,8 +23,8 @@
 
 // gad-sdk includes
 #include "nav/NComRxC.h"
-#include "nav_const.hpp"
-#include "ros_ncom_wrapper.hpp"
+#include "ros-driver/nav_const.hpp"
+#include "ros-driver/ros_ncom_wrapper.hpp"
 
 
 /* 

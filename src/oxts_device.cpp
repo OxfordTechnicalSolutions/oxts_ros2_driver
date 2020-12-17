@@ -1,4 +1,4 @@
-#include "oxts_device.hpp"
+#include "ros-driver/oxts_device.hpp"
 
 int OxtsDevice::handle_ncom()
 {

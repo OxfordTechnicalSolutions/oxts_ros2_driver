@@ -22,9 +22,9 @@
 #include "std_msgs/msg/string.hpp"
 
 // Other includes
-#include "ncom_publisher_node.hpp"
-#include "oxts_device.hpp"
-#include "udp_server_client.h"
+#include "ros-driver/ncom_publisher_node.hpp"
+#include "ros-driver/oxts_device.hpp"
+#include "ros-driver/udp_server_client.h"
 
 // gad-sdk includes
 #include "nav/NComRxC.h"

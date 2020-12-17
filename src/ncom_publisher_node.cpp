@@ -1,4 +1,4 @@
-#include "ncom_publisher_node.hpp"
+#include "ros-driver/ncom_publisher_node.hpp"
 
 
 int NComPublisherNode::ncom_callback(const NComRxC* nrx)

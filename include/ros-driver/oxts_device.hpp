@@ -16,11 +16,11 @@
 #include <boost/array.hpp>
 
 // Include NCom Decoder
-#include "NComRxC.h"
+#include "nav/NComRxC.h"
 
 // Other includes
-#include "ncom_publisher_node.hpp"
-#include "udp_server_client.h"
+#include "ros-driver/ncom_publisher_node.hpp"
+#include "ros-driver/udp_server_client.h"
 /**
 * Oxts Device
  */

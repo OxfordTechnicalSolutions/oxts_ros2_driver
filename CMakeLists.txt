@@ -60,7 +60,6 @@ add_executable(ncom_publisher
 ament_target_dependencies(ncom_publisher rclcpp std_msgs sensor_msgs geometry_msgs nav_msgs)
 target_include_directories(ncom_publisher PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/nav>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
