@@ -6,9 +6,9 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct std_msgs/msg/String
   //////////////////////////////////////////////////////////////////////////////
-  auto msgString = RosNComWrapper:wrap_string (nrx);
+  auto msgString = RosNComWrapper::wrap_string (nrx);
   pubString_->publish(msgString);      
-  
+
   if ((this->count_ % 100) == 0)
     RCLCPP_INFO(this->get_logger(), "'%d' Publishing: '%s'", 
                                     this->count_, msgString.data.c_str());

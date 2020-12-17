@@ -76,7 +76,7 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
  }
 
 
-std_msgs::msg::String RosNComWrapper:wrap_string (const NComRxC *nrx)
+std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 {
   auto msg = std_msgs::msg::String();
   msg.data = "Lat, Long, Alt : " + std::to_string(nrx->mLat) + ", "
