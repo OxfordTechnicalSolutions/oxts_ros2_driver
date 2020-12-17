@@ -1,3 +1,7 @@
+/**
+ * \file udp_server_client.h
+ * Simple UDP networking implementation for servers and clients.
+ */
 #ifndef UDP_SERVER_CLIENT
 #define UDP_SERVER_CLIENT
 
@@ -7,7 +11,9 @@
 #include <thread>
 #include <iostream>
 
-
+/*
+ * Simple UDP networking implementation for servers and clients.
+ */
 namespace networking_udp
 {
     using boost::asio::ip::udp;
