@@ -1,3 +1,8 @@
+/**
+ * \file oxts_device.hpp 
+ * OxtsDevice class for handling interactions with an OxTS INS.
+ */
+
 #ifndef OXTS_DEVICE_HPP
 #define OXTS_DEVICE_HPP
 
@@ -17,7 +22,7 @@
 #include "ncom_publisher_node.hpp"
 #include "udp_server_client.h"
 /**
- *Oxts Device
+* Oxts Device
  */
 class OxtsDevice
 {
@@ -36,7 +41,7 @@ public:
   /**
    * ROS2 Publisher Node for NCom data
    * 
-   * @TODO Change to std::shared_ptr<NComPublisherNode>
+   * \todo Change to std::shared_ptr<NComPublisherNode>
    */
   NComPublisherNode ncomPublisherNode;
   /**
