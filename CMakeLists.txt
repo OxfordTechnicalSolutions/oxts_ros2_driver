@@ -51,7 +51,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 
 add_executable(ncom_publisher src/ncom_publisher.cpp include/nav/NComRxC.c src/ncom_publisher_node.cpp src/oxts_device.cpp)
-ament_target_dependencies(ncom_publisher rclcpp std_msgs)
+ament_target_dependencies(ncom_publisher rclcpp std_msgs sensor_msgs geometry_msgs nav_msgs)
 target_include_directories(ncom_publisher PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/nav>
