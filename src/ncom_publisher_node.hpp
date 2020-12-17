@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <cmath>
 
 // ROS includes
 #include "rclcpp/rclcpp.hpp"
@@ -31,21 +32,25 @@ public:
   {
     // Initialise the publisher with the string message type, topic name 
     // "topic", and queue size limit
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10); 
-    //publisher2_ = this->create_publisher<nav_msgs::msg::Odometry>("topic2", 10); 
+    pubString_    = this->create_publisher<std_msgs::msg::String>("ncom_pub/std_msgs/msg/string", 10); 
+    pubOdom_      = this->create_publisher<nav_msgs::msg::Odometry>("ncom_pub/nav_msgs/msg/odometry", 10); 
+    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("ncom_pub/sensor_msgs/msg/nav_sat_fix", 10); 
 
   }
   int ncom_callback(NComRxC* nrx);
 
 private:
-  nav_msgs::msg::Odometry odo;
-  sensor_msgs::msg::NavSatFix nav;
-  // TODO: Config
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher2_;
-  // TODO: Restructure with different publishers for different messages
 
-  size_t count_;
+  /* 
+   * @TODO: Config
+   */
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr       pubString_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr     pubOdom_;
+  rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr pubNavSatFix_;
+  /* 
+   * @TODO: Restructure with different publishers for different messages
+   */
+  int count_;
 };
 
 
