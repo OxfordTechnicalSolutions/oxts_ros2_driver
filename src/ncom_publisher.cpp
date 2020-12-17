@@ -45,10 +45,8 @@ int main(int argc, char * argv[])
   OxtsDevice device(unitEndpointAddress);
   device.udpClient.set_local_port(unitEndpointPort);
   
-  // Initialise publishers for all supported (and configured) messages
-  // rclcpp::Publisher <msg>_publisher.advertise<sensor_msgs::NavSatFix>("gps/fix",2);
 //==============================================================================
-
+  // @TODO Add try/catch 
   RCLCPP_INFO(device.ncomPublisherNode.get_logger(), "Starting up node");
   while (rclcpp::ok())
   {
