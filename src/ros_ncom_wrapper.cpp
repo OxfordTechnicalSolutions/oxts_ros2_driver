@@ -38,7 +38,7 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
   msg.header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
   msg.header.stamp.nanosec = static_cast<uint32_t>(
     (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))*NAV_CONST::SECS2NANOSECS);
-  msg.header.frame_id = "WGS84"; // @TODO Change this
+  msg.header.frame_id = ""; // @TODO Change this
 
   msg.child_frame_id = "";
 
@@ -82,6 +82,54 @@ std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
   msg.data = "Lat, Long, Alt : " + std::to_string(nrx->mLat) + ", "
                                  + std::to_string(nrx->mLon) + ", "
                                  + std::to_string(nrx->mAlt);
+
+  return msg;
+}
+
+
+
+sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
+{
+  auto msg = sensor_msgs::msg::Imu();
+
+  // Header
+  msg.header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
+  msg.header.stamp.nanosec = static_cast<uint32_t>(
+    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
+    * NAV_CONST::SECS2NANOSECS);
+  msg.header.frame_id = ""; // @TODO Change this
+
+  std::vector<double> quaternion = Conversions::hpr_to_quaternion(nrx->mHeading,
+                                                                  nrx->mPitch,
+                                                                  nrx->mRoll);
+
+  // geometry_msgs/Quaternion
+  msg.orientation.x = quaternion[0]; // float64
+  msg.orientation.y = quaternion[1]; // float64
+  msg.orientation.z = quaternion[2]; // float64
+  msg.orientation.w = quaternion[3]; // float64
+  
+  msg.orientation_covariance[0] = 0.0;
+  // ...
+  msg.orientation_covariance[8] = 0.0;
+
+  // geometry_msgs/Vector3
+  msg.angular_velocity.x = nrx->mWx;
+  msg.angular_velocity.y = nrx->mWy;
+  msg.angular_velocity.z = nrx->mWz;
+
+  msg.angular_velocity_covariance[0] = 0.0;//Row major about x, y, z axes
+  // ...
+  msg.angular_velocity_covariance[8] = 0.0;
+
+  // geometry_msgs/Vector3
+  msg.linear_acceleration.x = nrx->mAx;
+  msg.linear_acceleration.y = nrx->mAy;
+  msg.linear_acceleration.z = nrx->mAz;
+
+  msg.linear_acceleration_covariance[0] = 0.0;//Row major about x, y, z axes
+  // ...
+  msg.linear_acceleration_covariance[8] = 0.0;
 
   return msg;
 }

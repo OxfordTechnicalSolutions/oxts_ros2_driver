@@ -23,7 +23,11 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
   pubNavSatFix_->publish(msgNavSatFix);
   
-
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct sensor_msgs/msg/Imu
+  //////////////////////////////////////////////////////////////////////////////
+  auto msgImu = RosNComWrapper::wrap_imu(nrx);
+  pubImu_->publish(msgImu);
 
 
   /*
