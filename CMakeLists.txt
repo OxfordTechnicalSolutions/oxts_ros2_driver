@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(ros-driver VERSION 0.1.0)
 
+# Add the cmake folder so the FindSphinx module is found
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
 add_subdirectory("docs")
 
 # Default to C99
@@ -16,6 +19,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
+
 
 # find dependencies
 find_package(ament_cmake REQUIRED)

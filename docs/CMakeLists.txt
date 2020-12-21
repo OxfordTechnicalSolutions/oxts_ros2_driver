@@ -22,3 +22,17 @@ add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
                    COMMENT "Generating docs")
 
 add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
+
+find_package(Sphinx REQUIRED)
+
+set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source)
+set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
+
+add_custom_target(Sphinx ALL
+                  COMMAND
+                  ${SPHINX_EXECUTABLE} -b html
+                  # Tell breathe where to find the doxygen output
+                  -Dbreathe_projects.ros-driver=${DOXYGEN_OUTPUT_DIR}/xml
+                  ${SPHINX_SOURCE} ${SPHINX_BUILD}
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  COMMENT "Generating documentation with Sphinx")
