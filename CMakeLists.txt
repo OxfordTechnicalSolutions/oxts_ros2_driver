@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ros-driver)
+project(ros-driver VERSION 0.1.0)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
