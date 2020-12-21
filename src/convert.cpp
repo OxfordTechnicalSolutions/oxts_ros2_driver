@@ -1,8 +1,8 @@
-#include "ros-driver/conversions.hpp"
+#include "ros-driver/convert.hpp"
 
 
 
-std::vector<double> Conversions::hpr_to_quaternion(double h, double p, double r)
+std::vector<double> Convert::hpr_to_quaternion(double h, double p, double r)
 {
   std::vector<double> q(4);  // q.x, q.y, q.z, q.w
   double h_rads, p_rads, r_rads;

@@ -1,18 +1,24 @@
 #include "ros-driver/ros_ncom_wrapper.hpp"
 
+std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
+{
+  auto header = std_msgs::msg::Header();
 
+  header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
+  header.stamp.nanosec = static_cast<uint32_t>(
+    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))*NAV_CONST::SECS2NANOSECS);
+  header.frame_id = "WGS84"; // @TODO Change this
+
+  return header;
+}
 
 sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::NavSatFix();
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
-  msg.header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
-  msg.header.stamp.nanosec = static_cast<uint32_t>(
-    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))*NAV_CONST::SECS2NANOSECS);
-  msg.header.frame_id = "WGS84"; // @TODO Change this
-
-  msg.status.status = nrx->mGpsPosMode; // @TODO Change to ROS code
-  msg.status.service = 8; // @TODO: 1 GPS, 2 GLO, 4 Bei, 8 GAL
+  msg.status.status = nrx->mGpsPosMode; /*!< @TODO Change to ROS code */
+  msg.status.service = 8; /*!< @TODO: 1 GPS, 2 GLO, 4 Bei, 8 GAL */
 
   msg.latitude  = nrx->mLat;
   msg.longitude = nrx->mLon;
@@ -23,10 +29,8 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
   msg.position_covariance[4] = nrx->mEastAcc;
   msg.position_covariance[8] = nrx->mAltAcc;
 
-  msg.position_covariance_type = 2; // @TODO Change to ROS code
+  msg.position_covariance_type = 2; /*!< @TODO Change to ROS code */
   
-
-
   return msg;
 }
 
@@ -34,11 +38,7 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
  nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
  {
   auto msg = nav_msgs::msg::Odometry();
-
-  msg.header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
-  msg.header.stamp.nanosec = static_cast<uint32_t>(
-    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))*NAV_CONST::SECS2NANOSECS);
-  msg.header.frame_id = ""; // @TODO Change this
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
   msg.child_frame_id = "";
 
@@ -91,15 +91,9 @@ std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::Imu();
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
-  // Header
-  msg.header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
-  msg.header.stamp.nanosec = static_cast<uint32_t>(
-    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
-    * NAV_CONST::SECS2NANOSECS);
-  msg.header.frame_id = ""; // @TODO Change this
-
-  std::vector<double> quaternion = Conversions::hpr_to_quaternion(nrx->mHeading,
+  std::vector<double> quaternion = Convert::hpr_to_quaternion(nrx->mHeading,
                                                                   nrx->mPitch,
                                                                   nrx->mRoll);
 

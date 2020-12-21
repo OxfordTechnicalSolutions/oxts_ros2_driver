@@ -56,8 +56,13 @@ add_executable(ncom_publisher
                src/ncom_publisher_node.cpp 
                src/oxts_device.cpp
                src/ros_ncom_wrapper.cpp
-               src/conversions.cpp)
-ament_target_dependencies(ncom_publisher rclcpp std_msgs sensor_msgs geometry_msgs nav_msgs)
+               src/convert.cpp)
+ament_target_dependencies(ncom_publisher 
+                          rclcpp
+                          std_msgs
+                          sensor_msgs
+                          geometry_msgs
+                          nav_msgs)
 target_include_directories(ncom_publisher PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}

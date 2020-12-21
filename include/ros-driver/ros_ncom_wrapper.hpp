@@ -21,7 +21,7 @@
 // OxTS includes
 #include "nav/NComRxC.h"
 #include "ros-driver/nav_const.hpp"
-#include "ros-driver/conversions.hpp"
+#include "ros-driver/convert.hpp"
 
 /**
  * Functions to convert data from the NCom decoder to ROS messages
@@ -29,28 +29,30 @@
 namespace RosNComWrapper
 {
   /**
-   * \todo Add helper function to create headers 
+   * Wrap data from NCom decoder to std_msgs/msg/Header (for use in other msgs)
+   * 
+   * @param nrx Pointer to the decoded NCom data
    */
-
+  std_msgs::msg::Header       wrap_header_ncom_time(const NComRxC *nrx);
   /**
    * Wrap data from NCom decoder to sensor_msgs/msg/NavSatFix
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  sensor_msgs::msg::NavSatFix wrap_nav_sat_fix(const NComRxC *nrx);
+  sensor_msgs::msg::NavSatFix wrap_nav_sat_fix     (const NComRxC *nrx);
   /**
    * Wrap data from NCom decoder to nav_msgs/msg/Odometry
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  nav_msgs::msg::Odometry     wrap_odometry   (const NComRxC *nrx);
+  nav_msgs::msg::Odometry     wrap_odometry        (const NComRxC *nrx);
   /**
    * Wrap position data from NCom decoder to std_msgs/msg/String
    * Not really a permanent function, more for easy testing.
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  std_msgs::msg::String       wrap_string     (const NComRxC *nrx); 
+  std_msgs::msg::String       wrap_string          (const NComRxC *nrx); 
   /**
    * Wrap IMU data from NCom decoder to sensor_msgs/msg/Imu
    * 
