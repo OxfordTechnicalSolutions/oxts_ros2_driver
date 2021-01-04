@@ -11,7 +11,7 @@
 #include <thread>
 #include <iostream>
 
-/*
+/**
  * Simple UDP networking implementation for servers and clients.
  */
 namespace networking_udp
@@ -20,7 +20,7 @@ namespace networking_udp
     using boost::asio::ip::address;
     typedef unsigned char byte;
 
-    /*
+    /**
         ---CLIENT---
 
         Simple UDP client program which receives data on a given port
@@ -35,7 +35,7 @@ namespace networking_udp
 
     public:
 
-        /*
+        /**
             default constructor to defer setting the local endpoint to a later time. Not safe to use this
             constructor and not specific local port with 
         */
@@ -43,8 +43,10 @@ namespace networking_udp
             socket(io_service)      
         {}
 
-        /*
-            Constructor requires a port. This will be the local port a socket is opened on
+        /**
+            \fn client
+            \brief Constructor requires a port. This will be the local port a socket is opened on
+            
 
             param:
             * port - the port on the local machine the socket will be opened on when receiving data
@@ -54,7 +56,7 @@ namespace networking_udp
             local_endpoint(boost::asio::ip::udp::v4(), local_port)
         {}
 
-        /*
+        /**
             sets the local port of the client which is what will be used when receiving data.
 
             params:
@@ -66,7 +68,7 @@ namespace networking_udp
             local_endpoint = udp::endpoint(boost::asio::ip::udp::v4(), local_port);
         }
 
-        /*
+        /**
             This function is used to received a UDP packet
 
             params:
@@ -105,7 +107,7 @@ namespace networking_udp
             return bytes_received;
         }
 
-        /*
+        /**
             This function is used to received a UDP packet
 
             params:
@@ -143,7 +145,7 @@ namespace networking_udp
     };
 
     ///-------------------------------------------------------------------------------------------
-    /*
+    /**
         ---SERVER---
 
         This sends a datagram over ethernet to the endpoint specified
@@ -161,7 +163,7 @@ namespace networking_udp
             socket(io_service)
         {}
 
-      /*
+      /**
          sents the remote endpoint if the server class will send a large volume of data to a single endpoint
 
          params:
@@ -173,7 +175,7 @@ namespace networking_udp
          remote_endpoint = udp::endpoint(address::from_string(dest_ip), dest_port);
       }
 
-        /*
+        /**
          sends what is passed in the buffer to the endpoint specified in the set_remote_endpoint function
 
          params:
@@ -204,7 +206,7 @@ namespace networking_udp
         return sent;
     }
 
-      /*
+      /**
          sends what is passed in the buffer to the endpoint specified in remote_endpoint
 
          params:
@@ -236,7 +238,7 @@ namespace networking_udp
          return sent;
       }
 
-      /*
+      /**
          sends what is passed in the buffer to the endpoint specified in remote_endpoint allowing the 
          user to specify a specific port to send the data to
 
