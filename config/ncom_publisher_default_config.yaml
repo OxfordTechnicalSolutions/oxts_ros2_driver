@@ -1,4 +1,26 @@
 ncom_publisher:
   ros__parameters:
+#===============================================================================
+    ## INS configuration
+    # Configure to match the NCom output rate of the IMU
     imu_rate: 250
+    # Unit IP address NOT YET IMPLEMENTED
+    unit_ip: "192.168.25.34"
+#===============================================================================
+    ## Configure ROS messages to be published by the node.
+    # Publish ROS string message
+    pub_string_flag     : 1
+    # Publish ROS Odometry message
+    pub_odometry_flag   : 1
+    # Publish ROS NavSatFix message
+    pub_nav_sat_fix_flag: 1
+    # Publish ROS Imu message
+    pub_imu_flag        : 1
 
+#===============================================================================
+    ## Timing - how to timestamp messages published by the ROS driver
+    # NOT YET IMPLEMENTED
+
+    # 0 => Timestamped by the ROS node time (future default)
+    # 1 => Timestamped from NCom
+    timestamp_mode : 1

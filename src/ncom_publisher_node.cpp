@@ -6,33 +6,40 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct std_msgs/msg/String
   //////////////////////////////////////////////////////////////////////////////
-  auto msgString = RosNComWrapper::wrap_string (nrx);
-  pubString_->publish(msgString);      
+  if (this->pubStringFlag == 1)
+  {
+    auto msgString = RosNComWrapper::wrap_string (nrx);
+    pubString_->publish(msgString);
 
-  if ((this->count_ % 100) == 0)
-    RCLCPP_INFO(this->get_logger(), "'%d' Publishing: '%s'", 
-                                    this->count_, msgString.data.c_str());
+    if ((this->count_ % 100) == 0)
+      RCLCPP_INFO(this->get_logger(), "'%d' Publishing: '%s'", 
+                                      this->count_, msgString.data.c_str());
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   // Construct nav_msgs/msg/Odometry
   //////////////////////////////////////////////////////////////////////////////
-  auto msgOdometry = RosNComWrapper::wrap_odometry (nrx);
-  pubOdometry_->publish(msgOdometry);
+  if (this->pub_odometry_flag == 1)
+  {
+    auto msgOdometry = RosNComWrapper::wrap_odometry (nrx);
+    pubOdometry_->publish(msgOdometry);
+  }
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/NavSatFix
   //////////////////////////////////////////////////////////////////////////////
-  auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
-  pubNavSatFix_->publish(msgNavSatFix);
-  
+  if (this->pub_nav_sat_fix_flag == 1)
+  {
+    auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
+    pubNavSatFix_->publish(msgNavSatFix);
+  }
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/Imu
   //////////////////////////////////////////////////////////////////////////////
-  auto msgImu = RosNComWrapper::wrap_imu(nrx);
-  pubImu_->publish(msgImu);
-
-
-  /**
-   * @todo Add switch statement on different messages to be output
-   */    
+  if (this->pub_imu_flag == 1)
+  {
+    auto msgImu = RosNComWrapper::wrap_imu(nrx);
+    pubImu_->publish(msgImu);
+  }
 
   this->count_++;  
   return 0;
