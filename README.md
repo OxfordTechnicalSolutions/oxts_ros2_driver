@@ -24,6 +24,16 @@ Build instructions will look something like this:
 
 ## Driver Configuration
 
+The driver is configured using .yaml files, as is the norm for ROS2 nodes. These should be kept in /config, and can be used to configure the node at run time like so:
+
+`{
+    ros2 run ros-driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/ros-driver/config/ncom_publisher_default_config.yaml
+}'
+
+The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
+
+If you (quite rightly) don't want to write that into the command line each time, launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine.
+
 
 ## Output ROS messages
 
