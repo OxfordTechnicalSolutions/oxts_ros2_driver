@@ -1,0 +1,4 @@
+ncom_publisher:
+  ros__parameters:
+    imu_rate: 250
+
