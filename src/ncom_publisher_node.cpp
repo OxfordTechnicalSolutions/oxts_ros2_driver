@@ -30,8 +30,8 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   pubImu_->publish(msgImu);
 
 
-  /*
-   * @TODO: Add switch statement on different messages to be output
+  /**
+   * @todo Add switch statement on different messages to be output
    */    
 
   this->count_++;  
