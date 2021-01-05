@@ -95,10 +95,10 @@ public:
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubString_    = this->create_publisher<std_msgs::msg::String>      ("imu/std_msgs/msg/string", 10); 
-    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("imu/nav_msgs/msg/odometry", 10); 
-    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("imu/sensor_msgs/msg/nav_sat_fix", 10); 
-    pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/sensor_msgs/msg/imu", 10); 
+    pubString_    = this->create_publisher<std_msgs::msg::String>      ("imu/debug_string_pos",    10); 
+    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("imu/odom",                10); 
+    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("imu/nav_sat_fix",         10); 
+    pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/imu_data",            10); 
 
   }
 
