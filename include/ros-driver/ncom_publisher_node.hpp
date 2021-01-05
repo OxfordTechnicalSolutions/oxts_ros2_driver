@@ -47,6 +47,7 @@ public:
   rclcpp::Parameter param_pub_odometry_flag;
   rclcpp::Parameter param_pub_nav_sat_fix_flag;
   rclcpp::Parameter param_pub_imu_flag;
+  rclcpp::Parameter param_pub_velocity_flag;
 
   int imuRate;
   int nodeOutputRate;
@@ -58,6 +59,7 @@ public:
   int pubOdometryFlag;
   int pubNavSatFixFlag;
   int pubImuFlag;
+  int pubVelocityFlag;
   // ...
 
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
@@ -72,33 +74,36 @@ public:
     this->declare_parameter("pub_odometry_flag", 1);
     this->declare_parameter("pub_nav_sat_fix_flag", 1);
     this->declare_parameter("pub_imu_flag", 1);
+    this->declare_parameter("pub_velocity_flag", 1);
     // Get parameters (from config, command line, or from default)
-    param_imu_rate             = this->get_parameter("imu_rate");
-    param_unit_ip              = this->get_parameter("unit_ip");
-    param_unit_port            = this->get_parameter("unit_port");
-    param_timestamp_mode       = this->get_parameter("timestamp_mode");
-    param_frame_id             = this->get_parameter("frame_id");
-    param_pub_string_flag      = this->get_parameter("pub_string_flag");
-    param_pub_odometry_flag    = this->get_parameter("pub_odometry_flag");
-    param_pub_nav_sat_fix_flag = this->get_parameter("pub_nav_sat_fix_flag");
-    param_pub_imu_flag         = this->get_parameter("pub_imu_flag");
+    param_imu_rate                  = this->get_parameter("imu_rate");
+    param_unit_ip                   = this->get_parameter("unit_ip");
+    param_unit_port                 = this->get_parameter("unit_port");
+    param_timestamp_mode            = this->get_parameter("timestamp_mode");
+    param_frame_id                  = this->get_parameter("frame_id");
+    param_pub_string_flag           = this->get_parameter("pub_string_flag");
+    param_pub_odometry_flag         = this->get_parameter("pub_odometry_flag");
+    param_pub_nav_sat_fix_flag      = this->get_parameter("pub_nav_sat_fix_flag");
+    param_pub_imu_flag              = this->get_parameter("pub_imu_flag");
+    param_pub_velocity_flag         = this->get_parameter("pub_velocity_flag");
     // Convert parameters to useful variable types
-    imuRate          = param_imu_rate.as_int();
-    unitIp           = param_unit_ip.as_string();
-    unitPort         = param_unit_port.as_int();
-    timestampMode    = param_timestamp_mode.as_int();
-    frameId          = param_timestamp_mode.as_string();
-    pubStringFlag    = param_pub_string_flag.as_int();
-    pubOdometryFlag  = param_pub_odometry_flag.as_int();
-    pubNavSatFixFlag = param_pub_nav_sat_fix_flag.as_int();
-    pubImuFlag       = param_pub_imu_flag.as_int();
-
+    imuRate               = param_imu_rate.as_int();
+    unitIp                = param_unit_ip.as_string();
+    unitPort              = param_unit_port.as_int();
+    timestampMode         = param_timestamp_mode.as_int();
+    frameId               = param_frame_id.as_string();
+    pubStringFlag         = param_pub_string_flag.as_int();
+    pubOdometryFlag       = param_pub_odometry_flag.as_int();
+    pubNavSatFixFlag      = param_pub_nav_sat_fix_flag.as_int();
+    pubImuFlag            = param_pub_imu_flag.as_int();
+    pubVelocityFlag       = param_pub_velocity_flag.as_int();
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubString_    = this->create_publisher<std_msgs::msg::String>      ("imu/debug_string_pos",    10); 
     pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("imu/odom",                10); 
     pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("imu/nav_sat_fix",         10); 
     pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/imu_data",            10); 
+    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("imu/velocity",       10); 
 
   }
 
@@ -127,6 +132,10 @@ private:
    * Publisher for /sensor_msgs/msg/Imu
    */
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr       pubImu_;
+  /**
+   * Publisher for /sensor_msgs/msg/TwistStamped
+   */
+  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
   /**
    * Count of messages sent by the node
    */

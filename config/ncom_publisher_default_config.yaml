@@ -20,6 +20,8 @@ ncom_publisher:
     pub_nav_sat_fix_flag: 1
     # Publish ROS Imu message
     pub_imu_flag        : 1
+    # Publish ROS Imu message
+    pub_velocity_flag   : 1
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver

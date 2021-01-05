@@ -40,6 +40,15 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
     auto msgImu = RosNComWrapper::wrap_imu(nrx);
     pubImu_->publish(msgImu);
   }
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct geometry_msgs/msg/TwistStamped
+  //////////////////////////////////////////////////////////////////////////////
+  if (this->pubVelocityFlag == 1)
+  {
+    auto msgVelocity = RosNComWrapper::wrap_velocity(nrx);
+    pubVelocity_->publish(msgVelocity);
+  }
+
 
   this->count_++;  
   return 0;
