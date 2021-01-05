@@ -4,14 +4,14 @@ ncom_publisher:
     ## INS configuration (set up to match the unit)
     # Configure to match the NCom output rate of the IMU
     imu_rate: 100
-    # Unit IP address NOT YET IMPLEMENTED
+    # Unit IP address
     unit_ip: "192.168.25.34"
     # Unit Port
     unit_port: 3000
 #===============================================================================
     ## Configure ROS messages to be published by the node.
     # Frames
-    frame_id           : "base_link"
+    frame_id            : "base_link"
     # Publish ROS string message
     pub_string_flag     : 1
     # Publish ROS Odometry message
