@@ -19,7 +19,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct nav_msgs/msg/Odometry
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pub_odometry_flag == 1)
+  if (this->pubOdometryFlag == 1)
   {
     auto msgOdometry = RosNComWrapper::wrap_odometry (nrx);
     pubOdometry_->publish(msgOdometry);
@@ -27,7 +27,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/NavSatFix
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pub_nav_sat_fix_flag == 1)
+  if (this->pubNavSatFixFlag == 1)
   {
     auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
     pubNavSatFix_->publish(msgNavSatFix);
@@ -35,7 +35,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/Imu
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pub_imu_flag == 1)
+  if (this->pubImuFlag == 1)
   {
     auto msgImu = RosNComWrapper::wrap_imu(nrx);
     pubImu_->publish(msgImu);
