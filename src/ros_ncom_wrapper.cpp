@@ -137,9 +137,12 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
   msg.twist.twist.angular.y = nrx->mWy; /*! @todo Check coordinate frame */
   msg.twist.twist.angular.z = nrx->mWz; /*! @todo Check coordinate frame */
 
-  msg.twist.covariance[0] = 0.0;
-  //  1 ... 34
-  msg.twist.covariance[35] = 0.0;
+  msg.twist.covariance[ 0] = nrx->mVnAcc;
+  msg.twist.covariance[ 7] = nrx->mVeAcc;
+  msg.twist.covariance[14] = nrx->mVdAcc;
+  msg.twist.covariance[21] = 0;
+  msg.twist.covariance[28] = 0;
+  msg.twist.covariance[35] = 0;
 
   return msg;
 }
@@ -193,6 +196,21 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
   msg.linear_acceleration_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
   msg.linear_acceleration_covariance[8] = 0.0;
+
+  return msg;
+}
+
+geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRxC *nrx)
+{
+  auto msg = geometry_msgs::msg::TwistStamped();
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+
+  msg.twist.linear.x  = nrx->mVf;
+  msg.twist.linear.y  = nrx->mVl;
+  msg.twist.linear.z  = nrx->mVd;
+  msg.twist.angular.x = nrx->mWf;
+  msg.twist.angular.x = nrx->mWl;
+  msg.twist.angular.x = nrx->mWd;
 
   return msg;
 }

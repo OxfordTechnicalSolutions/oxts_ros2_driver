@@ -18,6 +18,7 @@
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/nav_sat_status.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/twist_stamped.hpp"
 
 // OxTS includes
 #include "nav/NComRxC.h"
@@ -69,6 +70,15 @@ namespace RosNComWrapper
    * \todo Validate Quaternion conversions
    */
   sensor_msgs::msg::Imu       wrap_imu        (const NComRxC *nrx);
+  /**
+   * Wrap velocity data from NCom decoder to sensor_msgs/msg/Imu
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * 
+   * @returns Linear velocity forward, lateral, down. 
+   *          Angular velocity forward, lateral, down.
+   */
+  geometry_msgs::msg::TwistStamped   wrap_velocity   (const NComRxC *nrx);
 }
 
 
