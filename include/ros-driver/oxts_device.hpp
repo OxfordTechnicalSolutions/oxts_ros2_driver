@@ -60,23 +60,26 @@ public:
   /**
    * Constructor
    * 
-   * @param deviceIp The IP address of the device to connect to.
+   * @param unitEndpointIp The IP address of the device to connect to.
    */
-  OxtsDevice(std::string deviceIp = "0.0.0.0")
+  OxtsDevice(std::string unitEndpointIp = "0.0.0.0")
   {
-    ncomOutputRate = 100;
     nrx = NComCreateNComRxC();
 
     unitEndpointNCom = boost::asio::ip::udp::endpoint(
-      boost::asio::ip::address::from_string(deviceIp), 3000);
+      boost::asio::ip::address::from_string(unitEndpointIp), 3000);
+
+    this->udpClient.set_local_port(3000);
 
   }
 
   /**
    *  Look for new NCom packet. Decode, then publish ROS messages if there is
    */
-  int handle_ncom();   
+  int HandleNCom();   
 
+
+  void SetUnitEndpointNCom(std::string deviceIp, int port);
 
 };
 

@@ -40,7 +40,9 @@ class NComPublisherNode : public rclcpp::Node
 public:
   rclcpp::Parameter param_imu_rate;
   rclcpp::Parameter param_unit_ip;
+  rclcpp::Parameter param_unit_port;
   rclcpp::Parameter param_timestamp_mode;
+  rclcpp::Parameter param_frame_id;
   rclcpp::Parameter param_pub_string_flag;
   rclcpp::Parameter param_pub_odometry_flag;
   rclcpp::Parameter param_pub_nav_sat_fix_flag;
@@ -51,6 +53,7 @@ public:
   std::string unitIp;
   short unitPort;
   short timestampMode;
+  std::string frameId;
   int pubStringFlag;
   int pubOdometryFlag;
   int pubNavSatFixFlag;
@@ -59,18 +62,22 @@ public:
 
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
   {
-    // Initialise configurable parameters (taken from command line or yaml)
+    // Initialise configurable parameters (all params should have defaults)
     this->declare_parameter("imu_rate", 100);
     this->declare_parameter("unit_ip", "0.0.0.0");
+    this->declare_parameter("unit_port", 3000);
     this->declare_parameter("timestamp_mode", 1);
+    this->declare_parameter("frame_id", "base_link");
     this->declare_parameter("pub_string_flag", 1);
     this->declare_parameter("pub_odometry_flag", 1);
     this->declare_parameter("pub_nav_sat_fix_flag", 1);
     this->declare_parameter("pub_imu_flag", 1);
-    // Get parameters (from config or from default)
+    // Get parameters (from config, command line, or from default)
     param_imu_rate             = this->get_parameter("imu_rate");
     param_unit_ip              = this->get_parameter("unit_ip");
+    param_unit_port            = this->get_parameter("unit_port");
     param_timestamp_mode       = this->get_parameter("timestamp_mode");
+    param_frame_id             = this->get_parameter("frame_id");
     param_pub_string_flag      = this->get_parameter("pub_string_flag");
     param_pub_odometry_flag    = this->get_parameter("pub_odometry_flag");
     param_pub_nav_sat_fix_flag = this->get_parameter("pub_nav_sat_fix_flag");
@@ -78,7 +85,9 @@ public:
     // Convert parameters to useful variable types
     imuRate          = param_imu_rate.as_int();
     unitIp           = param_unit_ip.as_string();
+    unitPort         = param_unit_port.as_int();
     timestampMode    = param_timestamp_mode.as_int();
+    frameId          = param_timestamp_mode.as_string();
     pubStringFlag    = param_pub_string_flag.as_int();
     pubOdometryFlag  = param_pub_odometry_flag.as_int();
     pubNavSatFixFlag = param_pub_nav_sat_fix_flag.as_int();

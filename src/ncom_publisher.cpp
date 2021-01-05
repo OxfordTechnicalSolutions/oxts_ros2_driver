@@ -16,6 +16,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <fstream> // Will be used for NCom streaming from file (or recording to bag)
 
 // ROS includes
 #include "rclcpp/rclcpp.hpp"
@@ -28,6 +29,7 @@
 
 // gad-sdk includes
 #include "nav/NComRxC.h"
+#include <map>
 
 using namespace std::chrono_literals;
 
@@ -36,21 +38,28 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
+//==============================================================================  
+  // Test
+  
+  //const std::map<std::string, uint8_t,uint8_t> GpsPosModeMap;
+
+ // GpsPosModeMap["None"] = 0;
+
+
 //==============================================================================
 // Set up the UDP connection to the INS device
 
-  std::string unitEndpointAddress = "192.168.25.34";
-  short       unitEndpointPort    = 3000;
-
-  OxtsDevice device(unitEndpointAddress);
-  device.udpClient.set_local_port(unitEndpointPort);
+  OxtsDevice device;
   
+  device.SetUnitEndpointNCom(device.ncomPublisherNode.unitIp, 
+                             device.ncomPublisherNode.unitPort );
+
 //==============================================================================
-  // @TODO Add try/catch 
+  //! @todo Add try/catch 
   RCLCPP_INFO(device.ncomPublisherNode.get_logger(), "Starting up node");
   while (rclcpp::ok())
   {
-    device.handle_ncom();
+    device.HandleNCom();
   }
 
   rclcpp::shutdown();
