@@ -13,9 +13,9 @@ int OxtsDevice::HandleNCom()
 }
 
 
-  void OxtsDevice::SetUnitEndpointNCom(std::string unitEndpointIp = "0.0.0.0", 
-                                       int unitEndpointPort = 3000 )
-  {
-    unitEndpointNCom = boost::asio::ip::udp::endpoint(
-      boost::asio::ip::address::from_string(unitEndpointIp), unitEndpointPort);
-  }
+void OxtsDevice::SetUnitEndpointNCom(std::string unitEndpointIp = "0.0.0.0", 
+                                      int unitEndpointPort = 3000 )
+{
+  unitEndpointNCom = boost::asio::ip::udp::endpoint(
+    boost::asio::ip::address::from_string(unitEndpointIp), unitEndpointPort);
+}
