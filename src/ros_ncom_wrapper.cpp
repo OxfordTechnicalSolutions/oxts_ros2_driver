@@ -2,6 +2,7 @@
 
 
 
+
 std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
 {
   auto header = std_msgs::msg::Header();
@@ -15,14 +16,75 @@ std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
   return header;
 }
 
+sensor_msgs::msg::NavSatStatus RosNComWrapper::wrap_nav_sat_status(const NComRxC *nrx)
+{
+  auto msg = sensor_msgs::msg::NavSatStatus();
+
+  switch(nrx->mGpsPosMode)
+  {
+    // No Fix
+    case NAV_CONST::GNSS_MODE::NONE          :
+    case NAV_CONST::GNSS_MODE::SEARCH        :
+    case NAV_CONST::GNSS_MODE::DOPPLER       :
+    case NAV_CONST::GNSS_MODE::NODATA        :
+    case NAV_CONST::GNSS_MODE::BLANKED       :
+    case NAV_CONST::GNSS_MODE::PP_DOPPLER    :
+    case NAV_CONST::GNSS_MODE::NOT_KNOWN     :
+    case NAV_CONST::GNSS_MODE::GX_DOPPLER    :
+    case NAV_CONST::GNSS_MODE::IX_DOPPLER    :
+    case NAV_CONST::GNSS_MODE::UNKNOWN       :
+      msg.status = msg.STATUS_NO_FIX;
+      break;
+    // Fix
+    case NAV_CONST::GNSS_MODE::SPS           :
+    case NAV_CONST::GNSS_MODE::PP_SPS        :
+    case NAV_CONST::GNSS_MODE::GX_SPS        :
+    case NAV_CONST::GNSS_MODE::IX_SPS        :
+    case NAV_CONST::GNSS_MODE::GENAID        :
+    case NAV_CONST::GNSS_MODE::SEGMENT       :
+      msg.status = msg.STATUS_FIX;
+      break;
+    // Ground-based augmentation
+    case NAV_CONST::GNSS_MODE::DIFF          :
+    case NAV_CONST::GNSS_MODE::FLOAT         :
+    case NAV_CONST::GNSS_MODE::INTEGER       :
+    case NAV_CONST::GNSS_MODE::PP_DIFF       :
+    case NAV_CONST::GNSS_MODE::PP_FLOAT      :
+    case NAV_CONST::GNSS_MODE::PP_INTEGER    :
+    case NAV_CONST::GNSS_MODE::GX_DIFF       :
+    case NAV_CONST::GNSS_MODE::GX_FLOAT      :
+    case NAV_CONST::GNSS_MODE::GX_INTEGER    :
+    case NAV_CONST::GNSS_MODE::IX_DIFF       :
+    case NAV_CONST::GNSS_MODE::IX_FLOAT      :
+    case NAV_CONST::GNSS_MODE::IX_INTEGER    :
+      msg.status = msg.STATUS_GBAS_FIX;
+      break;
+    // Satellite-based augmentation
+    case NAV_CONST::GNSS_MODE::WAAS          :
+    case NAV_CONST::GNSS_MODE::OMNISTAR      :
+    case NAV_CONST::GNSS_MODE::OMNISTARHP    :
+    case NAV_CONST::GNSS_MODE::OMNISTARXP    :
+    case NAV_CONST::GNSS_MODE::CDGPS         :
+    case NAV_CONST::GNSS_MODE::PPP_CONVERGING:
+    case NAV_CONST::GNSS_MODE::PPP           :
+    case NAV_CONST::GNSS_MODE::GX_SBAS       :
+    case NAV_CONST::GNSS_MODE::IX_SBAS       :
+      msg.status = msg.STATUS_SBAS_FIX;
+      break;
+  }
+
+  msg.service = 0; /*! @todo Output value based on use of constellations */
+
+  return msg;
+}
 
 sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::NavSatFix();
+
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
-  msg.status.status = nrx->mGpsPosMode; /*! @todo Change to ROS code */
-  msg.status.service = 8; /*! @todo 1 GPS, 2 GLO, 4 Bei, 8 GAL */
+  msg.status = RosNComWrapper::wrap_nav_sat_status(nrx);
 
   msg.latitude  = nrx->mLat;
   msg.longitude = nrx->mLon;

@@ -16,6 +16,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
+#include "sensor_msgs/msg/nav_sat_status.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
 // OxTS includes
@@ -35,11 +36,17 @@ namespace RosNComWrapper
    */
   std_msgs::msg::Header       wrap_header_ncom_time(const NComRxC *nrx);
   /**
+   * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   */
+  sensor_msgs::msg::NavSatStatus wrap_nav_sat_status(const NComRxC *nrx);
+  /**
    * Wrap data from NCom decoder to sensor_msgs/msg/NavSatFix
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  sensor_msgs::msg::NavSatFix wrap_nav_sat_fix     (const NComRxC *nrx);
+  sensor_msgs::msg::NavSatFix  wrap_nav_sat_fix     (const NComRxC *nrx);
   /**
    * Wrap data from NCom decoder to nav_msgs/msg/Odometry
    * 
