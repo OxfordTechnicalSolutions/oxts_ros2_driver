@@ -129,11 +129,11 @@ public:
     pubVelocityFlag       = param_pub_velocity_flag.as_int();
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubString_    = this->create_publisher<std_msgs::msg::String>      ("imu/debug_string_pos",    10); 
-    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("gps/odom",                10); 
-    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("gps/nav_sat_fix",         10); 
+    pubString_    = this->create_publisher<std_msgs::msg::String>      ("ins/debug_string_pos",    10); 
+    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("ins/odom",                10); 
+    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix",         10); 
     pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/imu_data",            10); 
-    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("gps/velocity",       10); 
+    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity",       10); 
 
   }
 
