@@ -50,7 +50,11 @@ target_include_directories(ncom_publisher PUBLIC
 
 
 install(TARGETS ncom_publisher
-  DESTINATION lib/${PROJECT_NAME})
+        DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY launch 
+        DIRECTORY config
+        DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
