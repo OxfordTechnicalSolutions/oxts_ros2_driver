@@ -216,7 +216,7 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRx
 }
 
 
-sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
+sensor_msgs::msg::TimeReference   RosNComWrapper::wrap_ins_time   (const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::TimeReference();
 
@@ -233,7 +233,7 @@ sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
 }
 
 
-geometry_msgs::msg::TransformStamped   wrap_tf2   (const NComRxC *nrx)
+geometry_msgs::msg::TransformStamped   RosNComWrapper::wrap_tf2   (const NComRxC *nrx)
 {
   auto msg = geometry_msgs::msg::TransformStamped();
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
@@ -245,7 +245,11 @@ geometry_msgs::msg::TransformStamped   wrap_tf2   (const NComRxC *nrx)
   msg.transform.translation.z = nrx->mAlt;
 
   tf2::Quaternion q;
-  q.setRPY(nrx->mRoll,nrx->mPitch,nrx->mHeading);
+
+  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+           NAV_CONST::DEG2RADS * nrx->mPitch,
+           NAV_CONST::DEG2RADS * nrx->mHeading );
+           
   msg.transform.rotation.x = q.x();
   msg.transform.rotation.y = q.y();
   msg.transform.rotation.z = q.z();

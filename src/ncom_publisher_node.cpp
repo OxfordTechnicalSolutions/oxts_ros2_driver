@@ -48,7 +48,14 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
     auto msgVelocity = RosNComWrapper::wrap_velocity(nrx);
     pubVelocity_->publish(msgVelocity);
   }
-
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct geometry_msgs/msg/TransformStamped
+  //////////////////////////////////////////////////////////////////////////////
+  if (this->pubTf2Flag == 1)
+  {
+    auto msgTf2 = RosNComWrapper::wrap_tf2(nrx);
+    pubTf2_->publish(msgTf2);
+  }
 
   this->count_++;  
   return 0;

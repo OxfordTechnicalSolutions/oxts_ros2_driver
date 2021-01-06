@@ -49,6 +49,7 @@ private:
   rclcpp::Parameter param_pub_nav_sat_fix_flag;
   rclcpp::Parameter param_pub_imu_flag;
   rclcpp::Parameter param_pub_velocity_flag;
+  rclcpp::Parameter param_pub_tf2_flag;
 
   int imuRate;
   int nodeOutputRate;
@@ -61,6 +62,7 @@ private:
   int pubNavSatFixFlag;
   int pubImuFlag;
   int pubVelocityFlag;
+  int pubTf2Flag;
   // ...
 
 
@@ -87,6 +89,10 @@ private:
    */
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
   /**
+   * Publisher for /geometry_msgs/msg/TransformStamped
+   */
+  rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr  pubTf2_;
+  /**
    * Count of messages sent by the node
    */
   int count_;
@@ -105,6 +111,7 @@ public:
     this->declare_parameter("pub_nav_sat_fix_flag", 1);
     this->declare_parameter("pub_imu_flag", 1);
     this->declare_parameter("pub_velocity_flag", 1);
+    this->declare_parameter("pub_tf2_flag", 1);
     // Get parameters (from config, command line, or from default)
     param_imu_rate                  = this->get_parameter("imu_rate");
     param_unit_ip                   = this->get_parameter("unit_ip");
@@ -116,6 +123,7 @@ public:
     param_pub_nav_sat_fix_flag      = this->get_parameter("pub_nav_sat_fix_flag");
     param_pub_imu_flag              = this->get_parameter("pub_imu_flag");
     param_pub_velocity_flag         = this->get_parameter("pub_velocity_flag");
+    param_pub_tf2_flag              = this->get_parameter("pub_tf2_flag");
     // Convert parameters to useful variable types
     imuRate               = param_imu_rate.as_int();
     unitIp                = param_unit_ip.as_string();
@@ -127,13 +135,15 @@ public:
     pubNavSatFixFlag      = param_pub_nav_sat_fix_flag.as_int();
     pubImuFlag            = param_pub_imu_flag.as_int();
     pubVelocityFlag       = param_pub_velocity_flag.as_int();
+    pubTf2Flag            = param_pub_tf2_flag.as_int();
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubString_    = this->create_publisher<std_msgs::msg::String>      ("ins/debug_string_pos",    10); 
-    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("ins/odom",                10); 
-    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix",         10); 
-    pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/imu_data",            10); 
-    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity",       10); 
+    pubString_    = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
+    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>             ("ins/odom",             10); 
+    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
+    pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/imu_data",         10); 
+    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
+    pubTf2_       = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
 
   }
 

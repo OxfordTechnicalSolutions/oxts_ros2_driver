@@ -11,7 +11,7 @@ ncom_publisher:
 #===============================================================================
     ## Configure ROS messages to be published by the node.
     # Frames
-    frame_id            : "base_link"
+    frame_id            : "oxts_link"
     # Publish ROS string message
     pub_string_flag     : 1
     # Publish ROS Odometry message
@@ -22,6 +22,8 @@ ncom_publisher:
     pub_imu_flag        : 1
     # Publish ROS Imu message
     pub_velocity_flag   : 1
+    # Publish ROS Tf2 message
+    pub_tf2_flag        : 1
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver
