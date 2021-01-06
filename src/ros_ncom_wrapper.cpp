@@ -164,11 +164,6 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
   auto msg = sensor_msgs::msg::Imu();
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
-  std::vector<double> quaternion = Convert::hpr_to_quaternion(nrx->mHeading,
-                                                              nrx->mPitch,
-                                                              nrx->mRoll);
-
-  
   // geometry_msgs/Quaternion
   tf2::Quaternion q;
 
@@ -181,7 +176,6 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
   msg.orientation.z = q.z();
   msg.orientation.w = q.w();
 
-  
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
   // ...
