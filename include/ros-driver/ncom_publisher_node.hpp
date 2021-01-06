@@ -37,7 +37,6 @@
  */
 class NComPublisherNode : public rclcpp::Node
 {
-public:
   rclcpp::Parameter param_imu_rate;
   rclcpp::Parameter param_unit_ip;
   rclcpp::Parameter param_unit_port;
@@ -62,6 +61,36 @@ public:
   int pubVelocityFlag;
   // ...
 
+
+private:
+
+  /**
+   * Publisher for std_msgs/msg/string. Only used for debugging, currently 
+   * outputs lat, long, alt in string form.
+   */
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr       pubString_;
+  /**
+   * Publisher for /sensor_msgs/msg/Odometry
+   */
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr     pubOdometry_;
+  /**
+   * Publisher for /sensor_msgs/msg/NavSatFix
+   */
+  rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr pubNavSatFix_;
+  /**
+   * Publisher for /sensor_msgs/msg/Imu
+   */
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr       pubImu_;
+  /**
+   * Publisher for /sensor_msgs/msg/TwistStamped
+   */
+  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
+  /**
+   * Count of messages sent by the node
+   */
+  int count_;
+
+public:
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
   {
     // Initialise configurable parameters (all params should have defaults)
@@ -113,33 +142,19 @@ public:
    */
   int ncom_callback(const NComRxC* nrx);
 
-private:
+  /**
+   * Get the IP address of the OxTS unit, as set in the .yaml params file
+   * 
+   * @returns IP address as a string
+   */
+  std::string get_unit_ip();
+  /**
+   * Get the endpoint port of the OxTS unit, as set in the .yaml params file
+   * 
+   * @returns Port as a short
+   */
+  short get_unit_port();
 
-  /**
-   * Publisher for std_msgs/msg/string. Only used for debugging, currently 
-   * outputs lat, long, alt in string form.
-   */
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr       pubString_;
-  /**
-   * Publisher for /sensor_msgs/msg/Odometry
-   */
-  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr     pubOdometry_;
-  /**
-   * Publisher for /sensor_msgs/msg/NavSatFix
-   */
-  rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr pubNavSatFix_;
-  /**
-   * Publisher for /sensor_msgs/msg/Imu
-   */
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr       pubImu_;
-  /**
-   * Publisher for /sensor_msgs/msg/TwistStamped
-   */
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
-  /**
-   * Count of messages sent by the node
-   */
-  int count_;
 };
 
 

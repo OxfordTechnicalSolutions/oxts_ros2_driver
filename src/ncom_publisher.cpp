@@ -51,8 +51,8 @@ int main(int argc, char * argv[])
 
   OxtsDevice device;
   
-  device.SetUnitEndpointNCom(device.ncomPublisherNode.unitIp, 
-                             device.ncomPublisherNode.unitPort );
+  device.SetUnitEndpointNCom(device.ncomPublisherNode.get_unit_ip(), 
+                             device.ncomPublisherNode.get_unit_port() );
 
 //==============================================================================
   //! @todo Add try/catch 

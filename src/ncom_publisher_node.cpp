@@ -53,3 +53,15 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   this->count_++;  
   return 0;
 }
+
+
+
+std::string NComPublisherNode::get_unit_ip()
+{
+  return this->unitIp;
+}
+
+short       NComPublisherNode::get_unit_port()
+{
+  return this->unitPort;
+}
