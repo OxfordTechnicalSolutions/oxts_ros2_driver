@@ -105,8 +105,8 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
 {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
-
-  msg.child_frame_id = "";
+  msg.header.frame_id = "earth";
+  msg.child_frame_id = "odom";
 
   // Together, msgs Point and Quaternion make a geometry_msgs/Pose
   // geometry_msgs/msg/Point
