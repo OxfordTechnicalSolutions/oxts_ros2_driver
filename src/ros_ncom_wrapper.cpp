@@ -168,11 +168,19 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
                                                               nrx->mPitch,
                                                               nrx->mRoll);
 
+  
   // geometry_msgs/Quaternion
-  msg.orientation.x = quaternion[0]; // float64
-  msg.orientation.y = quaternion[1]; // float64
-  msg.orientation.z = quaternion[2]; // float64
-  msg.orientation.w = quaternion[3]; // float64
+  tf2::Quaternion q;
+
+  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+           NAV_CONST::DEG2RADS * nrx->mPitch,
+           NAV_CONST::DEG2RADS * nrx->mHeading );
+           
+  msg.orientation.x = q.x();
+  msg.orientation.y = q.y();
+  msg.orientation.z = q.z();
+  msg.orientation.w = q.w();
+
   
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
@@ -249,7 +257,7 @@ geometry_msgs::msg::TransformStamped   RosNComWrapper::wrap_tf2   (const NComRxC
   q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
            NAV_CONST::DEG2RADS * nrx->mPitch,
            NAV_CONST::DEG2RADS * nrx->mHeading );
-           
+
   msg.transform.rotation.x = q.x();
   msg.transform.rotation.y = q.y();
   msg.transform.rotation.z = q.z();
