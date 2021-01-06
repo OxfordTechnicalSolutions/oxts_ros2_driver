@@ -9,7 +9,7 @@
 // Standard includes
 #include <string>
 #include <vector>
-
+#include <cmath>
 
 // ROS message types includes
 #include "rclcpp/rclcpp.hpp"
@@ -95,7 +95,7 @@ namespace RosNComWrapper
   /**
    * Wrap tf data from NCom decoder to sensor_msgs/msg/TimeReference
    * 
-   * The time reference depends on the presence of GNSS signal.
+   * Transform from ______ to _______
    * 
    * @param nrx Pointer to the decoded NCom data
    * 

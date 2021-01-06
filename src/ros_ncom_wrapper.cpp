@@ -239,12 +239,21 @@ geometry_msgs::msg::TransformStamped   RosNComWrapper::wrap_tf2   (const NComRxC
 {
   auto msg = geometry_msgs::msg::TransformStamped();
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header.frame_id = "earth";
+  msg.child_frame_id =  "imu";
+  // We need to convert WGS84 to ECEF, the "global" frame in ROS2
 
-  msg.child_frame_id = "";
+  double radius = 6378137.0;
+  double flatFactor = (1.0 / 298.257223563) ;
+  double cosLat = std::cos(nrx->mLat * NAV_CONST::DEG2RADS);
+  double sinLat = std::sin(nrx->mLat * NAV_CONST::DEG2RADS);
+  double flatFactorSqr = std::pow((1.0-flatFactor),2);
+  double c = 1/std::sqrt(std::pow(cosLat,2) + (flatFactorSqr * std::pow(sinLat,2)));
+  double s = c * flatFactorSqr;
 
-  msg.transform.translation.x = nrx->mLat;
-  msg.transform.translation.y = nrx->mLon;
-  msg.transform.translation.z = nrx->mAlt;
+  msg.transform.translation.x = ((radius * c) + nrx->mAlt) * cosLat * std::cos(NAV_CONST::DEG2RADS*nrx->mLon);
+  msg.transform.translation.y = ((radius * c) + nrx->mAlt) * cosLat * std::sin(NAV_CONST::DEG2RADS*nrx->mLon);
+  msg.transform.translation.z = ((radius * s) + nrx->mAlt) * sinLat;
 
   tf2::Quaternion q;
 
