@@ -11,7 +11,7 @@ std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
   header.stamp.nanosec = static_cast<uint32_t>(
     (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
     * NAV_CONST::SECS2NANOSECS );
-  header.frame_id = "WGS84"; /*! @todo Change this */
+  header.frame_id = "earth"; /*! @todo Change this */
 
   return header;
 }
