@@ -31,12 +31,14 @@
  * This class creates a subclass of Node designed to take NCom data from the 
  * NCom decoder and publish it to pre-configured ROS topics.
  * 
- * @todo Add config struct to hold data which will eventually be parsed from a 
+ * @todo Add config struct to hold data which will hold config parsed from the 
  *       .yaml file.
  * @todo Change topic names to a standard form /imu/.. 
  */
 class NComPublisherNode : public rclcpp::Node
 {
+private:
+
   rclcpp::Parameter param_imu_rate;
   rclcpp::Parameter param_unit_ip;
   rclcpp::Parameter param_unit_port;
@@ -62,7 +64,6 @@ class NComPublisherNode : public rclcpp::Node
   // ...
 
 
-private:
 
   /**
    * Publisher for std_msgs/msg/string. Only used for debugging, currently 
@@ -129,10 +130,10 @@ public:
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubString_    = this->create_publisher<std_msgs::msg::String>      ("imu/debug_string_pos",    10); 
-    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("imu/odom",                10); 
-    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("imu/nav_sat_fix",         10); 
+    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>    ("gps/odom",                10); 
+    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("gps/nav_sat_fix",         10); 
     pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>      ("imu/imu_data",            10); 
-    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("imu/velocity",       10); 
+    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>("gps/velocity",       10); 
 
   }
 
