@@ -53,7 +53,7 @@ install(TARGETS ncom_publisher
         DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch 
-        DIRECTORY config
+        config
         DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
