@@ -20,6 +20,9 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
+#include <geometry_msgs/msg/transform_stamped.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 // OxTS includes
 #include "nav/NComRxC.h"
@@ -89,6 +92,15 @@ namespace RosNComWrapper
    * 
    */
   sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx);
+  /**
+   * Wrap tf data from NCom decoder to sensor_msgs/msg/TimeReference
+   * 
+   * The time reference depends on the presence of GNSS signal.
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * 
+   */
+  geometry_msgs::msg::TransformStamped   wrap_tf2   (const NComRxC *nrx);
 }
 
 

@@ -133,7 +133,7 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
   msg.twist.twist.linear.x  =  nrx->mVe; 
   msg.twist.twist.linear.y  =  nrx->mVn; 
   msg.twist.twist.linear.z  = -nrx->mVd; 
-  msg.twist.twist.angular.x =  nrx->mWx; 
+  msg.twist.twist.angular.x =  nrx->mWx; /*! @todo also needs converting to enu */ 
   msg.twist.twist.angular.y =  nrx->mWy; 
   msg.twist.twist.angular.z =  nrx->mWz; 
 
@@ -228,6 +228,28 @@ sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
     (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
     * NAV_CONST::SECS2NANOSECS );
   msg.source = "ins"; 
+
+  return msg;
+}
+
+
+geometry_msgs::msg::TransformStamped   wrap_tf2   (const NComRxC *nrx)
+{
+  auto msg = geometry_msgs::msg::TransformStamped();
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+
+  msg.child_frame_id = "";
+
+  msg.transform.translation.x = nrx->mLat;
+  msg.transform.translation.y = nrx->mLon;
+  msg.transform.translation.z = nrx->mAlt;
+
+  tf2::Quaternion q;
+  q.setRPY(nrx->mRoll,nrx->mPitch,nrx->mHeading);
+  msg.transform.rotation.x = q.x();
+  msg.transform.rotation.y = q.y();
+  msg.transform.rotation.z = q.z();
+  msg.transform.rotation.w = q.w();
 
   return msg;
 }
