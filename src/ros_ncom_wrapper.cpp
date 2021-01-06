@@ -110,9 +110,15 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
 
   // Together, msgs Point and Quaternion make a geometry_msgs/Pose
   // geometry_msgs/msg/Point
-  msg.pose.pose.position.x = nrx->mLat; // float64, make local coords
-  msg.pose.pose.position.y = nrx->mLon; // float64, make local coords
-  msg.pose.pose.position.z = nrx->mAlt; // float64, make local coords
+
+  // We need to convert WGS84 to ECEF, the "global" frame in ROS2
+  std::vector<double> transformVec(3);
+  transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
+
+  msg.pose.pose.position.x = transformVec[0];
+  msg.pose.pose.position.y = transformVec[1];
+  msg.pose.pose.position.z = transformVec[2];
+
 
   // geometry_msgs/msg/Quaternion
   tf2::Quaternion q;
