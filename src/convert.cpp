@@ -21,3 +21,23 @@ std::vector<double> Convert::hpr_to_quaternion(double h, double p, double r)
 
   return q;
 }
+
+
+std::vector<double> Convert::lla_to_ecef(double lat, double lon, double alt)
+{
+  std::vector<double> posEcef(3);
+
+  double cosLat = std::cos(lat * NAV_CONST::DEG2RADS);
+  double sinLat = std::sin(lat * NAV_CONST::DEG2RADS);
+  double c = 1/std::sqrt(std::pow(cosLat,2) 
+                              + (NAV_CONST::FLAT_FACTOR2 * std::pow(sinLat,2)));
+  double s = c * NAV_CONST::FLAT_FACTOR2;
+
+  posEcef[0] = ((NAV_CONST::EARTH_RADIUS * c) + alt) 
+                                   * cosLat * std::cos(NAV_CONST::DEG2RADS*lon);
+  posEcef[1] = ((NAV_CONST::EARTH_RADIUS * c) + alt) 
+                                   * cosLat * std::sin(NAV_CONST::DEG2RADS*lon);
+  posEcef[2] = ((NAV_CONST::EARTH_RADIUS * s) + alt) * sinLat;
+
+  return posEcef;
+}

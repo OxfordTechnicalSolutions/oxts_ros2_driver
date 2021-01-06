@@ -23,52 +23,52 @@ sensor_msgs::msg::NavSatStatus RosNComWrapper::wrap_nav_sat_status(const NComRxC
   switch(nrx->mGpsPosMode)
   {
     // No Fix
-    case NAV_CONST::GNSS_MODE::NONE          :
-    case NAV_CONST::GNSS_MODE::SEARCH        :
-    case NAV_CONST::GNSS_MODE::DOPPLER       :
-    case NAV_CONST::GNSS_MODE::NODATA        :
-    case NAV_CONST::GNSS_MODE::BLANKED       :
-    case NAV_CONST::GNSS_MODE::PP_DOPPLER    :
-    case NAV_CONST::GNSS_MODE::NOT_KNOWN     :
-    case NAV_CONST::GNSS_MODE::GX_DOPPLER    :
-    case NAV_CONST::GNSS_MODE::IX_DOPPLER    :
-    case NAV_CONST::GNSS_MODE::UNKNOWN       :
+    case NAV_CONST::GNSS_POS_MODE::NONE          :
+    case NAV_CONST::GNSS_POS_MODE::SEARCH        :
+    case NAV_CONST::GNSS_POS_MODE::DOPPLER       :
+    case NAV_CONST::GNSS_POS_MODE::NODATA        :
+    case NAV_CONST::GNSS_POS_MODE::BLANKED       :
+    case NAV_CONST::GNSS_POS_MODE::PP_DOPPLER    :
+    case NAV_CONST::GNSS_POS_MODE::NOT_KNOWN     :
+    case NAV_CONST::GNSS_POS_MODE::GX_DOPPLER    :
+    case NAV_CONST::GNSS_POS_MODE::IX_DOPPLER    :
+    case NAV_CONST::GNSS_POS_MODE::UNKNOWN       :
       msg.status = msg.STATUS_NO_FIX;
       break;
     // Fix
-    case NAV_CONST::GNSS_MODE::SPS           :
-    case NAV_CONST::GNSS_MODE::PP_SPS        :
-    case NAV_CONST::GNSS_MODE::GX_SPS        :
-    case NAV_CONST::GNSS_MODE::IX_SPS        :
-    case NAV_CONST::GNSS_MODE::GENAID        :
-    case NAV_CONST::GNSS_MODE::SEGMENT       :
+    case NAV_CONST::GNSS_POS_MODE::SPS           :
+    case NAV_CONST::GNSS_POS_MODE::PP_SPS        :
+    case NAV_CONST::GNSS_POS_MODE::GX_SPS        :
+    case NAV_CONST::GNSS_POS_MODE::IX_SPS        :
+    case NAV_CONST::GNSS_POS_MODE::GENAID        :
+    case NAV_CONST::GNSS_POS_MODE::SEGMENT       :
       msg.status = msg.STATUS_FIX;
       break;
     // Ground-based augmentation
-    case NAV_CONST::GNSS_MODE::DIFF          :
-    case NAV_CONST::GNSS_MODE::FLOAT         :
-    case NAV_CONST::GNSS_MODE::INTEGER       :
-    case NAV_CONST::GNSS_MODE::PP_DIFF       :
-    case NAV_CONST::GNSS_MODE::PP_FLOAT      :
-    case NAV_CONST::GNSS_MODE::PP_INTEGER    :
-    case NAV_CONST::GNSS_MODE::GX_DIFF       :
-    case NAV_CONST::GNSS_MODE::GX_FLOAT      :
-    case NAV_CONST::GNSS_MODE::GX_INTEGER    :
-    case NAV_CONST::GNSS_MODE::IX_DIFF       :
-    case NAV_CONST::GNSS_MODE::IX_FLOAT      :
-    case NAV_CONST::GNSS_MODE::IX_INTEGER    :
+    case NAV_CONST::GNSS_POS_MODE::DIFF          :
+    case NAV_CONST::GNSS_POS_MODE::FLOAT         :
+    case NAV_CONST::GNSS_POS_MODE::INTEGER       :
+    case NAV_CONST::GNSS_POS_MODE::PP_DIFF       :
+    case NAV_CONST::GNSS_POS_MODE::PP_FLOAT      :
+    case NAV_CONST::GNSS_POS_MODE::PP_INTEGER    :
+    case NAV_CONST::GNSS_POS_MODE::GX_DIFF       :
+    case NAV_CONST::GNSS_POS_MODE::GX_FLOAT      :
+    case NAV_CONST::GNSS_POS_MODE::GX_INTEGER    :
+    case NAV_CONST::GNSS_POS_MODE::IX_DIFF       :
+    case NAV_CONST::GNSS_POS_MODE::IX_FLOAT      :
+    case NAV_CONST::GNSS_POS_MODE::IX_INTEGER    :
       msg.status = msg.STATUS_GBAS_FIX;
       break;
     // Satellite-based augmentation
-    case NAV_CONST::GNSS_MODE::WAAS          :
-    case NAV_CONST::GNSS_MODE::OMNISTAR      :
-    case NAV_CONST::GNSS_MODE::OMNISTARHP    :
-    case NAV_CONST::GNSS_MODE::OMNISTARXP    :
-    case NAV_CONST::GNSS_MODE::CDGPS         :
-    case NAV_CONST::GNSS_MODE::PPP_CONVERGING:
-    case NAV_CONST::GNSS_MODE::PPP           :
-    case NAV_CONST::GNSS_MODE::GX_SBAS       :
-    case NAV_CONST::GNSS_MODE::IX_SBAS       :
+    case NAV_CONST::GNSS_POS_MODE::WAAS          :
+    case NAV_CONST::GNSS_POS_MODE::OMNISTAR      :
+    case NAV_CONST::GNSS_POS_MODE::OMNISTARHP    :
+    case NAV_CONST::GNSS_POS_MODE::OMNISTARXP    :
+    case NAV_CONST::GNSS_POS_MODE::CDGPS         :
+    case NAV_CONST::GNSS_POS_MODE::PPP_CONVERGING:
+    case NAV_CONST::GNSS_POS_MODE::PPP           :
+    case NAV_CONST::GNSS_POS_MODE::GX_SBAS       :
+    case NAV_CONST::GNSS_POS_MODE::IX_SBAS       :
       msg.status = msg.STATUS_SBAS_FIX;
       break;
   }
@@ -242,18 +242,12 @@ geometry_msgs::msg::TransformStamped   RosNComWrapper::wrap_tf2   (const NComRxC
   msg.header.frame_id = "earth";
   msg.child_frame_id =  "imu";
   // We need to convert WGS84 to ECEF, the "global" frame in ROS2
+  std::vector<double> transformVec(3);
+  transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
 
-  double radius = 6378137.0;
-  double flatFactor = (1.0 / 298.257223563) ;
-  double cosLat = std::cos(nrx->mLat * NAV_CONST::DEG2RADS);
-  double sinLat = std::sin(nrx->mLat * NAV_CONST::DEG2RADS);
-  double flatFactorSqr = std::pow((1.0-flatFactor),2);
-  double c = 1/std::sqrt(std::pow(cosLat,2) + (flatFactorSqr * std::pow(sinLat,2)));
-  double s = c * flatFactorSqr;
-
-  msg.transform.translation.x = ((radius * c) + nrx->mAlt) * cosLat * std::cos(NAV_CONST::DEG2RADS*nrx->mLon);
-  msg.transform.translation.y = ((radius * c) + nrx->mAlt) * cosLat * std::sin(NAV_CONST::DEG2RADS*nrx->mLon);
-  msg.transform.translation.z = ((radius * s) + nrx->mAlt) * sinLat;
+  msg.transform.translation.x = transformVec[0];
+  msg.transform.translation.y = transformVec[1];
+  msg.transform.translation.z = transformVec[2];
 
   tf2::Quaternion q;
 

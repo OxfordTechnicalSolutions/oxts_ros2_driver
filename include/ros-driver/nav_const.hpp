@@ -25,9 +25,23 @@ namespace NAV_CONST
    * Convert from radians to degrees
    */
   const double RADS2DEG   =  180.0 / M_PI;
+  /**
+   * Radius of the Earth in metres
+   */
+  const double EARTH_RADIUS = 6378137.0;
+  /**
+   * Flattening factor (WGS84 Model)
+   */
+  const double FLAT_FACTOR  = (1.0 / 298.257223563);
+  /**
+   * Flattening factor WGS84 Model
+   */
+  const double FLAT_FACTOR2 = std::pow((1.0-FLAT_FACTOR),2);
 
-
-  enum GNSS_MODE
+  /**
+   * Enumeration of GNSS position modes
+   */
+  enum GNSS_POS_MODE
   {
     NONE            =  0,
     SEARCH          =  1,

@@ -31,7 +31,16 @@ namespace Convert
   std::vector<double> hpr_to_quaternion(double h, double p, double r);
 
 
-
+  /**
+   * @fn lla_to_ecef
+   * @brief Convert Lat, Long, Alt to ECEF x,y,z 
+   * 
+   * @param  lat Latitude in WGS84
+   * @param  lon Longitude in WGS84
+   * @param  alt Altitude in WGS84
+   * @return ECEF (x, y, z)
+   */
+  std::vector<double> lla_to_ecef(double lat, double lon, double alt);
 
 
 
