@@ -114,15 +114,16 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
   msg.pose.pose.position.y = nrx->mLon; // float64, make local coords
   msg.pose.pose.position.z = nrx->mAlt; // float64, make local coords
 
-  std::vector<double> quaternion = Convert::hpr_to_quaternion(nrx->mHeading,
-                                                              nrx->mPitch,
-                                                              nrx->mRoll);
-
   // geometry_msgs/msg/Quaternion
-  msg.pose.pose.orientation.x = quaternion[0]; // float64
-  msg.pose.pose.orientation.y = quaternion[1]; // float64
-  msg.pose.pose.orientation.z = quaternion[2]; // float64
-  msg.pose.pose.orientation.w = quaternion[3]; // float64
+  tf2::Quaternion q;
+  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+           NAV_CONST::DEG2RADS * nrx->mPitch,
+           NAV_CONST::DEG2RADS * nrx->mHeading );
+           
+  msg.pose.pose.orientation.x = q.x();
+  msg.pose.pose.orientation.y = q.y();
+  msg.pose.pose.orientation.z = q.z();
+  msg.pose.pose.orientation.w = q.w();
   
   msg.pose.covariance[0] = 0.0;
   //  1 ... 34
