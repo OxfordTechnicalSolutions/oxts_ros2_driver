@@ -130,15 +130,15 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
 
   // geometry_msgs/msg/TwistWithCovariance
   // This expresses velocity in free space broken into its linear and angular parts.
-  msg.twist.twist.linear.x  = nrx->mVn; /*! @todo Check coordinate frame */
-  msg.twist.twist.linear.y  = nrx->mVe; /*! @todo Check coordinate frame */
-  msg.twist.twist.linear.z  = nrx->mVd; /*! @todo Check coordinate frame */
-  msg.twist.twist.angular.x = nrx->mWx; /*! @todo Check coordinate frame */
-  msg.twist.twist.angular.y = nrx->mWy; /*! @todo Check coordinate frame */
-  msg.twist.twist.angular.z = nrx->mWz; /*! @todo Check coordinate frame */
+  msg.twist.twist.linear.x  =  nrx->mVe; 
+  msg.twist.twist.linear.y  =  nrx->mVn; 
+  msg.twist.twist.linear.z  = -nrx->mVd; 
+  msg.twist.twist.angular.x =  nrx->mWx; 
+  msg.twist.twist.angular.y =  nrx->mWy; 
+  msg.twist.twist.angular.z =  nrx->mWz; 
 
-  msg.twist.covariance[ 0] = nrx->mVnAcc;
-  msg.twist.covariance[ 7] = nrx->mVeAcc;
+  msg.twist.covariance[ 0] = nrx->mVeAcc;
+  msg.twist.covariance[ 7] = nrx->mVnAcc;
   msg.twist.covariance[14] = nrx->mVdAcc;
   msg.twist.covariance[21] = 0;
   msg.twist.covariance[28] = 0;
@@ -209,8 +209,24 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRx
   msg.twist.linear.y  = nrx->mVl;
   msg.twist.linear.z  = nrx->mVd;
   msg.twist.angular.x = nrx->mWf;
-  msg.twist.angular.x = nrx->mWl;
-  msg.twist.angular.x = nrx->mWd;
+  msg.twist.angular.y = nrx->mWl;
+  msg.twist.angular.z = nrx->mWd;
 
   return msg;
+}
+
+
+geometry_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
+{
+  auto msg = geometry_msgs::msg::TimeReference();
+
+  /*! @todo This should be system time not ncom time in header */
+  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+
+  msg.time.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
+  msg.time.nanosec = static_cast<uint32_t>(
+    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
+    * NAV_CONST::SECS2NANOSECS );
+  msg.source = "ins"; 
+
 }

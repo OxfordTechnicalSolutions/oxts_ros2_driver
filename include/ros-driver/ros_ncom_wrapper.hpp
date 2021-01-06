@@ -79,6 +79,15 @@ namespace RosNComWrapper
    *          Angular velocity forward, lateral, down.
    */
   geometry_msgs::msg::TwistStamped   wrap_velocity   (const NComRxC *nrx);
+  /**
+   * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
+   * 
+   * The time reference depends on the presence of GNSS signal.
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * 
+   */
+  geometry_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx);
 }
 
 
