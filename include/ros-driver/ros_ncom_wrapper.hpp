@@ -18,6 +18,7 @@
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/nav_sat_status.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 
 // OxTS includes
@@ -87,7 +88,7 @@ namespace RosNComWrapper
    * @param nrx Pointer to the decoded NCom data
    * 
    */
-  geometry_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx);
+  sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx);
 }
 
 

@@ -216,17 +216,18 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRx
 }
 
 
-geometry_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
+sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx)
 {
-  auto msg = geometry_msgs::msg::TimeReference();
+  auto msg = sensor_msgs::msg::TimeReference();
 
   /*! @todo This should be system time not ncom time in header */
   msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
 
-  msg.time.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
-  msg.time.nanosec = static_cast<uint32_t>(
+  msg.time_ref.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
+  msg.time_ref.nanosec = static_cast<uint32_t>(
     (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
     * NAV_CONST::SECS2NANOSECS );
   msg.source = "ins"; 
 
+  return msg;
 }
