@@ -95,7 +95,7 @@ namespace RosNComWrapper
   /**
    * Wrap tf data from NCom decoder to sensor_msgs/msg/TimeReference
    * 
-   * Transform from ______ to _______
+   * Transform from global ECEF to IMU
    * 
    * @param nrx Pointer to the decoded NCom data
    * 
