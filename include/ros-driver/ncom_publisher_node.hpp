@@ -39,30 +39,29 @@ class NComPublisherNode : public rclcpp::Node
 {
 private:
 
-  rclcpp::Parameter param_imu_rate;
+  rclcpp::Parameter param_ncom_rate;
   rclcpp::Parameter param_unit_ip;
   rclcpp::Parameter param_unit_port;
   rclcpp::Parameter param_timestamp_mode;
   rclcpp::Parameter param_frame_id;
-  rclcpp::Parameter param_pub_string_flag;
-  rclcpp::Parameter param_pub_odometry_flag;
-  rclcpp::Parameter param_pub_nav_sat_fix_flag;
-  rclcpp::Parameter param_pub_imu_flag;
-  rclcpp::Parameter param_pub_velocity_flag;
-  rclcpp::Parameter param_pub_tf2_flag;
+  rclcpp::Parameter param_pub_string_rate;
+  rclcpp::Parameter param_pub_odometry_rate;
+  rclcpp::Parameter param_pub_nav_sat_fix_rate;
+  rclcpp::Parameter param_pub_imu_rate;
+  rclcpp::Parameter param_pub_velocity_rate;
+  rclcpp::Parameter param_pub_tf2_rate;
 
-  int imuRate;
-  int nodeOutputRate;
+  int ncomRate;
   std::string unitIp;
   short unitPort;
   short timestampMode;
   std::string frameId;
-  int pubStringFlag;
-  int pubOdometryFlag;
-  int pubNavSatFixFlag;
-  int pubImuFlag;
-  int pubVelocityFlag;
-  int pubTf2Flag;
+  int pubStringRate;
+  int pubOdometryRate;
+  int pubNavSatFixRate;
+  int pubImuRate;
+  int pubVelocityRate;
+  int pubTf2Rate;
   // ...
 
 
@@ -92,50 +91,57 @@ private:
    * Publisher for /geometry_msgs/msg/TransformStamped
    */
   rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr  pubTf2_;
-  /**
-   * Count of messages sent by the node
-   */
-  int count_;
 
 public:
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
   {
     // Initialise configurable parameters (all params should have defaults)
-    this->declare_parameter("imu_rate", 100);
+    this->declare_parameter("ncom_rate", 100);
     this->declare_parameter("unit_ip", "0.0.0.0");
     this->declare_parameter("unit_port", 3000);
     this->declare_parameter("timestamp_mode", 1);
     this->declare_parameter("frame_id", "base_link");
-    this->declare_parameter("pub_string_flag", 1);
-    this->declare_parameter("pub_odometry_flag", 1);
-    this->declare_parameter("pub_nav_sat_fix_flag", 1);
-    this->declare_parameter("pub_imu_flag", 1);
-    this->declare_parameter("pub_velocity_flag", 1);
-    this->declare_parameter("pub_tf2_flag", 1);
+    this->declare_parameter("pub_string_rate", 1);
+    this->declare_parameter("pub_odometry_rate", 1);
+    this->declare_parameter("pub_nav_sat_fix_rate", 1);
+    this->declare_parameter("pub_imu_rate", 1);
+    this->declare_parameter("pub_velocity_rate", 1);
+    this->declare_parameter("pub_tf2_rate", 1);
+
     // Get parameters (from config, command line, or from default)
-    param_imu_rate                  = this->get_parameter("imu_rate");
+    param_ncom_rate                 = this->get_parameter("ncom_rate");
     param_unit_ip                   = this->get_parameter("unit_ip");
     param_unit_port                 = this->get_parameter("unit_port");
     param_timestamp_mode            = this->get_parameter("timestamp_mode");
     param_frame_id                  = this->get_parameter("frame_id");
-    param_pub_string_flag           = this->get_parameter("pub_string_flag");
-    param_pub_odometry_flag         = this->get_parameter("pub_odometry_flag");
-    param_pub_nav_sat_fix_flag      = this->get_parameter("pub_nav_sat_fix_flag");
-    param_pub_imu_flag              = this->get_parameter("pub_imu_flag");
-    param_pub_velocity_flag         = this->get_parameter("pub_velocity_flag");
-    param_pub_tf2_flag              = this->get_parameter("pub_tf2_flag");
+    param_pub_string_rate           = this->get_parameter("pub_string_rate");
+    param_pub_odometry_rate         = this->get_parameter("pub_odometry_rate");
+    param_pub_nav_sat_fix_rate      = this->get_parameter("pub_nav_sat_fix_rate");
+    param_pub_imu_rate              = this->get_parameter("pub_imu_rate");
+    param_pub_velocity_rate         = this->get_parameter("pub_velocity_rate");
+    param_pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
     // Convert parameters to useful variable types
-    imuRate               = param_imu_rate.as_int();
+    ncomRate              = param_ncom_rate.as_int();
     unitIp                = param_unit_ip.as_string();
     unitPort              = param_unit_port.as_int();
     timestampMode         = param_timestamp_mode.as_int();
     frameId               = param_frame_id.as_string();
-    pubStringFlag         = param_pub_string_flag.as_int();
-    pubOdometryFlag       = param_pub_odometry_flag.as_int();
-    pubNavSatFixFlag      = param_pub_nav_sat_fix_flag.as_int();
-    pubImuFlag            = param_pub_imu_flag.as_int();
-    pubVelocityFlag       = param_pub_velocity_flag.as_int();
-    pubTf2Flag            = param_pub_tf2_flag.as_int();
+    pubStringRate         = param_pub_string_rate.as_int();
+    pubOdometryRate       = param_pub_odometry_rate.as_int();
+    pubNavSatFixRate      = param_pub_nav_sat_fix_rate.as_int();
+    pubImuRate            = param_pub_imu_rate.as_int();
+    pubVelocityRate       = param_pub_velocity_rate.as_int();
+    pubTf2Rate            = param_pub_tf2_rate.as_int();
+
+    // Derive number of NCom packets received per message published by each 
+    // publisher from the NCom and publisher rates. 0 => message configured off
+    ncomPerStringPublished    = pubStringRate    ? (ncomRate / pubStringRate   ) : 0;
+    ncomPerOdometryPublished  = pubOdometryRate  ? (ncomRate / pubOdometryRate ) : 0;
+    ncomPerNavSatFixPublished = pubNavSatFixRate ? (ncomRate / pubNavSatFixRate) : 0;
+    ncomPerImuPublished       = pubImuRate       ? (ncomRate / pubImuRate      ) : 0;
+    ncomPerVelocityPublished  = pubVelocityRate  ? (ncomRate / pubVelocityRate ) : 0;
+    ncomPerTf2Published       = pubTf2Rate       ? (ncomRate / pubTf2Rate      ) : 0;
+
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubString_    = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
@@ -143,9 +149,46 @@ public:
     pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
     pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/imu_data",         10); 
     pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
+    // pubTimeReference_
     pubTf2_       = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
 
   }
+
+  /**
+   * Count of callbacks run by the node (will correspond to number of ncom 
+   * packets received.)
+   */
+  int count_;
+  /**
+   * Expected number of NCom packets received for every one String message to be 
+   * published. This is derived from the ncomRate and pubStringRate
+   */
+  int ncomPerStringPublished;
+  /**
+   * Expected number of NCom packets received for every one Odometry message to be 
+   * published. This is derived from the ncomRate and pubOdometryRate
+   */
+  int ncomPerOdometryPublished;
+  /**
+   * Expected number of NCom packets received for every one NavSatFix message to be 
+   * published. This is derived from the ncomRate and pubNavSatFixRate
+   */
+  int ncomPerNavSatFixPublished;
+  /**
+   * Expected number of NCom packets received for every one Imu message to be 
+   * published. This is derived from the ncomRate and pubImuRate
+   */
+  int ncomPerImuPublished;
+  /**
+   * Expected number of NCom packets received for every one Velocity message to be 
+   * published. This is derived from the ncomRate and pubVelocityRate
+   */
+  int ncomPerVelocityPublished;
+  /**
+   * Expected number of NCom packets received for every one tf2 message to be 
+   * published. This is derived from the ncomRate and pubTf2Rate
+   */
+  int ncomPerTf2Published;
 
   /**
    * Constructs and publishes all configured ROS topics using data from NCom

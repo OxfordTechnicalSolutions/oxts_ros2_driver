@@ -6,20 +6,19 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct std_msgs/msg/String
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubStringFlag == 1)
+  if (this->pubStringRate && ((this->count_ % this->ncomPerStringPublished) == 0))
   {
     auto msgString = RosNComWrapper::wrap_string (nrx);
     pubString_->publish(msgString);
 
-    if ((this->count_ % 100) == 0)
-      RCLCPP_INFO(this->get_logger(), "'%d' Publishing: '%s'", 
-                                      this->count_, msgString.data.c_str());
+    RCLCPP_INFO(this->get_logger(), "'%d' Publishing: '%s'", 
+                                    this->count_, msgString.data.c_str());
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // Construct nav_msgs/msg/Odometry
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubOdometryFlag == 1)
+  if (this->pubOdometryRate && ((this->count_ % this->ncomPerOdometryPublished) == 0))
   {
     auto msgOdometry = RosNComWrapper::wrap_odometry (nrx);
     pubOdometry_->publish(msgOdometry);
@@ -27,7 +26,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/NavSatFix
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubNavSatFixFlag == 1)
+  if (this->pubNavSatFixRate && ((this->count_ % this->ncomPerNavSatFixPublished) == 0))
   {
     auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
     pubNavSatFix_->publish(msgNavSatFix);
@@ -35,7 +34,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct sensor_msgs/msg/Imu
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubImuFlag == 1)
+  if (this->pubImuRate && ((this->count_ % this->ncomPerImuPublished) == 0))
   {
     auto msgImu = RosNComWrapper::wrap_imu(nrx);
     pubImu_->publish(msgImu);
@@ -43,7 +42,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct geometry_msgs/msg/TwistStamped
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubVelocityFlag == 1)
+  if (this->pubVelocityRate && ((this->count_ % this->ncomPerVelocityPublished) == 0))
   {
     auto msgVelocity = RosNComWrapper::wrap_velocity(nrx);
     pubVelocity_->publish(msgVelocity);
@@ -51,7 +50,7 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   // Construct geometry_msgs/msg/TransformStamped
   //////////////////////////////////////////////////////////////////////////////
-  if (this->pubTf2Flag == 1)
+  if (this->pubTf2Rate && ((this->count_ % this->ncomPerTf2Published) == 0))
   {
     auto msgTf2 = RosNComWrapper::wrap_tf2(nrx);
     pubTf2_->publish(msgTf2);
@@ -60,7 +59,6 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   this->count_++;  
   return 0;
 }
-
 
 
 std::string NComPublisherNode::get_unit_ip()
