@@ -152,6 +152,8 @@ public:
     // pubTimeReference_
     pubTf2_       = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
 
+    // Initialise uptime to 0
+    upTime = 0;
   }
 
   /**
@@ -159,6 +161,13 @@ public:
    * packets received.)
    */
   int count_;
+  /**
+   * Time that the node has been active (s).
+   * 
+   * This is derived from number of NCom packets received so not suitable for 
+   * critical applications. More useful as an indicator.
+   */
+  unsigned long int upTime;
   /**
    * Expected number of NCom packets received for every one String message to be 
    * published. This is derived from the ncomRate and pubStringRate

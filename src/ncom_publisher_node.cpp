@@ -56,7 +56,16 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
     pubTf2_->publish(msgTf2);
   }
 
+
+  // Reset count to 1 if we have crossed over 1s. Increment upTime.
+  if ((this->count_ % this->ncomRate) == 0)
+  {
+    this->count_ = 0;
+    this->upTime++;
+  }
+
   this->count_++;  
+
   return 0;
 }
 
