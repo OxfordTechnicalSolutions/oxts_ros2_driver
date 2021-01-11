@@ -7,7 +7,7 @@ int OxtsDevice::HandleNCom()
   // Add data to decoder
   NComNewChars(nrx, buff, size); 
   // Run callback function to publish configured ROS messages
-  this->ncomPublisherNode.ncom_callback(nrx);
+  //this->ncomPublisherNode.ncom_callback(nrx);
 
   return 0;
 }

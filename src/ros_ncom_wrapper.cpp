@@ -178,7 +178,8 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
 std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 {
   auto msg = std_msgs::msg::String();
-  msg.data = "Lat, Long, Alt : " + std::to_string(nrx->mLat) + ", "
+  msg.data = "Time, Lat, Long, Alt : "+ std::to_string(nrx->mTimeWeekSecond) + ", " 
+                                 + std::to_string(nrx->mLat) + ", "
                                  + std::to_string(nrx->mLon) + ", "
                                  + std::to_string(nrx->mAlt);
 

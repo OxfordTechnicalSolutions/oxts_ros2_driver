@@ -2,7 +2,7 @@ ncom_publisher:
   ros__parameters:
 #===============================================================================
     # INS configuration (set up to match the unit)
-    ## Configure to match the NCom output rate of the IMU
+    ## Configure sample rate of NCom (do not exceed output rate of ncom)
     ncom_rate: 100
     ## Unit IP address
     unit_ip: "192.168.25.216"
@@ -16,19 +16,19 @@ ncom_publisher:
     ## Rates must be factors of the ncom_rate, configured above.
     ## Rates are in Hz. 0 Hz => Message will not be published
     ### Publish ROS string message
-    pub_string_rate           : 0
+    pub_string_rate           : 10.0
     ### Publish ROS Odometry message
-    pub_odometry_rate         : 1
+    pub_odometry_rate         : 1.0
     ### Publish ROS NavSatFix message
-    pub_nav_sat_fix_rate      : 5
+    pub_nav_sat_fix_rate      : 5.0
     ### Publish ROS Imu message
-    pub_imu_rate              : 100
+    pub_imu_rate              : 100.0
     ### Publish ROS Velocity message
-    pub_velocity_rate         : 5
+    pub_velocity_rate         : 5.0
     ### Publish ROS TimeReference message
-    pub_time_reference_rate   : 1
+    pub_time_reference_rate   : 1.0
     ### Publish ROS Tf2 message
-    pub_tf2_rate              : 10
+    pub_tf2_rate              : 10.0
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver

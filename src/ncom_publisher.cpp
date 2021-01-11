@@ -24,7 +24,6 @@
 
 // Other includes
 #include "ros-driver/ncom_publisher_node.hpp"
-#include "ros-driver/oxts_device.hpp"
 #include "ros-driver/udp_server_client.h"
 
 // gad-sdk includes
@@ -38,30 +37,12 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-//==============================================================================  
-  // Test
-  
-  //const std::map<std::string, uint8_t,uint8_t> GpsPosModeMap;
+  auto ncomNode = std::make_shared<NComPublisherNode>();
 
- // GpsPosModeMap["None"] = 0;
-
-
-//==============================================================================
-// Set up the UDP connection to the INS device
-
-  OxtsDevice device;
-  
-  device.SetUnitEndpointNCom(device.ncomPublisherNode.get_unit_ip(), 
-                             device.ncomPublisherNode.get_unit_port() );
-
-//==============================================================================
   //! @todo Add try/catch 
-  RCLCPP_INFO(device.ncomPublisherNode.get_logger(), "Starting up node");
-  while (rclcpp::ok())
-  {
-    device.HandleNCom();
-  }
-
+  RCLCPP_INFO(ncomNode->get_logger(), "Starting up node");
+  
+  rclcpp::spin(ncomNode);
   rclcpp::shutdown();
   return 0;
 }
