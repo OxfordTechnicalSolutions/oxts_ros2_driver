@@ -3,6 +3,21 @@
 
 int NComPublisherNode::ncom_callback(const NComRxC* nrx)
 {
+  rclcpp::Time currentTime;
+
+  // Get time for timestamps from the configured source
+  if (this->timestampMode == PUB_TIMESTAMP_MODE::NCOM)
+  {
+    currentTime = RosNComWrapper::ncom_time_to_time(nrx);
+  }
+  else
+  {
+    currentTime = clock_.now();
+  }
+
+  //RCLCPP_INFO(this->get_logger(), "Count: %d, Seconds: %f, Nanoseconds: %u", this->count_, currentTime.seconds(), currentTime.nanoseconds());
+
+
   //////////////////////////////////////////////////////////////////////////////
   // Construct std_msgs/msg/String
   //////////////////////////////////////////////////////////////////////////////
@@ -20,7 +35,8 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   if (this->pubOdometryRate && ((this->count_ % this->ncomPerOdometryPublished) == 0))
   {
-    auto msgOdometry = RosNComWrapper::wrap_odometry (nrx);
+    auto headerOdometry = RosNComWrapper::wrap_header(currentTime, "ins");
+    auto msgOdometry = RosNComWrapper::wrap_odometry (nrx, headerOdometry);
     pubOdometry_->publish(msgOdometry);
   }
   //////////////////////////////////////////////////////////////////////////////
@@ -28,7 +44,8 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   if (this->pubNavSatFixRate && ((this->count_ % this->ncomPerNavSatFixPublished) == 0))
   {
-    auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx);
+    auto headerNavSatFix = RosNComWrapper::wrap_header(currentTime, "ins");
+    auto msgNavSatFix = RosNComWrapper::wrap_nav_sat_fix(nrx, headerNavSatFix);
     pubNavSatFix_->publish(msgNavSatFix);
   }
   //////////////////////////////////////////////////////////////////////////////
@@ -36,7 +53,8 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   if (this->pubImuRate && ((this->count_ % this->ncomPerImuPublished) == 0))
   {
-    auto msgImu = RosNComWrapper::wrap_imu(nrx);
+    auto headerImu = RosNComWrapper::wrap_header(currentTime, "ins");
+    auto msgImu = RosNComWrapper::wrap_imu(nrx, headerImu);
     pubImu_->publish(msgImu);
   }
   //////////////////////////////////////////////////////////////////////////////
@@ -44,15 +62,26 @@ int NComPublisherNode::ncom_callback(const NComRxC* nrx)
   //////////////////////////////////////////////////////////////////////////////
   if (this->pubVelocityRate && ((this->count_ % this->ncomPerVelocityPublished) == 0))
   {
-    auto msgVelocity = RosNComWrapper::wrap_velocity(nrx);
+    auto headerVelocity = RosNComWrapper::wrap_header(currentTime, "ins");
+    auto msgVelocity = RosNComWrapper::wrap_velocity(nrx,headerVelocity);
     pubVelocity_->publish(msgVelocity);
+  }
+  //////////////////////////////////////////////////////////////////////////////
+  // Construct geometry_msgs/msg/TimeReference
+  //////////////////////////////////////////////////////////////////////////////
+  if (this->pubTimeReferenceRate && ((this->count_ % this->ncomPerTimeReferencePublished) == 0))
+  {
+    auto headerTimeReference = RosNComWrapper::wrap_header(currentTime, "ins");
+    auto msgTimeReference = RosNComWrapper::wrap_time_reference(nrx, headerTimeReference);
+    pubTimeReference_->publish(msgTimeReference);
   }
   //////////////////////////////////////////////////////////////////////////////
   // Construct geometry_msgs/msg/TransformStamped
   //////////////////////////////////////////////////////////////////////////////
   if (this->pubTf2Rate && ((this->count_ % this->ncomPerTf2Published) == 0))
   {
-    auto msgTf2 = RosNComWrapper::wrap_tf2(nrx);
+    auto headerTf2 = RosNComWrapper::wrap_header(currentTime, "earth");
+    auto msgTf2 = RosNComWrapper::wrap_tf2(nrx, headerTf2);
     pubTf2_->publish(msgTf2);
   }
 

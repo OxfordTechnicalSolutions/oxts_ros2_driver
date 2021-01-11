@@ -35,36 +35,54 @@
 namespace RosNComWrapper
 {
   /**
+   * Convert NCom time to a ROS friendly time format
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   */
+  rclcpp::Time       ncom_time_to_time(const NComRxC *nrx);
+  /**
    * Wrap data from NCom decoder to std_msgs/msg/Header (for use in other msgs)
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  std_msgs::msg::Header       wrap_header_ncom_time(const NComRxC *nrx);
+  std_msgs::msg::Header              wrap_header_ncom_time(const NComRxC *nrx);
   /**
+   * Wrap data into ROS header format.
+   * 
+   * Does not strictly belong here since it is not encoding NCom data. Move when
+   * appropriate alternative location makes itself known.
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   */
+  std_msgs::msg::Header              wrap_header     (rclcpp::Time time, 
+                                                      std::string frame);
+  /** 
    * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  sensor_msgs::msg::NavSatStatus wrap_nav_sat_status(const NComRxC *nrx);
+  sensor_msgs::msg::NavSatStatus     wrap_nav_sat_status(const NComRxC *nrx);
   /**
    * Wrap data from NCom decoder to sensor_msgs/msg/NavSatFix
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  sensor_msgs::msg::NavSatFix  wrap_nav_sat_fix     (const NComRxC *nrx);
+  sensor_msgs::msg::NavSatFix        wrap_nav_sat_fix(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
   /**
    * Wrap data from NCom decoder to nav_msgs/msg/Odometry
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  nav_msgs::msg::Odometry     wrap_odometry        (const NComRxC *nrx);
+  nav_msgs::msg::Odometry            wrap_odometry (const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
   /**
    * Wrap position data from NCom decoder to std_msgs/msg/String
    * Not really a permanent function, more for easy testing.
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  std_msgs::msg::String       wrap_string          (const NComRxC *nrx); 
+  std_msgs::msg::String              wrap_string   (const NComRxC *nrx); 
   /**
    * Wrap IMU data from NCom decoder to sensor_msgs/msg/Imu
    * 
@@ -73,7 +91,8 @@ namespace RosNComWrapper
    * \todo Covariances
    * \todo Validate Quaternion conversions
    */
-  sensor_msgs::msg::Imu       wrap_imu        (const NComRxC *nrx);
+  sensor_msgs::msg::Imu              wrap_imu      (const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
   /**
    * Wrap velocity data from NCom decoder to sensor_msgs/msg/Imu
    * 
@@ -82,7 +101,8 @@ namespace RosNComWrapper
    * @returns Linear velocity forward, lateral, down. 
    *          Angular velocity forward, lateral, down.
    */
-  geometry_msgs::msg::TwistStamped   wrap_velocity   (const NComRxC *nrx);
+  geometry_msgs::msg::TwistStamped   wrap_velocity (const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
   /**
    * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
    * 
@@ -91,7 +111,8 @@ namespace RosNComWrapper
    * @param nrx Pointer to the decoded NCom data
    * 
    */
-  sensor_msgs::msg::TimeReference   wrap_ins_time   (const NComRxC *nrx);
+  sensor_msgs::msg::TimeReference wrap_time_reference (const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
   /**
    * Wrap tf data from NCom decoder to sensor_msgs/msg/TimeReference
    * 
@@ -100,7 +121,8 @@ namespace RosNComWrapper
    * @param nrx Pointer to the decoded NCom data
    * 
    */
-  geometry_msgs::msg::TransformStamped   wrap_tf2   (const NComRxC *nrx);
+  geometry_msgs::msg::TransformStamped wrap_tf2    (const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
 }
 
 

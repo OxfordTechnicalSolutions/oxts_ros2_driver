@@ -1,22 +1,39 @@
 #include "ros-driver/ros_ncom_wrapper.hpp"
 
 
+rclcpp::Time      RosNComWrapper::ncom_time_to_time(const NComRxC *nrx)
+{
+  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond),
+  static_cast<uint32_t>((nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
+    * NAV_CONST::SECS2NANOSECS ));
 
+  return time;
+}
 
 std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
 {
   auto header = std_msgs::msg::Header();
 
-  header.stamp.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
-  header.stamp.nanosec = static_cast<uint32_t>(
-    (nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
-    * NAV_CONST::SECS2NANOSECS );
+  header.stamp = RosNComWrapper::ncom_time_to_time(nrx);
+
   header.frame_id = "earth"; /*! @todo Change this */
 
   return header;
 }
 
-sensor_msgs::msg::NavSatStatus RosNComWrapper::wrap_nav_sat_status(const NComRxC *nrx)
+std_msgs::msg::Header       RosNComWrapper::wrap_header(rclcpp::Time time, 
+                                                        std::string frame )
+{
+  auto header = std_msgs::msg::Header();
+
+  header.stamp = time;
+  header.frame_id = frame; 
+
+  return header;
+}
+
+sensor_msgs::msg::NavSatStatus RosNComWrapper::wrap_nav_sat_status(
+                                                    const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::NavSatStatus();
 
@@ -78,11 +95,12 @@ sensor_msgs::msg::NavSatStatus RosNComWrapper::wrap_nav_sat_status(const NComRxC
   return msg;
 }
 
-sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
+sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(
+                            const NComRxC *nrx,
+                            std_msgs::msg::Header head)
 {
   auto msg = sensor_msgs::msg::NavSatFix();
-
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header = head;
 
   msg.status = RosNComWrapper::wrap_nav_sat_status(nrx);
 
@@ -101,10 +119,12 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(const NComRxC *nrx)
 }
 
 
-nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (const NComRxC *nrx)
+nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
+                        const NComRxC *nrx,
+                        std_msgs::msg::Header head)
 {
   auto msg = nav_msgs::msg::Odometry();
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header = head;
   msg.header.frame_id = "earth";
   msg.child_frame_id = "odom";
 
@@ -166,10 +186,12 @@ std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 }
 
 
-sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
+sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
+                      const NComRxC *nrx,
+                      std_msgs::msg::Header head)
 {
   auto msg = sensor_msgs::msg::Imu();
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header = head;
 
   // geometry_msgs/Quaternion
   tf2::Quaternion q;
@@ -209,10 +231,12 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (const NComRxC *nrx)
   return msg;
 }
 
-geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRxC *nrx)
+geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (
+                                   const NComRxC *nrx,
+                                   std_msgs::msg::Header head)
 {
   auto msg = geometry_msgs::msg::TwistStamped();
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header = head;
 
   msg.twist.linear.x  = nrx->mVf;
   msg.twist.linear.y  = nrx->mVl;
@@ -225,12 +249,13 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (const NComRx
 }
 
 
-sensor_msgs::msg::TimeReference   RosNComWrapper::wrap_ins_time   (const NComRxC *nrx)
+  sensor_msgs::msg::TimeReference   RosNComWrapper::wrap_time_reference  (
+                                    const NComRxC *nrx,
+                                    std_msgs::msg::Header head)
 {
   auto msg = sensor_msgs::msg::TimeReference();
-
-  /*! @todo This should be system time not ncom time in header */
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  
+  msg.header = head;
 
   msg.time_ref.sec     = static_cast<int32_t>(nrx->mTimeWeekSecond);
   msg.time_ref.nanosec = static_cast<uint32_t>(
@@ -242,12 +267,14 @@ sensor_msgs::msg::TimeReference   RosNComWrapper::wrap_ins_time   (const NComRxC
 }
 
 
-geometry_msgs::msg::TransformStamped   RosNComWrapper::wrap_tf2   (const NComRxC *nrx)
+geometry_msgs::msg::TransformStamped  RosNComWrapper::wrap_tf2   (
+                                      const NComRxC *nrx,
+                                      std_msgs::msg::Header head)
 {
   auto msg = geometry_msgs::msg::TransformStamped();
-  msg.header = RosNComWrapper::wrap_header_ncom_time(nrx);
+  msg.header = head;
   msg.header.frame_id = "earth";
-  msg.child_frame_id =  "imu";
+  msg.child_frame_id  = "imu";
   // We need to convert WGS84 to ECEF, the "global" frame in ROS2
   std::vector<double> transformVec(3);
   transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);

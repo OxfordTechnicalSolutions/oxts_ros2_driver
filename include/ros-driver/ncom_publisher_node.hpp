@@ -27,6 +27,13 @@
 #include "ros-driver/ros_ncom_wrapper.hpp"
 
 
+enum PUB_TIMESTAMP_MODE
+{
+  DRIVER = 0,
+  NCOM = 1
+};
+
+
 /**
  * This class creates a subclass of Node designed to take NCom data from the 
  * NCom decoder and publish it to pre-configured ROS topics.
@@ -49,6 +56,7 @@ private:
   rclcpp::Parameter param_pub_nav_sat_fix_rate;
   rclcpp::Parameter param_pub_imu_rate;
   rclcpp::Parameter param_pub_velocity_rate;
+  rclcpp::Parameter param_pub_time_reference_rate;
   rclcpp::Parameter param_pub_tf2_rate;
 
   int ncomRate;
@@ -61,6 +69,7 @@ private:
   int pubNavSatFixRate;
   int pubImuRate;
   int pubVelocityRate;
+  int pubTimeReferenceRate;
   int pubTf2Rate;
   // ...
 
@@ -88,13 +97,20 @@ private:
    */
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
   /**
+   * Publisher for /sensor_msgs/msg/TimeReference
+   */
+  rclcpp::Publisher<sensor_msgs::msg::TimeReference>::SharedPtr  pubTimeReference_;
+  /**
    * Publisher for /geometry_msgs/msg/TransformStamped
    */
   rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr  pubTf2_;
 
+  rclcpp::Clock clock_;
+
 public:
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
   {
+    
     // Initialise configurable parameters (all params should have defaults)
     this->declare_parameter("ncom_rate", 100);
     this->declare_parameter("unit_ip", "0.0.0.0");
@@ -106,6 +122,7 @@ public:
     this->declare_parameter("pub_nav_sat_fix_rate", 1);
     this->declare_parameter("pub_imu_rate", 1);
     this->declare_parameter("pub_velocity_rate", 1);
+    this->declare_parameter("pub_time_reference_rate", 1);
     this->declare_parameter("pub_tf2_rate", 1);
 
     // Get parameters (from config, command line, or from default)
@@ -119,6 +136,7 @@ public:
     param_pub_nav_sat_fix_rate      = this->get_parameter("pub_nav_sat_fix_rate");
     param_pub_imu_rate              = this->get_parameter("pub_imu_rate");
     param_pub_velocity_rate         = this->get_parameter("pub_velocity_rate");
+    param_pub_time_reference_rate   = this->get_parameter("pub_time_reference_rate");
     param_pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
     // Convert parameters to useful variable types
     ncomRate              = param_ncom_rate.as_int();
@@ -131,29 +149,34 @@ public:
     pubNavSatFixRate      = param_pub_nav_sat_fix_rate.as_int();
     pubImuRate            = param_pub_imu_rate.as_int();
     pubVelocityRate       = param_pub_velocity_rate.as_int();
+    pubTimeReferenceRate  = param_pub_time_reference_rate.as_int();
     pubTf2Rate            = param_pub_tf2_rate.as_int();
 
     // Derive number of NCom packets received per message published by each 
     // publisher from the NCom and publisher rates. 0 => message configured off
-    ncomPerStringPublished    = pubStringRate    ? (ncomRate / pubStringRate   ) : 0;
-    ncomPerOdometryPublished  = pubOdometryRate  ? (ncomRate / pubOdometryRate ) : 0;
-    ncomPerNavSatFixPublished = pubNavSatFixRate ? (ncomRate / pubNavSatFixRate) : 0;
-    ncomPerImuPublished       = pubImuRate       ? (ncomRate / pubImuRate      ) : 0;
-    ncomPerVelocityPublished  = pubVelocityRate  ? (ncomRate / pubVelocityRate ) : 0;
-    ncomPerTf2Published       = pubTf2Rate       ? (ncomRate / pubTf2Rate      ) : 0;
+    ncomPerStringPublished         = pubStringRate    ? (ncomRate / pubStringRate   ) : 0;
+    ncomPerOdometryPublished       = pubOdometryRate  ? (ncomRate / pubOdometryRate ) : 0;
+    ncomPerNavSatFixPublished      = pubNavSatFixRate ? (ncomRate / pubNavSatFixRate) : 0;
+    ncomPerImuPublished            = pubImuRate       ? (ncomRate / pubImuRate      ) : 0;
+    ncomPerVelocityPublished       = pubVelocityRate  ? (ncomRate / pubVelocityRate ) : 0;
+    ncomPerTimeReferencePublished  = pubTimeReferenceRate ? (ncomRate / pubTimeReferenceRate) : 0;
+    ncomPerTf2Published            = pubTf2Rate       ? (ncomRate / pubTf2Rate      ) : 0;
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubString_    = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
-    pubOdometry_  = this->create_publisher<nav_msgs::msg::Odometry>             ("ins/odom",             10); 
-    pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
-    pubImu_       = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/imu_data",         10); 
-    pubVelocity_  = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
-    // pubTimeReference_
-    pubTf2_       = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
+    pubString_        = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
+    pubOdometry_      = this->create_publisher<nav_msgs::msg::Odometry>             ("ins/odom",             10); 
+    pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
+    pubImu_           = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/imu_data",         10); 
+    pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
+    pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>     ("ins/time_reference",   10);
+    pubTf2_           = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
 
     // Initialise uptime to 0
     upTime = 0;
+
+    clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
+
   }
 
   /**
@@ -193,6 +216,11 @@ public:
    * published. This is derived from the ncomRate and pubVelocityRate
    */
   int ncomPerVelocityPublished;
+  /**
+   * Expected number of NCom packets received for every one TimeReference message 
+   * to be published. This is derived from the ncomRate and pubVelocityRate
+   */
+  int ncomPerTimeReferencePublished;
   /**
    * Expected number of NCom packets received for every one tf2 message to be 
    * published. This is derived from the ncomRate and pubTf2Rate
