@@ -22,22 +22,37 @@ Build instructions will look something like this:
 8. source install/setup.bash
 
 
-## Driver Configuration
+## Configuring and Launching the Driver
 
 The driver is configured using .yaml files, as is the norm for ROS2 nodes. These should be kept in /config, and can be used to configure the node at run time like so:
 
 `{
     ros2 run ros-driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/ros-driver/config/ncom_publisher_default_config.yaml
-}'
+}`
 
 The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
 
 If you (quite rightly) don't want to write that into the command line each time, launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine.
 
+To launch only the ncom publisher, use basic_launch.py like so:
+
+`{
+    ros2 launch basic_launch.py
+}`
+
+
 
 ## Output ROS messages
 
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network.
+
+- **ins/debug_string_pos** std_msgs/msg/String
+- **ins/odom** nav_msgs/msg/Odometry
+- **ins/nav_sat_fix** sensor_msgs/msg/NavSatFix
+- **imu/imu_data** sensor_msgs/msg/Imu
+- **ins/velocity** geometry_msgs/msg/TwistStamped
+- **ins/tf2** geometry_msgs/msg/TransformStamped
+
 
 ## Input ROS messages
 
