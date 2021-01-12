@@ -61,18 +61,18 @@ private:
   rclcpp::Parameter param_pub_time_reference_rate;
   rclcpp::Parameter param_pub_tf2_rate;
 
-  int ncomRate;
   std::string unitIp;
   short unitPort;
   short timestampMode;
   std::string frameId;
-  std::chrono::duration<uint64_t,std::milli> pubStringRate;
-  std::chrono::duration<uint64_t> pubOdometryRate;
-  std::chrono::duration<uint64_t> pubNavSatFixRate;
-  std::chrono::duration<uint64_t> pubImuRate;
-  std::chrono::duration<uint64_t> pubVelocityRate;
-  std::chrono::duration<uint64_t> pubTimeReferenceRate;
-  std::chrono::duration<uint64_t> pubTf2Rate;
+  std::chrono::duration<uint64_t,std::milli> ncomInterval;
+  std::chrono::duration<uint64_t,std::milli> pubStringInterval;
+  std::chrono::duration<uint64_t,std::milli> pubOdometryInterval;
+  std::chrono::duration<uint64_t,std::milli> pubNavSatFixInterval;
+  std::chrono::duration<uint64_t,std::milli> pubImuInterval;
+  std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
+  std::chrono::duration<uint64_t,std::milli> pubTimeReferenceInterval;
+  std::chrono::duration<uint64_t,std::milli> pubTf2Interval;
   // ...
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
@@ -130,11 +130,11 @@ public:
   {
     
     // Initialise configurable parameters (all params should have defaults)
-    this->declare_parameter("ncom_rate", 100);
     this->declare_parameter("unit_ip", "0.0.0.0");
     this->declare_parameter("unit_port", 3000);
     this->declare_parameter("timestamp_mode", 1);
     this->declare_parameter("frame_id", "base_link");
+    this->declare_parameter("ncom_rate", 100.0);
     this->declare_parameter("pub_string_rate", 1.0);
     this->declare_parameter("pub_odometry_rate", 1.0);
     this->declare_parameter("pub_nav_sat_fix_rate", 1.0);
@@ -158,19 +158,27 @@ public:
     param_pub_time_reference_rate   = this->get_parameter("pub_time_reference_rate");
     param_pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
     // Convert parameters to useful variable types
-    ncomRate              = param_ncom_rate.as_int();
     unitIp                = param_unit_ip.as_string();
     unitPort              = param_unit_port.as_int();
     timestampMode         = param_timestamp_mode.as_int();
     frameId               = param_frame_id.as_string();
 
-    pubStringRate         = std::chrono::milliseconds(int(1000.0 / param_pub_string_rate.as_double()));
-    pubOdometryRate         = std::chrono::seconds(int(1.0 / param_pub_odometry_rate.as_double()));
-    pubNavSatFixRate         = std::chrono::seconds(int(1.0 / param_pub_nav_sat_fix_rate.as_double()));
-    pubImuRate         = std::chrono::seconds(int(1.0 / param_pub_imu_rate.as_double()));
-    pubVelocityRate         = std::chrono::seconds(int(1.0 / param_pub_velocity_rate.as_double()));
-    pubTimeReferenceRate         = std::chrono::seconds(int(1.0 / param_pub_time_reference_rate.as_double()));
-    pubTf2Rate         = std::chrono::seconds(int(1.0 / param_pub_tf2_rate.as_double()));
+    ncomInterval             = std::chrono::milliseconds(
+                             int(1000.0 / param_ncom_rate.as_double()));
+    pubStringInterval        = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_string_rate.as_double()));
+    pubOdometryInterval      = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_odometry_rate.as_double()));
+    pubNavSatFixInterval     = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_nav_sat_fix_rate.as_double()));
+    pubImuInterval           = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_imu_rate.as_double()));
+    pubVelocityInterval      = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_velocity_rate.as_double()));
+    pubTimeReferenceInterval = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_time_reference_rate.as_double()));
+    pubTf2Interval           = std::chrono::milliseconds(
+                             int(1000.0 / param_pub_tf2_rate.as_double()));
 
  
     // Initialise publishers for each message - all are initialised, even if not
@@ -185,24 +193,22 @@ public:
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
-    // NEW
-
     timer_ncom_ = this->create_wall_timer(
-                  pubStringRate, std::bind(&NComPublisherNode::timer_ncom_callback, this));
+                  ncomInterval, std::bind(&NComPublisherNode::timer_ncom_callback, this));
     timer_string_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_string_callback, this));
+                  pubStringInterval, std::bind(&NComPublisherNode::timer_string_callback, this));
     timer_odometry_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_odometry_callback, this));
+                  pubOdometryInterval, std::bind(&NComPublisherNode::timer_odometry_callback, this));
     timer_nav_sat_fix_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_nav_sat_fix_callback, this));
+                  pubNavSatFixInterval, std::bind(&NComPublisherNode::timer_nav_sat_fix_callback, this));
     timer_imu_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_imu_callback, this));
+                  pubImuInterval, std::bind(&NComPublisherNode::timer_imu_callback, this));
     timer_velocity_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_velocity_callback, this));
+                  pubVelocityInterval, std::bind(&NComPublisherNode::timer_velocity_callback, this));
     timer_time_reference_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
+                  pubTimeReferenceInterval, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
     timer_tf2_ = this->create_wall_timer(
-                  1000ms, std::bind(&NComPublisherNode::timer_tf2_callback, this));
+                  pubTf2Interval, std::bind(&NComPublisherNode::timer_tf2_callback, this));
 
     nrx = NComCreateNComRxC();
 
@@ -213,7 +219,6 @@ public:
 
   }
 
-  // NEW ***************************
   /**
    * NCom decoder instance
    */
@@ -231,65 +236,11 @@ public:
    */
   boost::asio::ip::udp::endpoint unitEndpointNCom;
 
-
-
-
-  // *******************************
-
   /**
    * Count of callbacks run by the node (will correspond to number of ncom 
    * packets received)
    */
   int count_;
-  /**
-   * Time that the node has been active (s).
-   * 
-   * This is derived from number of NCom packets received so not suitable for 
-   * critical applications. More useful as an indicator.
-   */
-  unsigned long int upTime;
-  /**
-   * Expected number of NCom packets received for every one String message to be 
-   * published. This is derived from the ncomRate and pubStringRate
-   */
-  int ncomPerStringPublished;
-  /**
-   * Expected number of NCom packets received for every one Odometry message to be 
-   * published. This is derived from the ncomRate and pubOdometryRate
-   */
-  int ncomPerOdometryPublished;
-  /**
-   * Expected number of NCom packets received for every one NavSatFix message to be 
-   * published. This is derived from the ncomRate and pubNavSatFixRate
-   */
-  int ncomPerNavSatFixPublished;
-  /**
-   * Expected number of NCom packets received for every one Imu message to be 
-   * published. This is derived from the ncomRate and pubImuRate
-   */
-  int ncomPerImuPublished;
-  /**
-   * Expected number of NCom packets received for every one Velocity message to be 
-   * published. This is derived from the ncomRate and pubVelocityRate
-   */
-  int ncomPerVelocityPublished;
-  /**
-   * Expected number of NCom packets received for every one TimeReference message 
-   * to be published. This is derived from the ncomRate and pubVelocityRate
-   */
-  int ncomPerTimeReferencePublished;
-  /**
-   * Expected number of NCom packets received for every one tf2 message to be 
-   * published. This is derived from the ncomRate and pubTf2Rate
-   */
-  int ncomPerTf2Published;
-
-  /**
-   * Constructs and publishes all configured ROS topics using data from NCom
-   * decoder.
-   */
-  int ncom_callback(const NComRxC* nrx);
-
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    * 
