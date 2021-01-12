@@ -9,6 +9,20 @@ void NComPublisherNode::timer_ncom_callback()
   NComNewChars(nrx, buff, size); 
 }
 
+void NComPublisherNode::timer_ncom_file_callback()
+{
+  char c;
+
+  while(this->inFileNCom.get(c))
+  {
+    // Decode the data
+    if(NComNewChar(this->nrx, (unsigned char) c) == COM_NEW_UPDATE)
+    {
+      break;
+    }
+  }
+
+}
 
 void NComPublisherNode::timer_string_callback()
 {

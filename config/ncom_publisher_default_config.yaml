@@ -2,12 +2,16 @@ ncom_publisher:
   ros__parameters:
 #===============================================================================
     # INS configuration (set up to match the unit)
-    ## Configure sample rate of NCom (do not exceed output rate of ncom)
-    ncom_rate: 100.0
     ## Unit IP address
     unit_ip: "192.168.25.216"
     ## Unit Port
     unit_port: 3000
+#===============================================================================
+    # OR if reading from file
+    #use_sim_time: true
+    ncom_file_replay: false
+    ncom_input_file_path: "/home/smccarthy/data/driver/test.ncom"
+
 #===============================================================================
     # Configure ROS messages to be published by the node.
     ## Frames
@@ -15,6 +19,8 @@ ncom_publisher:
     ## Configure output rates of individual topics
     ## Rates must be factors of the ncom_rate, configured above.
     ## Rates are in Hz. 0 Hz => Message will not be published
+    ### Configure sample rate of NCom (do not exceed output rate of ncom)
+    ncom_rate: 100.0
     ### Publish ROS string message
     pub_string_rate           : 1.0
     ### Publish ROS Odometry message

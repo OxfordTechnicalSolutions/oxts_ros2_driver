@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <cmath>
+#include <fstream>
 
 // ROS includes
 #include "rclcpp/rclcpp.hpp"
@@ -56,6 +57,15 @@ struct NComPublisherParams
    * Endpoint Port of the INS to be connected to. Default 3000 for NCom.
    */
   rclcpp::Parameter unit_port;
+  /** 
+   * Flag to indicate file replay is active.
+   */
+  rclcpp::Parameter ncom_file_replay;
+  /** 
+   * File path to NCom file to be used as input. Not required if running in 
+   * real time.
+   */
+  rclcpp::Parameter ncom_input_file_path;
   /**
    * Timestamp type to be applied to published packets
    * 
@@ -119,6 +129,8 @@ private:
 
   std::string unitIp;
   short unitPort;
+  bool ncomFileReplay;
+  std::string ncomInFilePath;
   short timestampMode;
   std::string frameId;
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
@@ -147,6 +159,7 @@ private:
    * @todo Implement file parsing.
    */
   void timer_ncom_callback();
+  void timer_ncom_file_callback();
   /** 
    * Callback function for debug String message. Wraps message, publishes, and
    * prints some information to the console.
@@ -177,6 +190,7 @@ private:
    * Callback function for Tf2 message. Wraps message and publishes.
    */
   void timer_tf2_callback();
+
 
   /**
    * Publisher for std_msgs/msg/string. Only used for debugging, currently 
@@ -223,6 +237,8 @@ public:
     // Initialise configurable parameters (all params should have defaults)
     this->declare_parameter("unit_ip", "0.0.0.0");
     this->declare_parameter("unit_port", 3000);
+    this->declare_parameter("ncom_file_replay", false);
+    this->declare_parameter("ncom_input_file_path", "/home/test.ncom");
     this->declare_parameter("timestamp_mode", 1);
     this->declare_parameter("frame_id", "base_link");
     this->declare_parameter("ncom_rate", 100.0);
@@ -238,6 +254,8 @@ public:
     params.ncom_rate                 = this->get_parameter("ncom_rate");
     params.unit_ip                   = this->get_parameter("unit_ip");
     params.unit_port                 = this->get_parameter("unit_port");
+    params.ncom_file_replay          = this->get_parameter("ncom_file_replay");
+    params.ncom_input_file_path      = this->get_parameter("ncom_input_file_path");
     params.timestamp_mode            = this->get_parameter("timestamp_mode");
     params.frame_id                  = this->get_parameter("frame_id");
     params.pub_string_rate           = this->get_parameter("pub_string_rate");
@@ -250,6 +268,8 @@ public:
     // Convert parameters to useful variable types
     unitIp                   = params.unit_ip.as_string();
     unitPort                 = params.unit_port.as_int();
+    ncomFileReplay           = params.ncom_file_replay.as_bool();
+    ncomInFilePath           = params.ncom_input_file_path.as_string();
     timestampMode            = params.timestamp_mode.as_int();
     frameId                  = params.frame_id.as_string();
 
@@ -283,8 +303,19 @@ public:
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
-    timer_ncom_ = this->create_wall_timer(
-                  ncomInterval, std::bind(&NComPublisherNode::timer_ncom_callback, this));
+
+    //this->get_parameter("use_sim_time");
+
+    if (ncomFileReplay)
+    {
+      timer_ncom_ = this->create_wall_timer(
+                   ncomInterval, std::bind(&NComPublisherNode::timer_ncom_file_callback, this));
+    }
+    else 
+    {
+      timer_ncom_ = this->create_wall_timer(
+                    ncomInterval, std::bind(&NComPublisherNode::timer_ncom_callback, this));
+    }
     timer_string_ = this->create_wall_timer(
                   pubStringInterval, std::bind(&NComPublisherNode::timer_string_callback, this));
     timer_odometry_ = this->create_wall_timer(
@@ -302,10 +333,21 @@ public:
 
     nrx = NComCreateNComRxC();
 
-    unitEndpointNCom = boost::asio::ip::udp::endpoint(
-      boost::asio::ip::address::from_string(this->unitIp), 3000);
+    if (ncomFileReplay)
+    {
+      inFileNCom.open(ncomInFilePath);
+      if(!inFileNCom.is_open())
+      {
+        // error  
+      }
+    }
+    else 
+    {
+      unitEndpointNCom = boost::asio::ip::udp::endpoint(
+        boost::asio::ip::address::from_string(this->unitIp), 3000);
 
-    this->udpClient.set_local_port(3000);
+      this->udpClient.set_local_port(3000);
+    }
 
   }
 
@@ -325,6 +367,8 @@ public:
    * Endpoint for the udpClient to receive data from 
    */
   boost::asio::ip::udp::endpoint unitEndpointNCom;
+
+  std::fstream inFileNCom;
 
   /**
    * Count of callbacks run by the node (will correspond to number of ncom 
