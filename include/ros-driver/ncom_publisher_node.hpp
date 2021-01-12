@@ -38,20 +38,66 @@ enum PUB_TIMESTAMP_MODE
   DRIVER = 0,
   NCOM = 1
 };
-
+/**
+ * Params for the NComPublisherNode. 
+ */
 struct NComPublisherParams
 {
+  /**
+   * Rate at which to sample NCom. Expected that this will typically match the 
+   * rate of NCom itself, though can be set lower to save computation.
+   */
   rclcpp::Parameter ncom_rate;
+  /** 
+   * IP address of the INS to connect to
+   */
   rclcpp::Parameter unit_ip;
+  /** 
+   * Endpoint Port of the INS to be connected to. Default 3000 for NCom.
+   */
   rclcpp::Parameter unit_port;
+  /**
+   * Timestamp type to be applied to published packets
+   * 
+   * - 0 : Driver time. 
+   * - 1 : NCom time.
+   * 
+   * @todo Implement NCom timestamping
+   */
   rclcpp::Parameter timestamp_mode;
+  /**
+   * Frame ID of outgoing packets. 
+   * 
+   * @todo Having a general frame ID may not make sense. This isn't implemented.
+   */
   rclcpp::Parameter frame_id;
+  /**
+   * Publishing rate for debug String message.
+   */
   rclcpp::Parameter pub_string_rate;
+  /**
+   * Publishing rate for Odometry message.
+   */
   rclcpp::Parameter pub_odometry_rate;
+  /**
+   * Publishing rate for NavSatFix message.
+   */
   rclcpp::Parameter pub_nav_sat_fix_rate;
+  /**
+   * Publishing rate for Imu message.
+   */
   rclcpp::Parameter pub_imu_rate;
+  /**
+   * Publishing rate for Velocity message.
+   */
   rclcpp::Parameter pub_velocity_rate;
+  /**
+   * Publishing rate for TimeReference message.
+   */
   rclcpp::Parameter pub_time_reference_rate;
+  /**
+   * Publishing rate for Tf2 message.
+   */
   rclcpp::Parameter pub_tf2_rate;
 };
 
@@ -66,7 +112,9 @@ struct NComPublisherParams
 class NComPublisherNode : public rclcpp::Node
 {
 private:
-
+  /**
+   * Container for node params
+   */
   NComPublisherParams params;
 
   std::string unitIp;
@@ -92,13 +140,42 @@ private:
   rclcpp::TimerBase::SharedPtr timer_time_reference_;
   rclcpp::TimerBase::SharedPtr timer_tf2_;
 
+  /**
+   * Callback function for NCom sampling. Receives data from chosen source
+   * (UDP or file) and parses a packet to nrx.
+   * 
+   * @todo Implement file parsing.
+   */
   void timer_ncom_callback();
+  /** 
+   * Callback function for debug String message. Wraps message, publishes, and
+   * prints some information to the console.
+   */
   void timer_string_callback();
+  /** 
+   * Callback function for Odometry message. Wraps message and 
+   * publishes.
+   */
   void timer_odometry_callback();
+    /** 
+   * Callback function for NavSatFix message. Wraps message and publishes.
+   */
   void timer_nav_sat_fix_callback();
+    /** 
+   * Callback function for Imu message. Wraps message and publishes.
+   */
   void timer_imu_callback();
+    /** 
+   * Callback function for TimeReference message. Wraps message and publishes.
+   */
   void timer_time_reference_callback();
+    /** 
+   * Callback function for Velocity message. Wraps message and publishes.
+   */
   void timer_velocity_callback();
+  /** 
+   * Callback function for Tf2 message. Wraps message and publishes.
+   */
   void timer_tf2_callback();
 
   /**
@@ -130,10 +207,16 @@ private:
    * Publisher for /geometry_msgs/msg/TransformStamped
    */
   rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr  pubTf2_;
-
+  /**
+   * Node clock.
+   */ 
   rclcpp::Clock clock_;
 
 public:
+  /**
+   * Default constructor for the NComPublisherNode. Parses options from the 
+   * .yaml params/config file, sets up UDP connection to unit.
+   */
   NComPublisherNode() : Node("ncom_publisher"), count_(0)
   {
     
@@ -165,10 +248,10 @@ public:
     params.pub_time_reference_rate   = this->get_parameter("pub_time_reference_rate");
     params.pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
     // Convert parameters to useful variable types
-    unitIp                = params.unit_ip.as_string();
-    unitPort              = params.unit_port.as_int();
-    timestampMode         = params.timestamp_mode.as_int();
-    frameId               = params.frame_id.as_string();
+    unitIp                   = params.unit_ip.as_string();
+    unitPort                 = params.unit_port.as_int();
+    timestampMode            = params.timestamp_mode.as_int();
+    frameId                  = params.frame_id.as_string();
 
     ncomInterval             = std::chrono::milliseconds(
                              int(1000.0 / params.ncom_rate.as_double()));

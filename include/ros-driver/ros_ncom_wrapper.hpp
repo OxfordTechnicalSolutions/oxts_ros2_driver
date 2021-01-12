@@ -52,7 +52,8 @@ namespace RosNComWrapper
    * Does not strictly belong here since it is not encoding NCom data. Move when
    * appropriate alternative location makes itself known.
    * 
-   * @param nrx Pointer to the decoded NCom data
+   * @param time Timestamp to be added to the packet
+   * @param frame frame_id of the message
    */
   std_msgs::msg::Header              wrap_header     (rclcpp::Time time, 
                                                       std::string frame);
@@ -66,6 +67,7 @@ namespace RosNComWrapper
    * Wrap data from NCom decoder to sensor_msgs/msg/NavSatFix
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    */
   sensor_msgs::msg::NavSatFix        wrap_nav_sat_fix(const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
@@ -73,6 +75,7 @@ namespace RosNComWrapper
    * Wrap data from NCom decoder to nav_msgs/msg/Odometry
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    */
   nav_msgs::msg::Odometry            wrap_odometry (const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
@@ -87,6 +90,7 @@ namespace RosNComWrapper
    * Wrap IMU data from NCom decoder to sensor_msgs/msg/Imu
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    * 
    * \todo Covariances
    * \todo Validate Quaternion conversions
@@ -97,6 +101,7 @@ namespace RosNComWrapper
    * Wrap velocity data from NCom decoder to sensor_msgs/msg/Imu
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    * 
    * @returns Linear velocity forward, lateral, down. 
    *          Angular velocity forward, lateral, down.
@@ -109,6 +114,7 @@ namespace RosNComWrapper
    * The time reference depends on the presence of GNSS signal.
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    * 
    */
   sensor_msgs::msg::TimeReference wrap_time_reference (const NComRxC *nrx,
@@ -119,6 +125,7 @@ namespace RosNComWrapper
    * Transform from global ECEF to IMU
    * 
    * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
    * 
    */
   geometry_msgs::msg::TransformStamped wrap_tf2    (const NComRxC *nrx,
