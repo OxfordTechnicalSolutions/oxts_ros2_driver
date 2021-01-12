@@ -29,12 +29,31 @@
 
 using namespace std::chrono_literals;
 
+
+/**
+ * Enumeration of driver timestamp modes for published topics
+ */
 enum PUB_TIMESTAMP_MODE
 {
   DRIVER = 0,
   NCOM = 1
 };
 
+struct NComPublisherParams
+{
+  rclcpp::Parameter ncom_rate;
+  rclcpp::Parameter unit_ip;
+  rclcpp::Parameter unit_port;
+  rclcpp::Parameter timestamp_mode;
+  rclcpp::Parameter frame_id;
+  rclcpp::Parameter pub_string_rate;
+  rclcpp::Parameter pub_odometry_rate;
+  rclcpp::Parameter pub_nav_sat_fix_rate;
+  rclcpp::Parameter pub_imu_rate;
+  rclcpp::Parameter pub_velocity_rate;
+  rclcpp::Parameter pub_time_reference_rate;
+  rclcpp::Parameter pub_tf2_rate;
+};
 
 /**
  * This class creates a subclass of Node designed to take NCom data from the 
@@ -48,18 +67,7 @@ class NComPublisherNode : public rclcpp::Node
 {
 private:
 
-  rclcpp::Parameter param_ncom_rate;
-  rclcpp::Parameter param_unit_ip;
-  rclcpp::Parameter param_unit_port;
-  rclcpp::Parameter param_timestamp_mode;
-  rclcpp::Parameter param_frame_id;
-  rclcpp::Parameter param_pub_string_rate;
-  rclcpp::Parameter param_pub_odometry_rate;
-  rclcpp::Parameter param_pub_nav_sat_fix_rate;
-  rclcpp::Parameter param_pub_imu_rate;
-  rclcpp::Parameter param_pub_velocity_rate;
-  rclcpp::Parameter param_pub_time_reference_rate;
-  rclcpp::Parameter param_pub_tf2_rate;
+  NComPublisherParams params;
 
   std::string unitIp;
   short unitPort;
@@ -144,41 +152,40 @@ public:
     this->declare_parameter("pub_tf2_rate", 1.0);
 
     // Get parameters (from config, command line, or from default)
-    param_ncom_rate                 = this->get_parameter("ncom_rate");
-    param_unit_ip                   = this->get_parameter("unit_ip");
-    param_unit_port                 = this->get_parameter("unit_port");
-    param_timestamp_mode            = this->get_parameter("timestamp_mode");
-    param_frame_id                  = this->get_parameter("frame_id");
-
-    param_pub_string_rate           = this->get_parameter("pub_string_rate");
-    param_pub_odometry_rate         = this->get_parameter("pub_odometry_rate");
-    param_pub_nav_sat_fix_rate      = this->get_parameter("pub_nav_sat_fix_rate");
-    param_pub_imu_rate              = this->get_parameter("pub_imu_rate");
-    param_pub_velocity_rate         = this->get_parameter("pub_velocity_rate");
-    param_pub_time_reference_rate   = this->get_parameter("pub_time_reference_rate");
-    param_pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
+    params.ncom_rate                 = this->get_parameter("ncom_rate");
+    params.unit_ip                   = this->get_parameter("unit_ip");
+    params.unit_port                 = this->get_parameter("unit_port");
+    params.timestamp_mode            = this->get_parameter("timestamp_mode");
+    params.frame_id                  = this->get_parameter("frame_id");
+    params.pub_string_rate           = this->get_parameter("pub_string_rate");
+    params.pub_odometry_rate         = this->get_parameter("pub_odometry_rate");
+    params.pub_nav_sat_fix_rate      = this->get_parameter("pub_nav_sat_fix_rate");
+    params.pub_imu_rate              = this->get_parameter("pub_imu_rate");
+    params.pub_velocity_rate         = this->get_parameter("pub_velocity_rate");
+    params.pub_time_reference_rate   = this->get_parameter("pub_time_reference_rate");
+    params.pub_tf2_rate              = this->get_parameter("pub_tf2_rate");
     // Convert parameters to useful variable types
-    unitIp                = param_unit_ip.as_string();
-    unitPort              = param_unit_port.as_int();
-    timestampMode         = param_timestamp_mode.as_int();
-    frameId               = param_frame_id.as_string();
+    unitIp                = params.unit_ip.as_string();
+    unitPort              = params.unit_port.as_int();
+    timestampMode         = params.timestamp_mode.as_int();
+    frameId               = params.frame_id.as_string();
 
     ncomInterval             = std::chrono::milliseconds(
-                             int(1000.0 / param_ncom_rate.as_double()));
+                             int(1000.0 / params.ncom_rate.as_double()));
     pubStringInterval        = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_string_rate.as_double()));
+                             int(1000.0 / params.pub_string_rate.as_double()));
     pubOdometryInterval      = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_odometry_rate.as_double()));
+                             int(1000.0 / params.pub_odometry_rate.as_double()));
     pubNavSatFixInterval     = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_nav_sat_fix_rate.as_double()));
+                             int(1000.0 / params.pub_nav_sat_fix_rate.as_double()));
     pubImuInterval           = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_imu_rate.as_double()));
+                             int(1000.0 / params.pub_imu_rate.as_double()));
     pubVelocityInterval      = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_velocity_rate.as_double()));
+                             int(1000.0 / params.pub_velocity_rate.as_double()));
     pubTimeReferenceInterval = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_time_reference_rate.as_double()));
+                             int(1000.0 / params.pub_time_reference_rate.as_double()));
     pubTf2Interval           = std::chrono::milliseconds(
-                             int(1000.0 / param_pub_tf2_rate.as_double()));
+                             int(1000.0 / params.pub_tf2_rate.as_double()));
 
  
     // Initialise publishers for each message - all are initialised, even if not
