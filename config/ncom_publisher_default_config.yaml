@@ -4,12 +4,13 @@ ncom_publisher:
     # INS configuration (set up to match the unit)
     ## Unit IP address
     unit_ip: "192.168.25.216"
-    ## Unit Port
+    ## Unit Port (3000 unless intentionally configured otherwise on the INS)
     unit_port: 3000
 #===============================================================================
     # OR if reading from file
     #use_sim_time: true
     ncom_file_replay: false
+
     ncom_input_file_path: "/home/smccarthy/data/driver/test.ncom"
 
 #===============================================================================
@@ -38,7 +39,6 @@ ncom_publisher:
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver
-    # NOT YET IMPLEMENTED
 
     # 0 => Timestamped by the ROS node time (future default)
     # 1 => Timestamped from NCom

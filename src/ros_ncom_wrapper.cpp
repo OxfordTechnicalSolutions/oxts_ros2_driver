@@ -3,7 +3,9 @@
 
 rclcpp::Time      RosNComWrapper::ncom_time_to_time(const NComRxC *nrx)
 {
-  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond),
+  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
+                           (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 
+                           nrx->mTimeUtcOffset,
   static_cast<uint32_t>((nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
     * NAV_CONST::SECS2NANOSECS ));
 

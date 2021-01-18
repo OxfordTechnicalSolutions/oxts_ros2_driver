@@ -18,6 +18,10 @@ namespace NAV_CONST
    */
   const int SECS2NANOSECS =  1e9;
   /**
+   * Seconds in a week
+   */
+  const int WEEK_SECS =  604800;
+  /**
    * Convert from degrees to radians
    */
   const double DEG2RADS   =  M_PI / 180.0;

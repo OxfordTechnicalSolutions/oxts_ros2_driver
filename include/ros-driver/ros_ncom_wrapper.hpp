@@ -34,8 +34,11 @@
  */
 namespace RosNComWrapper
 {
+  
+
   /**
-   * Convert NCom time to a ROS friendly time format
+   * Convert NCom time to a ROS friendly time format. Does not convert to ROS
+   * time, only the format.
    * 
    * @param nrx Pointer to the decoded NCom data
    */
