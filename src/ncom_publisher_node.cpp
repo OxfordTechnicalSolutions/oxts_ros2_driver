@@ -41,7 +41,7 @@ void NComPublisherNode::timer_odometry_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "ins");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "ins");
@@ -56,7 +56,7 @@ void NComPublisherNode::timer_nav_sat_fix_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "ins");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "ins");
@@ -71,7 +71,7 @@ void NComPublisherNode::timer_imu_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "ins");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "ins");
@@ -86,7 +86,7 @@ void NComPublisherNode::timer_velocity_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "ins");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "ins");
@@ -101,7 +101,7 @@ void NComPublisherNode::timer_time_reference_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "ins");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "ins");
@@ -116,7 +116,7 @@ void NComPublisherNode::timer_tf2_callback()
   if(nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    if (this->timestampMode == PUB_TIMESTAMP_MODE::DRIVER)
+    if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
       header = RosNComWrapper::wrap_header(clock_.now(), "earth");
     else
       header = RosNComWrapper::wrap_header(RosNComWrapper::ncom_time_to_time(nrx), "earth");
@@ -129,10 +129,10 @@ void NComPublisherNode::timer_tf2_callback()
 
 std::string NComPublisherNode::get_unit_ip()
 {
-  return this->unitIp;
+  return this->unit_ip;
 }
 
 short       NComPublisherNode::get_unit_port()
 {
-  return this->unitPort;
+  return this->unit_port;
 }

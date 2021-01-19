@@ -3,15 +3,13 @@ ncom_publisher:
 #===============================================================================
     # INS configuration (set up to match the unit)
     ## Unit IP address
-    unit_ip: "192.168.25.216"
+    unit_ip: 192.168.25.216
     ## Unit Port (3000 unless intentionally configured otherwise on the INS)
     unit_port: 3000
 #===============================================================================
     # OR if reading from file
     #use_sim_time: true
-    ncom_file_replay: false
-
-    ncom_input_file_path: "/home/smccarthy/data/driver/test.ncom"
+    ncom: "/home/oxts/201130_150624.ncom"
 
 #===============================================================================
     # Configure ROS messages to be published by the node.
