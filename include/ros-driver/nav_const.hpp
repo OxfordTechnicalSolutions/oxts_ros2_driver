@@ -86,6 +86,13 @@ namespace NAV_CONST
     UNKNOWN         = 36
   };
 
+  enum NAV_MODE
+  {
+    RAW_INERTIAL_DATA   = 1, 
+    READY_TO_INITIALISE = 2,
+    LOCKING_ON          = 3, 
+    REAL_TIME           = 4
+  };
 
 }
 
