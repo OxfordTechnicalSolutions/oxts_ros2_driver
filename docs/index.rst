@@ -23,7 +23,16 @@ Docs
 ====
 
 .. doxygenclass:: NComPublisherNode
-    :members:
+   :members:
+
+.. doxygenclass:: OxtsDevice
+   :members:
 
 .. doxygennamespace:: RosNComWrapper
-    :members:
+   :members:
+
+.. doxygennamespace:: NAV_CONST
+   :members:
+
+.. doxygenstruct:: NComPublisherParams
+   :members:

@@ -1,5 +1,7 @@
 # ROS2 Driver
 
+[![pipeline status](https://gitlab.com/oxts/navigation/generic-aiding/ros-driver/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/generic-aiding/ros-driver/-/commits/master)
+
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Includes NCOM decoding and GAD encoding functionality. Where ROS is mentioned in this document this is in reference to ROS2. References to ROS1 will be explicit.
 
 The ROS driver has been built with ROS release Foxy Fitzroy as a pre-built binary. The need has not arisen to build from source just yet. 
@@ -10,25 +12,31 @@ Dependencies:
 
 - ROS2 (Foxy Fitzroy)
 
+```bash
+sudo apt install doxygen
+pip3 install sphinx breathe sphinx_rtd_theme
+```
+
 Build instructions will look something like this:
 
-1. cd <colcon_ws>/src
-2. git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
-3. cd ros-driver
-4. rosdep update
-5. rosdep install --from-path .
-6. cd ../..
-7. colcon build
-8. source install/setup.bash
+1. . /opt/ros/foxy/setup.bash
+2. cd <colcon_ws>/src
+3. git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
+4. cd ros-driver
+5. rosdep update
+6. rosdep install --from-path .
+7. cd ../..
+8. colcon build
+9. source install/setup.bash
 
 
 ## Configuring and Launching the Driver
 
 The driver is configured using .yaml files, as is the norm for ROS2 nodes. These should be kept in /config, and can be used to configure the node at run time like so:
 
-`{
+```bash
     ros2 run ros-driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/ros-driver/config/ncom_publisher_default_config.yaml
-}`
+```
 
 The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
 
@@ -36,9 +44,9 @@ If you (quite rightly) don't want to write that into the command line each time,
 
 To launch only the ncom publisher, use basic_launch.py like so:
 
-`{
+```bash
     ros2 launch basic_launch.py
-}`
+```
 
 
 

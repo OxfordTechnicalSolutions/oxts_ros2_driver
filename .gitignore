@@ -2,3 +2,10 @@
 build/
 log/
 install/ros-driver/
+# temo files
+*.pyc
+# doc files
+docs/build
+docs/doxygen
+docs/sphinx
+docs/Doxyfile
