@@ -1,0 +1,60 @@
+image: ubuntu:focal
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - apt update && apt install python3 python3-pip -y
+  - DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
+  - apt install libboost-all-dev -y
+  - python3 -V               # Print out python version for debugging
+  - pip3 install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+# Install python dependencies
+  - pip3 install sphinx sphinx_rtd_theme breathe
+# Install Ros2 Foxy
+  - apt update &&  apt install curl gnupg2 lsb-release doxygen -y
+  - curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+  - sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+  - apt update && apt install ros-foxy-ros-base -y
+  - source /opt/ros/foxy/setup.bash
+# Create documentation dir and move to build dir
+  - mkdir public
+  - mkdir docs/build
+  - cd docs/build
+# deploy pages only on master branch
+pages:
+  stage: deploy
+  script:
+    - cmake ../
+    - make
+    - mv ../sphinx/* ../../public
+  artifacts:
+    paths:
+    - public
+  # rules:
+    # - if: '$CI_COMMIT_BRANCH == "master"'
+# check built site before deploying to master
+# test:
+#   stage: test
+#   script:
+#     - sphinx-apidoc -M -f -A "Harry Mellor" -o . ../
+#     - sphinx-build -a -b html . ../public
+#   artifacts:
+#     paths:
+#       - test
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH != "master"'
