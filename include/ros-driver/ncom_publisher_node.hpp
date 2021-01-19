@@ -36,9 +36,17 @@ using namespace std::chrono_literals;
  */
 enum PUB_TIMESTAMP_MODE
 {
+  /**
+   * Use time within the driver. ROS time.
+   */
   DRIVER = 0,
+  /**
+   * Use NCom time.
+   */
   NCOM = 1
 };
+
+
 /**
  * Params for the NComPublisherNode. 
  */
@@ -71,8 +79,6 @@ struct NComPublisherParams
    * 
    * - 0 : Driver time. 
    * - 1 : NCom time.
-   * 
-   * @todo Implement NCom timestamping
    */
   rclcpp::Parameter timestamp_mode;
   /**
@@ -118,6 +124,8 @@ struct NComPublisherParams
  * @todo Add config struct to hold data which will hold config parsed from the 
  *       .yaml file.
  * @todo Change topic names to a standard form /imu/.. 
+ * @todo Refactor timestamping if statements out of callback functions and into
+ *       node initialisation.
  */
 class NComPublisherNode : public rclcpp::Node
 {
@@ -166,23 +174,22 @@ private:
    */
   void timer_string_callback();
   /** 
-   * Callback function for Odometry message. Wraps message and 
-   * publishes.
+   * Callback function for Odometry message. Wraps message and publishes.
    */
   void timer_odometry_callback();
-    /** 
+  /** 
    * Callback function for NavSatFix message. Wraps message and publishes.
    */
   void timer_nav_sat_fix_callback();
-    /** 
+  /** 
    * Callback function for Imu message. Wraps message and publishes.
    */
   void timer_imu_callback();
-    /** 
+  /** 
    * Callback function for TimeReference message. Wraps message and publishes.
    */
   void timer_time_reference_callback();
-    /** 
+  /** 
    * Callback function for Velocity message. Wraps message and publishes.
    */
   void timer_velocity_callback();
@@ -306,6 +313,8 @@ public:
 
     //this->get_parameter("use_sim_time");
 
+    // Assign callback functions to timers (callbacks are called at a rate
+    // dictated by the associated timer)
     if (ncomFileReplay)
     {
       timer_ncom_ = this->create_wall_timer(
