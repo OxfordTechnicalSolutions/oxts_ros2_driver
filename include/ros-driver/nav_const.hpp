@@ -14,6 +14,10 @@
 namespace NAV_CONST
 {
   /**
+   * Offset to convert from GPS epoch to Unix epoch
+   */
+  const int GPS2UNIX_EPOCH = 315964800;
+  /**
    * Convert from seconds to nanoseconds
    */
   const int SECS2NANOSECS =  1e9;
