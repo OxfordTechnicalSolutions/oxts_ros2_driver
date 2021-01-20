@@ -57,7 +57,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 - **ins/debug_string_pos** std_msgs/msg/String
 - **ins/odom** nav_msgs/msg/Odometry
 - **ins/nav_sat_fix** sensor_msgs/msg/NavSatFix
-- **imu/imu_data** sensor_msgs/msg/Imu
+- **imu/data** sensor_msgs/msg/Imu
 - **ins/velocity** geometry_msgs/msg/TwistStamped
 - **ins/tf2** geometry_msgs/msg/TransformStamped
 

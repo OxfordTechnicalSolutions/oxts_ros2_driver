@@ -33,11 +33,14 @@
 using namespace std::chrono_literals;
 
 
-int main(int argc, char * argv[])
+int main(int argc, char ** argv)
 {
+  // Force flush of the stdout buffer
+  setvbuf(stdout, nullptr, _IONBF, BUFSIZ);
+
   rclcpp::init(argc, argv);
 
-  auto ncomNode = std::make_shared<NComPublisherNode>();
+  auto ncomNode = std::make_shared<NComPublisherNode>(rclcpp::NodeOptions());
 
   //! @todo Add try/catch 
   RCLCPP_INFO(ncomNode->get_logger(), "Starting up node");

@@ -1,6 +1,7 @@
 # Untrack files
 build/
 log/
+.vscode/
 install/ros-driver/
 # temo files
 *.pyc

@@ -28,7 +28,6 @@ add_executable(ncom_publisher
                src/ncom_publisher.cpp 
                include/nav/NComRxC.c 
                src/ncom_publisher_node.cpp 
-               src/oxts_device.cpp
                src/ros_ncom_wrapper.cpp
                src/convert.cpp)
 

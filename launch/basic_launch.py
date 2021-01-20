@@ -9,7 +9,7 @@ parameters_file_name = 'ncom_publisher_default_config.yaml'
 
 def generate_launch_description():
     # get current path and go one level up
-    parameters_file_path = Path(get_package_share_directory('ros-driver'),'config', parameters_file_name )
+    parameters_file_path = Path(get_package_share_directory('ros-driver'), 'config', parameters_file_name)
     print(parameters_file_path)
 
     return LaunchDescription([
