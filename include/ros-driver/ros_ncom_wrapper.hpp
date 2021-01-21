@@ -44,12 +44,6 @@ namespace RosNComWrapper
    */
   rclcpp::Time       ncom_time_to_time(const NComRxC *nrx);
   /**
-   * Wrap data from NCom decoder to std_msgs/msg/Header (for use in other msgs)
-   * 
-   * @param nrx Pointer to the decoded NCom data
-   */
-  std_msgs::msg::Header              wrap_header_ncom_time(const NComRxC *nrx);
-  /**
    * Wrap data into ROS header format.
    * 
    * Does not strictly belong here since it is not encoding NCom data. Move when
@@ -58,8 +52,7 @@ namespace RosNComWrapper
    * @param time Timestamp to be added to the packet
    * @param frame frame_id of the message
    */
-  std_msgs::msg::Header              wrap_header     (rclcpp::Time time, 
-                                                      std::string frame);
+  std_msgs::msg::Header wrap_header(rclcpp::Time time, std::string frame);
   /** 
    * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
    * 

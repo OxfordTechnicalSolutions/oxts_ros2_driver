@@ -12,19 +12,8 @@ rclcpp::Time      RosNComWrapper::ncom_time_to_time(const NComRxC *nrx)
   return time;
 }
 
-std_msgs::msg::Header RosNComWrapper::wrap_header_ncom_time(const NComRxC *nrx)
-{
-  auto header = std_msgs::msg::Header();
-
-  header.stamp = RosNComWrapper::ncom_time_to_time(nrx);
-
-  header.frame_id = "earth"; /*! @todo Change this */
-
-  return header;
-}
-
-std_msgs::msg::Header       RosNComWrapper::wrap_header(rclcpp::Time time, 
-                                                        std::string frame )
+std_msgs::msg::Header       RosNComWrapper::wrap_header(rclcpp::Time time,
+                                                        std::string frame)
 {
   auto header = std_msgs::msg::Header();
 
