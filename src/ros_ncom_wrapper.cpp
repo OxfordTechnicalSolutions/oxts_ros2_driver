@@ -134,7 +134,7 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
 {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = head;
-  msg.header.frame_id = "earth";
+  msg.header.frame_id = "map";
   msg.child_frame_id = "odom";
 
   // Together, msgs Point and Quaternion make a geometry_msgs/Pose
@@ -148,17 +148,14 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
   msg.pose.pose.position.y = transformVec[1];
   msg.pose.pose.position.z = transformVec[2];
 
-
   // geometry_msgs/msg/Quaternion
   tf2::Quaternion q;
-  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
-           NAV_CONST::DEG2RADS * nrx->mPitch,
-           NAV_CONST::DEG2RADS * nrx->mHeading );
+  q.setEuler(NAV_CONST::DEG2RADS * nrx->mHeading,
+             NAV_CONST::DEG2RADS * nrx->mPitch,
+             NAV_CONST::DEG2RADS * nrx->mRoll );
            
-  msg.pose.pose.orientation.x = q.x();
-  msg.pose.pose.orientation.y = q.y();
-  msg.pose.pose.orientation.z = q.z();
-  msg.pose.pose.orientation.w = q.w();
+  tf2::convert(q,msg.pose.pose.orientation);
+
   
   msg.pose.covariance[0] = 0.0;
   //  1 ... 34
@@ -214,18 +211,21 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   tf2::Quaternion q_vat; // Quaternion representation of the vehicle-imu alignment
   t_vat_msg = RosNComWrapper::wrap_vat_to_tf(nrx);
   tf2::convert(t_vat_msg.transform.rotation,q_vat);
-  // Rotate orientation data using q_vat ---------------------------------------
+  // Get vehicle orientatin from HPR -------------------------------------------
   tf2::Quaternion q_veh_orientation;
   q_veh_orientation.setEuler(NAV_CONST::DEG2RADS * nrx->mHeading,
-                           NAV_CONST::DEG2RADS * nrx->mPitch,
-                           NAV_CONST::DEG2RADS * nrx->mRoll );
+                             NAV_CONST::DEG2RADS * nrx->mPitch,
+                             NAV_CONST::DEG2RADS * nrx->mRoll );
   tf2::convert(q_veh_orientation,q_veh_orientation_msg);
 
-  tf2::Quaternion q_vat_temp = q_vat;
-  q_vat_temp *= q_veh_orientation;
-  //q_veh_orientation *= q_vat ;
-  // tf2::convert(q_veh_orientation,msg.orientation);
-  tf2::convert(q_vat_temp,msg.orientation);
+  // Rotate orientation data using q_vat ---------------------------------------
+  auto poseStamped = geometry_msgs::msg::PoseStamped();
+  auto pose_out = geometry_msgs::msg::PoseStamped();
+
+  poseStamped.pose.orientation = q_veh_orientation_msg;
+
+  tf2::doTransform(poseStamped,pose_out,t_vat_msg);
+  tf2::convert(pose_out.pose.orientation,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
