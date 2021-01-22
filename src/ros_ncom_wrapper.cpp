@@ -203,9 +203,9 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.orientation_covariance[8] = 0.0;
 
   // geometry_msgs/Vector3
-  msg.angular_velocity.x = nrx->mWx;
-  msg.angular_velocity.y = nrx->mWy;
-  msg.angular_velocity.z = nrx->mWz;
+  msg.angular_velocity.x = nrx->mWx * NAV_CONST::DEG2RADS;
+  msg.angular_velocity.y = nrx->mWy * NAV_CONST::DEG2RADS;
+  msg.angular_velocity.z = nrx->mWz * NAV_CONST::DEG2RADS;
 
   msg.angular_velocity_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
