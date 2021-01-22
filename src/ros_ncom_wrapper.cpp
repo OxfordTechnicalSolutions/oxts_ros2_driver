@@ -185,36 +185,54 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   auto msg = sensor_msgs::msg::Imu();
   msg.header = head;
 
-  // geometry_msgs/Quaternion
-  tf2::Quaternion q;
+  // Construct vehicle-imu frame transformation
+  tf2::Quaternion q_vat; // Quaternion representation of the vehicle-imu alignment
+  q_vat.setRPY(NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
+               NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
+               NAV_CONST::DEG2RADS * nrx->mImu2VehHeading );
 
-  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
-           NAV_CONST::DEG2RADS * nrx->mPitch,
-           NAV_CONST::DEG2RADS * nrx->mHeading );
-           
-  msg.orientation.x = q.x();
-  msg.orientation.y = q.y();
-  msg.orientation.z = q.z();
-  msg.orientation.w = q.w();
+  auto q_vat_msg = geometry_msgs::msg::Quaternion(); // q_vat in msg type
+  tf2::convert(q_vat,q_vat_msg);
+  auto t_vat_msg = geometry_msgs::msg::TransformStamped(); // vehicle-imu frame transform
+  t_vat_msg.transform.rotation = q_vat_msg;
+
+  tf2::Quaternion q_veh_orientation;
+  auto q_veh_orientation_msg = geometry_msgs::msg::Quaternion();
+  // Rotate orientation data using q_vat
+  q_veh_orientation.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+                           NAV_CONST::DEG2RADS * nrx->mPitch,
+                           NAV_CONST::DEG2RADS * nrx->mHeading );
+  tf2::convert(q_veh_orientation,q_veh_orientation_msg);
+  q_veh_orientation *= q_vat ;
+  tf2::convert(q_veh_orientation,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
   // ...
   msg.orientation_covariance[8] = 0.0;
 
-  // geometry_msgs/Vector3
-  msg.angular_velocity.x = nrx->mWx * NAV_CONST::DEG2RADS;
-  msg.angular_velocity.y = nrx->mWy * NAV_CONST::DEG2RADS;
-  msg.angular_velocity.z = nrx->mWz * NAV_CONST::DEG2RADS;
+  // Rotate angular rate data using t_vat_msg
+  auto veh_w = geometry_msgs::msg::Vector3Stamped();
+  auto imu_w = geometry_msgs::msg::Vector3Stamped();
+
+  veh_w.vector.x = nrx->mWx * NAV_CONST::DEG2RADS;
+  veh_w.vector.y = nrx->mWy * NAV_CONST::DEG2RADS;
+  veh_w.vector.z = nrx->mWz * NAV_CONST::DEG2RADS;
+  tf2::doTransform(veh_w,imu_w,t_vat_msg);
+  msg.angular_velocity = imu_w.vector;
 
   msg.angular_velocity_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
   msg.angular_velocity_covariance[8] = 0.0;
 
-  // geometry_msgs/Vector3
-  msg.linear_acceleration.x = nrx->mAx;
-  msg.linear_acceleration.y = nrx->mAy;
-  msg.linear_acceleration.z = nrx->mAz;
+  // Rotate linear acceleration data using t_vat_msg
+  auto vm_in = geometry_msgs::msg::Vector3Stamped(); // vehicle frame acc.
+  vm_in.vector.x = nrx->mAx;
+  vm_in.vector.y = nrx->mAy;
+  vm_in.vector.z = nrx->mAz;
+  auto vm_out = geometry_msgs::msg::Vector3Stamped(); // imu frame acc.
+  tf2::doTransform(vm_in,vm_out,t_vat_msg); // Apply transformation to acc.
+  msg.linear_acceleration = vm_out.vector;
 
   msg.linear_acceleration_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...

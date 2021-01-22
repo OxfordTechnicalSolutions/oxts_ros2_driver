@@ -21,8 +21,12 @@
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include <geometry_msgs/msg/transform_stamped.h>
+#include <geometry_msgs/msg/quaternion.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+
+#include "tf2_kdl/tf2_kdl.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 // OxTS includes
 #include "nav/NComRxC.h"
