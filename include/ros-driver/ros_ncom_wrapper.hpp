@@ -22,6 +22,7 @@
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include <geometry_msgs/msg/transform_stamped.h>
 #include <geometry_msgs/msg/quaternion.h>
+#include <geometry_msgs/msg/pose.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 
