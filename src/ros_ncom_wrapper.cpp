@@ -1,6 +1,24 @@
 #include "ros-driver/ros_ncom_wrapper.hpp"
 
 
+geometry_msgs::msg::TransformStamped RosNComWrapper::wrap_vat_to_tf(
+                                     const NComRxC *nrx)
+{
+  auto tfStamped = geometry_msgs::msg::TransformStamped();
+  tf2::Quaternion q_align; 
+  geometry_msgs::msg::Quaternion q_align_msg;
+  q_align.setEuler(NAV_CONST::DEG2RADS * nrx->mImu2VehHeading,
+                   NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
+                   NAV_CONST::DEG2RADS * nrx->mImu2VehRoll    );
+  //q_align = q_align.inverse();
+  tf2::convert(q_align,q_align_msg);
+  tfStamped.transform.rotation = q_align_msg;
+
+  return tfStamped;
+}
+
+
+
 rclcpp::Time      RosNComWrapper::ncom_time_to_time(const NComRxC *nrx)
 {
   auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
@@ -185,7 +203,6 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   auto msg = sensor_msgs::msg::Imu();
   msg.header = head;
 
-  auto q_vat_msg             = geometry_msgs::msg::Quaternion(); // q_vat in msg type
   auto t_vat_msg             = geometry_msgs::msg::TransformStamped(); // vehicle-imu frame transform
   auto q_veh_orientation_msg = geometry_msgs::msg::Quaternion();
   auto veh_w                 = geometry_msgs::msg::Vector3Stamped();
@@ -195,14 +212,8 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   
   // Construct vehicle-imu frame transformation --------------------------------
   tf2::Quaternion q_vat; // Quaternion representation of the vehicle-imu alignment
-
-  q_vat.setEuler(NAV_CONST::DEG2RADS * nrx->mImu2VehHeading,
-               NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
-               NAV_CONST::DEG2RADS * nrx->mImu2VehRoll );
-  //q_vat = q_vat.inverse();
-  tf2::convert(q_vat,q_vat_msg);
-  t_vat_msg.transform.rotation = q_vat_msg;
-
+  t_vat_msg = RosNComWrapper::wrap_vat_to_tf(nrx);
+  tf2::convert(t_vat_msg.transform.rotation,q_vat);
   // Rotate orientation data using q_vat ---------------------------------------
   tf2::Quaternion q_veh_orientation;
   q_veh_orientation.setEuler(NAV_CONST::DEG2RADS * nrx->mHeading,
@@ -301,14 +312,12 @@ geometry_msgs::msg::TransformStamped  RosNComWrapper::wrap_tf2   (
 
   tf2::Quaternion q;
 
-  q.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
-           NAV_CONST::DEG2RADS * nrx->mPitch,
-           NAV_CONST::DEG2RADS * nrx->mHeading );
+  q.setEuler(NAV_CONST::DEG2RADS * nrx->mHeading,
+             NAV_CONST::DEG2RADS * nrx->mPitch,
+             NAV_CONST::DEG2RADS * nrx->mRoll );
 
-  msg.transform.rotation.x = q.x();
-  msg.transform.rotation.y = q.y();
-  msg.transform.rotation.z = q.z();
-  msg.transform.rotation.w = q.w();
+  tf2::convert(q,msg.transform.rotation);
+
 
   return msg;
 }

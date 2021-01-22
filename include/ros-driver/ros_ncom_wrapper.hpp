@@ -39,7 +39,17 @@
 namespace RosNComWrapper
 {
   
-
+  /**
+   * Calculate the rotational component of the transform from frame1 to frame2
+   * based on Euler angles
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @return A transform which can be applied to data in the vehicle frame to 
+   *         convert it to the imu frame. Timestamp is not used.
+   * 
+   * @todo Translation component?
+   */
+  geometry_msgs::msg::TransformStamped wrap_vat_to_tf(const NComRxC *nrx);
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.
