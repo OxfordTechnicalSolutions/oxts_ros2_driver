@@ -1,25 +1,17 @@
 #include "ros-driver/ros_ncom_wrapper.hpp"
 
 
-geometry_msgs::msg::TransformStamped RosNComWrapper::wrap_vat_to_tf(
+tf2::Quaternion RosNComWrapper::wrap_vat_to_quaternion(
                                      const NComRxC *nrx)
 {
-  auto tfStamped = geometry_msgs::msg::TransformStamped();
   tf2::Quaternion q_align; 
   geometry_msgs::msg::Quaternion q_align_msg;
-  q_align.setEuler(NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
-                   NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
-                   NAV_CONST::DEG2RADS * nrx->mImu2VehHeading);
-  // q_align = q_align.inverse(); 
-  double imuRoll, imuPitch, imuYaw;
-  tf2::Matrix3x3(q_align).getRPY(imuRoll, imuPitch, imuYaw);
-  std::cout << "VAT: " << imuRoll*NAV_CONST::RADS2DEG << ", pitch: " << imuPitch*NAV_CONST::RADS2DEG << ", yaw: " << imuYaw*NAV_CONST::RADS2DEG << std::endl;
-  // std::cout << "VAT:" <<  nrx->mImu2VehRoll << ", " << nrx->mImu2VehHeading << ", " << nrx->mImu2VehPitch <<std::endl;
-  
-  tf2::convert(q_align,q_align_msg);
-  tfStamped.transform.rotation = q_align_msg;
-
-  return tfStamped;
+  q_align.setRPY(
+    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
+    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
+    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading
+  );
+  return q_align;
 }
 
 
@@ -148,16 +140,25 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
   std::vector<double> transformVec(3);
   transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
 
-  msg.pose.pose.position.x = transformVec[0];
-  msg.pose.pose.position.y = transformVec[1];
-  msg.pose.pose.position.z = transformVec[2];
+  // msg.pose.pose.position.x = transformVec[0];
+  // msg.pose.pose.position.y = transformVec[1];
+  // msg.pose.pose.position.z = transformVec[2];
+  msg.pose.pose.position.x = 0;
+  msg.pose.pose.position.y = 0;
+  msg.pose.pose.position.z = 0;
 
   // geometry_msgs/msg/Quaternion
   tf2::Quaternion q;
-  q.setEuler(
-            NAV_CONST::DEG2RADS * nrx->mHeading,
+  q.setRPY(
+             NAV_CONST::DEG2RADS * nrx->mRoll ,
              NAV_CONST::DEG2RADS * nrx->mPitch,
-             NAV_CONST::DEG2RADS * nrx->mRoll );
+             NAV_CONST::DEG2RADS * nrx->mHeading
+             );
+  auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
+  // Construct vehicle-imu frame transformation --------------------------------
+  q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
+
+  q = q_vat * q;
 
   tf2::convert(q,msg.pose.pose.orientation);
 
@@ -202,71 +203,54 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
                       const NComRxC *nrx,
                       std_msgs::msg::Header head)
 {
-  std::cout << "time: " << (double)nrx->mTimeWeekSecond << std::endl;
   auto msg = sensor_msgs::msg::Imu();
   msg.header = head;
 
-  auto t_vat_msg             = geometry_msgs::msg::TransformStamped(); // vehicle-imu frame transform
-  // auto q_veh_orientation_msg = geometry_msgs::msg::Quaternion();
-  auto veh_w                 = geometry_msgs::msg::Vector3Stamped();
-  auto imu_w                 = geometry_msgs::msg::Vector3Stamped();
-  auto vm_in                 = geometry_msgs::msg::Vector3Stamped(); // vehicle frame acc.
-  auto vm_out                = geometry_msgs::msg::Vector3Stamped(); // imu frame acc.
-  
+  auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
+  auto r_vat = tf2::Matrix3x3();
+  auto veh_o = tf2::Quaternion();
+  auto imu_o = tf2::Quaternion();
+  auto veh_w = tf2::Vector3();
+  auto imu_w = tf2::Vector3();
+  auto veh_a = tf2::Vector3();
+  auto imu_a = tf2::Vector3();
+
   // Construct vehicle-imu frame transformation --------------------------------
-  tf2::Quaternion q_vat; // Quaternion representation of the vehicle-imu alignment
-  t_vat_msg = RosNComWrapper::wrap_vat_to_tf(nrx);
-  tf2::convert(t_vat_msg.transform.rotation,q_vat);
+  q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
+  r_vat = tf2::Matrix3x3(q_vat);
   // Get vehicle orientation from HPR -------------------------------------------
-  tf2::Quaternion q_veh_orientation;
-  q_veh_orientation.setEuler(NAV_CONST::DEG2RADS * nrx->mPitch, // set Quaternion in vehicle frame
-                             NAV_CONST::DEG2RADS * nrx->mRoll,
-                             NAV_CONST::DEG2RADS * nrx->mHeading);
-  //tf2::convert(q_veh_orientation,q_veh_orientation_msg);
-
-  // Rotate orientation data using q_vat ---------------------------------------
-  // auto poseStamped = geometry_msgs::msg::PoseStamped();
-  // auto pose_out = geometry_msgs::msg::PoseStamped();
-  q_veh_orientation =  q_vat * q_veh_orientation;
-  // poseStamped.pose.orientation = q_veh_orientation_msg;
-
-  // tf2::doTransform(poseStamped,pose_out,t_vat_msg);
-  // tf2::convert(pose_out.pose.orientation, msg.orientation);
-  tf2::convert(q_veh_orientation,msg.orientation);
-  // PRINT
-  double imuRoll, imuPitch, imuYaw;
-  tf2::Quaternion orientation;
-  tf2::convert(msg.orientation, orientation);
-  unsigned int solution_number = 2;
-  tf2::Matrix3x3(orientation).getRPY(imuRoll, imuPitch, imuYaw);
-
-  std::cout << "IMU roll: " << imuRoll*NAV_CONST::RADS2DEG << ", pitch: " << imuPitch*NAV_CONST::RADS2DEG << ", yaw: " << imuYaw*NAV_CONST::RADS2DEG << std::endl;
-  // std::cout << "Quaternion: " << q_vat.getAxis()[0] << ", "<< q_vat.getAxis()[1] << ", "<< q_vat.getAxis()[2] << ", " << q_vat.getAngle() << std::endl;
-  // PRINT END
+  veh_o.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+               NAV_CONST::DEG2RADS * nrx->mPitch,
+               NAV_CONST::DEG2RADS * nrx->mHeading);
+  imu_o =  q_vat * veh_o;
+  tf2::convert(imu_o,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
   // ...
   msg.orientation_covariance[8] = 0.0;
 
-  // Rotate angular rate data using t_vat_msg ----------------------------------
-
-  veh_w.vector.x = NAV_CONST::DEG2RADS * nrx->mWx;
-  veh_w.vector.y = NAV_CONST::DEG2RADS * nrx->mWy;
-  veh_w.vector.z = NAV_CONST::DEG2RADS * nrx->mWz;
-  tf2::doTransform(veh_w,imu_w,t_vat_msg);
-  msg.angular_velocity = imu_w.vector;
+  // Rotate angular rate data ----------------------------------
+  veh_w.setX(NAV_CONST::DEG2RADS * nrx->mWx);
+  veh_w.setY(NAV_CONST::DEG2RADS * nrx->mWy);
+  veh_w.setZ(NAV_CONST::DEG2RADS * nrx->mWz);
+  imu_w = r_vat * veh_w;
+  msg.angular_velocity.x = imu_w.getX();
+  msg.angular_velocity.y = imu_w.getY();
+  msg.angular_velocity.z = imu_w.getZ();
 
   msg.angular_velocity_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
   msg.angular_velocity_covariance[8] = 0.0;
 
-  // Rotate linear acceleration data using t_vat_msg ---------------------------
-  vm_in.vector.x = nrx->mAx;
-  vm_in.vector.y = nrx->mAy;
-  vm_in.vector.z = nrx->mAz;
-  tf2::doTransform(vm_in,vm_out,t_vat_msg); // Apply transformation to acc.
-  msg.linear_acceleration = vm_out.vector;
+  // Rotate linear acceleration data ---------------------------
+  veh_a.setX(nrx->mAx);
+  veh_a.setY(nrx->mAy);
+  veh_a.setZ(nrx->mAz);
+  imu_a = r_vat * veh_a;
+  msg.linear_acceleration.x = imu_a.getX();
+  msg.linear_acceleration.y = imu_a.getY();
+  msg.linear_acceleration.z = imu_a.getZ();
 
   msg.linear_acceleration_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
