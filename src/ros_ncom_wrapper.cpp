@@ -5,7 +5,6 @@ tf2::Quaternion RosNComWrapper::wrap_vat_to_quaternion(
                                      const NComRxC *nrx)
 {
   tf2::Quaternion q_align; 
-  geometry_msgs::msg::Quaternion q_align_msg;
   q_align.setRPY(
     NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
     NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
@@ -133,27 +132,21 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
   msg.header.frame_id = "odom";
   msg.child_frame_id = "imu_link";
 
-  // Together, msgs Point and Quaternion make a geometry_msgs/Pose
-  // geometry_msgs/msg/Point
-
   // We need to convert WGS84 to ECEF, the "global" frame in ROS2
   std::vector<double> transformVec(3);
   transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
 
-  // msg.pose.pose.position.x = transformVec[0];
-  // msg.pose.pose.position.y = transformVec[1];
-  // msg.pose.pose.position.z = transformVec[2];
-  msg.pose.pose.position.x = 0;
-  msg.pose.pose.position.y = 0;
-  msg.pose.pose.position.z = 0;
+  msg.pose.pose.position.x = transformVec[0];
+  msg.pose.pose.position.y = transformVec[1];
+  msg.pose.pose.position.z = transformVec[2];
 
   // geometry_msgs/msg/Quaternion
   tf2::Quaternion q;
   q.setRPY(
-             NAV_CONST::DEG2RADS * nrx->mRoll ,
-             NAV_CONST::DEG2RADS * nrx->mPitch,
-             NAV_CONST::DEG2RADS * nrx->mHeading
-             );
+           NAV_CONST::DEG2RADS * nrx->mRoll,
+           NAV_CONST::DEG2RADS * nrx->mPitch,
+           NAV_CONST::DEG2RADS * nrx->mHeading
+           );
   auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
   // Construct vehicle-imu frame transformation --------------------------------
   q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
@@ -162,7 +155,6 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
 
   tf2::convert(q,msg.pose.pose.orientation);
 
-  
   msg.pose.covariance[0] = 0.0;
   //  1 ... 34
   msg.pose.covariance[35] = 0.0;
@@ -190,7 +182,8 @@ nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
 std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 {
   auto msg = std_msgs::msg::String();
-  msg.data = "Time, Lat, Long, Alt : "+ std::to_string(nrx->mTimeWeekSecond) + ", " 
+  msg.data = "Time, Lat, Long, Alt : "
+                                 + std::to_string(nrx->mTimeWeekSecond) + ", " 
                                  + std::to_string(nrx->mLat) + ", "
                                  + std::to_string(nrx->mLon) + ", "
                                  + std::to_string(nrx->mAlt);
