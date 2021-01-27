@@ -78,8 +78,6 @@ private:
   std::string frame_id;           
   /*! Publishing rate for debug String message. */
   double pub_string_rate;         
-  /*! Publishing rate for Odometry message. */
-  double pub_odometry_rate;       
   /*! Publishing rate for NavSatFix message. */
   double pub_nav_sat_fix_rate;    
   /*! Publishing rate for Imu message. */
@@ -93,7 +91,6 @@ private:
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
   std::chrono::duration<uint64_t,std::milli> pubStringInterval;
-  std::chrono::duration<uint64_t,std::milli> pubOdometryInterval;
   std::chrono::duration<uint64_t,std::milli> pubNavSatFixInterval;
   std::chrono::duration<uint64_t,std::milli> pubImuInterval;
   std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
@@ -103,7 +100,6 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
   rclcpp::TimerBase::SharedPtr timer_string_;
-  rclcpp::TimerBase::SharedPtr timer_odometry_;
   rclcpp::TimerBase::SharedPtr timer_nav_sat_fix_;
   rclcpp::TimerBase::SharedPtr timer_imu_;
   rclcpp::TimerBase::SharedPtr timer_velocity_;
@@ -123,10 +119,6 @@ private:
    * prints some information to the console.
    */
   void timer_string_callback();
-  /** 
-   * Callback function for Odometry message. Wraps message and publishes.
-   */
-  void timer_odometry_callback();
   /** 
    * Callback function for NavSatFix message. Wraps message and publishes.
    */
@@ -154,10 +146,6 @@ private:
    * outputs lat, long, alt in string form.
    */
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr       pubString_;
-  /**
-   * Publisher for /sensor_msgs/msg/Odometry
-   */
-  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr     pubOdometry_;
   /**
    * Publisher for /sensor_msgs/msg/NavSatFix
    */
@@ -199,32 +187,26 @@ public:
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
     frame_id                = this->declare_parameter("frame_id", "base_link");                   
     pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);                    
-    pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 1.0);                  
     pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);               
     pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);                       
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);                  
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);            
-    pub_tf2_rate            = this->declare_parameter("pub_tf2_rate", 1.0);                       
 
     ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));
-    pubOdometryInterval      = std::chrono::milliseconds(int(1000.0 / pub_odometry_rate));
     pubNavSatFixInterval     = std::chrono::milliseconds(int(1000.0 / pub_nav_sat_fix_rate));
     pubImuInterval           = std::chrono::milliseconds(int(1000.0 / pub_imu_rate));
     pubVelocityInterval      = std::chrono::milliseconds(int(1000.0 / pub_velocity_rate));
     pubTimeReferenceInterval = std::chrono::milliseconds(int(1000.0 / pub_time_reference_rate));
-    pubTf2Interval           = std::chrono::milliseconds(int(1000.0 / pub_tf2_rate));
 
  
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubString_        = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
-    pubOdometry_      = this->create_publisher<nav_msgs::msg::Odometry>             ("ins/odom",             10); 
     pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
     pubImu_           = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/data",             10); 
     pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
     pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>     ("ins/time_reference",   10);
-    pubTf2_           = this->create_publisher<geometry_msgs::msg::TransformStamped>("ins/tf2",              10); 
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
@@ -245,8 +227,6 @@ public:
     }
     timer_string_ = this->create_wall_timer(
                   pubStringInterval, std::bind(&NComPublisherNode::timer_string_callback, this));
-    timer_odometry_ = this->create_wall_timer(
-                  pubOdometryInterval, std::bind(&NComPublisherNode::timer_odometry_callback, this));
     timer_nav_sat_fix_ = this->create_wall_timer(
                   pubNavSatFixInterval, std::bind(&NComPublisherNode::timer_nav_sat_fix_callback, this));
     timer_imu_ = this->create_wall_timer(
@@ -255,8 +235,6 @@ public:
                   pubVelocityInterval, std::bind(&NComPublisherNode::timer_velocity_callback, this));
     timer_time_reference_ = this->create_wall_timer(
                   pubTimeReferenceInterval, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
-    timer_tf2_ = this->create_wall_timer(
-                  pubTf2Interval, std::bind(&NComPublisherNode::timer_tf2_callback, this));
 
     nrx = NComCreateNComRxC();
 

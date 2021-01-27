@@ -36,16 +36,6 @@ void NComPublisherNode::timer_string_callback()
   }
 }
 
-void NComPublisherNode::timer_odometry_callback()
-{
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "ins");
-    auto msg    = RosNComWrapper::wrap_odometry (this->nrx, header);
-    pubOdometry_->publish(msg);
-  }
-}
 
 void NComPublisherNode::timer_nav_sat_fix_callback()
 {
@@ -63,7 +53,7 @@ void NComPublisherNode::timer_imu_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "ins");
+    header = RosNComWrapper::wrap_header(this->get_timestamp(), "imu");
     auto msg    = RosNComWrapper::wrap_imu(this->nrx, header);
     pubImu_->publish(msg);
   }

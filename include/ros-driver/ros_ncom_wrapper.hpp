@@ -84,14 +84,6 @@ namespace RosNComWrapper
   sensor_msgs::msg::NavSatFix        wrap_nav_sat_fix(const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
   /**
-   * Wrap data from NCom decoder to nav_msgs/msg/Odometry
-   * 
-   * @param nrx Pointer to the decoded NCom data
-   * @param head Header to be added to the published message
-   */
-  nav_msgs::msg::Odometry            wrap_odometry (const NComRxC *nrx,
-                                                    std_msgs::msg::Header head);
-  /**
    * Wrap position data from NCom decoder to std_msgs/msg/String
    * Not really a permanent function, more for easy testing.
    * 
