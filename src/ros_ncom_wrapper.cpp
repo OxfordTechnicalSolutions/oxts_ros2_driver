@@ -125,55 +125,92 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(
 
 nav_msgs::msg::Odometry RosNComWrapper::wrap_odometry (
                         const NComRxC *nrx,
-                        std_msgs::msg::Header head)
+                        std_msgs::msg::Header head,
+                        nav_msgs::msg::Odometry prev)
 {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = head;
   msg.header.frame_id = "odom";
-  msg.child_frame_id = "imu_link";
+  msg.child_frame_id = "base_link";
 
-  // We need to convert WGS84 to ECEF, the "global" frame in ROS2
-  std::vector<double> transformVec(3);
-  transformVec = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-
-  msg.pose.pose.position.x = transformVec[0];
-  msg.pose.pose.position.y = transformVec[1];
-  msg.pose.pose.position.z = transformVec[2];
-
-  // geometry_msgs/msg/Quaternion
-  tf2::Quaternion q;
-  q.setRPY(
-           NAV_CONST::DEG2RADS * nrx->mRoll,
-           NAV_CONST::DEG2RADS * nrx->mPitch,
-           NAV_CONST::DEG2RADS * nrx->mHeading
-           );
-  auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
   // Construct vehicle-imu frame transformation --------------------------------
+  auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
+  auto r_vat = tf2::Matrix3x3();
   q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
+  q_vat.normalize();
+  r_vat = tf2::Matrix3x3(q_vat);
+  // Get FLD velocity data and angular rates from the NCom decoder. ------------
+  // This data is in the vehicle frame
+  auto veh_v = tf2::Vector3();
+  auto veh_w = tf2::Vector3();
+  auto imu_v = tf2::Vector3();
+  auto imu_w = tf2::Vector3();
+  veh_v.setX(nrx->mVf);
+  veh_v.setY(nrx->mVl);
+  veh_v.setZ(nrx->mVd);
+  veh_w.setX(nrx->mWx);
+  veh_w.setY(nrx->mWy);
+  veh_w.setZ(nrx->mWz);
 
-  q = q_vat * q;
+  // Convert this data to imu frame --------------------------------------------
+  imu_v = r_vat * veh_v;
+  imu_w = r_vat * veh_w;
+  // Convert to base_link frame (Feature TBA) - until then, assume base_link ---
+  // and imu_link are aligned.
 
-  tf2::convert(q,msg.pose.pose.orientation);
+  // Put velocity and angular rates (base_link) into twist ---------------------
+  msg.twist.twist.linear.x  = imu_v.getX();
+  msg.twist.twist.linear.y  = imu_v.getY();
+  msg.twist.twist.linear.z  = imu_v.getZ();
+  msg.twist.twist.angular.x = imu_w.getX();
+  msg.twist.twist.angular.y = imu_w.getY();
+  msg.twist.twist.angular.z = imu_w.getZ();
+
+  msg.twist.covariance[ 0] = 0;
+  msg.twist.covariance[ 7] = 0;
+  msg.twist.covariance[14] = 0;
+  msg.twist.covariance[21] = 0;
+  msg.twist.covariance[28] = 0;
+  msg.twist.covariance[35] = 0;
+
+  // Transform velocity and angular rates into odom frame ----------------------
+
+  // Position estimate calc: integrate velocity and angular rates --------------
+  // double dt = msg.header.time.secs - prev.header.time.secs; 
+  double dt = 0.01; 
+  // double dt = (msg.header.stamp.nanosec - prev.header.stamp.nanosec)/1000.0; 
+  auto imu_pose_o_prev = tf2::Quaternion();
+  auto imu_pose_t_prev = tf2::Vector3();
+  auto o_matrix        = tf2::Matrix3x3();
+
+  //std::cout << "prev       : " << prev.pose.pose.orientation.x << "," << prev.pose.pose.orientation.y << "," << prev.pose.pose.orientation.z << std::endl;
+  
+  tf2::convert(prev.pose.pose.orientation, imu_pose_o_prev);
+  imu_pose_t_prev.setX(prev.pose.pose.position.x); 
+  imu_pose_t_prev.setY(prev.pose.pose.position.y); 
+  imu_pose_t_prev.setZ(prev.pose.pose.position.z); 
+
+  //std::cout << "post_t_prev: " << imu_pose_t_prev.getX() << "," << imu_pose_t_prev.getY() << "," << imu_pose_t_prev.getZ()<< std::endl;
+
+  auto o = tf2::Quaternion();
+  auto p = tf2::Vector3();
+ 
+  o = o + imu_pose_o_prev * imu_w * dt * 0.5;
+  o.normalize(); 
+  //std::cout << "o:           " << o.getX() << "," << o.getY() << "," << o.getZ()<<o.getW()<< std::endl;
+
+  o_matrix         = tf2::Matrix3x3(o);
+  p = imu_pose_t_prev + o_matrix * imu_v * dt;
+  
+  // Put position estimate into pose -------------------------------------------
+  msg.pose.pose.position.x = p.getX();
+  msg.pose.pose.position.y = p.getY();
+  msg.pose.pose.position.z = p.getZ();
+  tf2::convert(o,msg.pose.pose.orientation);
 
   msg.pose.covariance[0] = 0.0;
   //  1 ... 34
   msg.pose.covariance[35] = 0.0;
-
-  // geometry_msgs/msg/TwistWithCovariance
-  // This expresses velocity in free space broken into its linear and angular parts.
-  msg.twist.twist.linear.x  =  nrx->mVe; 
-  msg.twist.twist.linear.y  =  nrx->mVn; 
-  msg.twist.twist.linear.z  = -nrx->mVd; 
-  msg.twist.twist.angular.x =  nrx->mWx; /*! @todo also needs converting to enu */ 
-  msg.twist.twist.angular.y =  nrx->mWy; 
-  msg.twist.twist.angular.z =  nrx->mWz; 
-
-  msg.twist.covariance[ 0] = nrx->mVeAcc;
-  msg.twist.covariance[ 7] = nrx->mVnAcc;
-  msg.twist.covariance[14] = nrx->mVdAcc;
-  msg.twist.covariance[21] = 0;
-  msg.twist.covariance[28] = 0;
-  msg.twist.covariance[35] = 0;
 
   return msg;
 }
