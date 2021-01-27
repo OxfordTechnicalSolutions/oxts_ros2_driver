@@ -19,6 +19,7 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include <geometry_msgs/msg/pose_with_covariance.h>
 // Boost includes
 #include <boost/asio.hpp>
 
@@ -62,32 +63,32 @@ class NComPublisherNode : public rclcpp::Node
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
-  int ncom_rate;                  
+  int ncom_rate;
   /*! IP address of the INS to connect to */
-  std::string unit_ip;            
+  std::string unit_ip;
   /*! Endpoint Port of the INS to be connected to. Default 3000 for NCom. */
-  int unit_port;                  
+  int unit_port;
   /*! File path to NCom file to be used as input. Not required if running
     in real time. */
-  std::string ncom_path;               
+  std::string ncom_path;
   /*! Timestamp type to be applied to published packets
     {0 : Driver time, 1 : NCom time} */
-  int timestamp_mode;             
+  int timestamp_mode;
   /*! Frame ID of outgoing packets. @todo Having a general frame ID may not
     make sense. This isn't implemented. */
-  std::string frame_id;           
+  std::string frame_id;
   /*! Publishing rate for debug String message. */
-  double pub_string_rate;         
+  double pub_string_rate;
   /*! Publishing rate for NavSatFix message. */
-  double pub_nav_sat_fix_rate;    
+  double pub_nav_sat_fix_rate;
   /*! Publishing rate for Imu message. */
-  double pub_imu_rate;            
+  double pub_imu_rate;
   /*! Publishing rate for Velocity message. */
-  double pub_velocity_rate;       
+  double pub_velocity_rate;
   /*! Publishing rate for TimeReference message.*/
   double pub_time_reference_rate; 
-  /*! Publishing rate for Tf2 message. */
-  double pub_tf2_rate;            
+  /*! Publishing rate for PoseWithCovarianceStamped message. */
+  double pub_pose_rate;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
   std::chrono::duration<uint64_t,std::milli> pubStringInterval;
@@ -95,7 +96,7 @@ private:
   std::chrono::duration<uint64_t,std::milli> pubImuInterval;
   std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
   std::chrono::duration<uint64_t,std::milli> pubTimeReferenceInterval;
-  std::chrono::duration<uint64_t,std::milli> pubTf2Interval;
+  std::chrono::duration<uint64_t,std::milli> pubPoseInterval;
   // ...
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
@@ -104,7 +105,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_imu_;
   rclcpp::TimerBase::SharedPtr timer_velocity_;
   rclcpp::TimerBase::SharedPtr timer_time_reference_;
-  rclcpp::TimerBase::SharedPtr timer_tf2_;
+  rclcpp::TimerBase::SharedPtr timer_pose_;
 
   /**
    * Callback function for NCom sampling. Receives data from chosen source
@@ -136,9 +137,10 @@ private:
    */
   void timer_velocity_callback();
   /** 
-   * Callback function for Tf2 message. Wraps message and publishes.
+   * Callback function for PoseWithCovarianceStamped message. Wraps message and 
+   * publishes.
    */
-  void timer_tf2_callback();
+  void timer_pose_callback();
 
 
   /**
@@ -165,7 +167,7 @@ private:
   /**
    * Publisher for /geometry_msgs/msg/TransformStamped
    */
-  rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr  pubTf2_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr  pubPose_;
   /**
    * Node clock.
    */ 
@@ -180,17 +182,18 @@ public:
   {
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
-    ncom_rate               = this->declare_parameter("ncom_rate", 100.0);                        
-    unit_ip                 = this->declare_parameter("unit_ip", "0.0.0.0");                      
-    unit_port               = this->declare_parameter("unit_port", 3000);                         
-    ncom_path               = this->declare_parameter("ncom", std::string(""));                   
+    ncom_rate               = this->declare_parameter("ncom_rate", 100.0);
+    unit_ip                 = this->declare_parameter("unit_ip", "0.0.0.0");
+    unit_port               = this->declare_parameter("unit_port", 3000);
+    ncom_path               = this->declare_parameter("ncom", std::string(""));
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
-    frame_id                = this->declare_parameter("frame_id", "base_link");                   
-    pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);                    
-    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);               
-    pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);                       
-    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);                  
-    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);            
+    frame_id                = this->declare_parameter("frame_id", "base_link");
+    pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);
+    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);
+    pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
+    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);
+    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);
+    pub_pose_rate           = this->declare_parameter("pub_pose_rate", 1.0);
 
     ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));
@@ -198,15 +201,22 @@ public:
     pubImuInterval           = std::chrono::milliseconds(int(1000.0 / pub_imu_rate));
     pubVelocityInterval      = std::chrono::milliseconds(int(1000.0 / pub_velocity_rate));
     pubTimeReferenceInterval = std::chrono::milliseconds(int(1000.0 / pub_time_reference_rate));
+    pubPoseInterval          = std::chrono::milliseconds(int(1000.0 / pub_pose_rate));
 
- 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubString_        = this->create_publisher<std_msgs::msg::String>               ("ins/debug_string_pos", 10); 
-    pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>         ("ins/nav_sat_fix",      10); 
-    pubImu_           = this->create_publisher<sensor_msgs::msg::Imu>               ("imu/data",             10); 
-    pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>    ("ins/velocity",         10); 
-    pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>     ("ins/time_reference",   10);
+    pubString_        = this->create_publisher<std_msgs::msg::String>                      
+                                                   ("ins/debug_string_pos", 10); 
+    pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>                
+                                                   ("ins/nav_sat_fix",      10); 
+    pubImu_           = this->create_publisher<sensor_msgs::msg::Imu>                      
+                                                   ("imu/data",             10); 
+    pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>           
+                                                   ("ins/velocity",         10); 
+    pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>            
+                                                   ("ins/time_reference",   10);
+    pubPose_          = this->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>
+                                                   ("ins/pose",             10);
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
@@ -229,12 +239,14 @@ public:
                   pubStringInterval, std::bind(&NComPublisherNode::timer_string_callback, this));
     timer_nav_sat_fix_ = this->create_wall_timer(
                   pubNavSatFixInterval, std::bind(&NComPublisherNode::timer_nav_sat_fix_callback, this));
-    timer_imu_ = this->create_wall_timer(
+    timer_imu_    = this->create_wall_timer(
                   pubImuInterval, std::bind(&NComPublisherNode::timer_imu_callback, this));
     timer_velocity_ = this->create_wall_timer(
                   pubVelocityInterval, std::bind(&NComPublisherNode::timer_velocity_callback, this));
     timer_time_reference_ = this->create_wall_timer(
                   pubTimeReferenceInterval, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
+    timer_pose_   = this->create_wall_timer(
+                  pubPoseInterval, std::bind(&NComPublisherNode::timer_pose_callback, this));
 
     nrx = NComCreateNComRxC();
 

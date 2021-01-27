@@ -21,11 +21,9 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
-#include <geometry_msgs/msg/transform_stamped.h>
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/pose.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
 
 #include "tf2_kdl/tf2_kdl.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
@@ -83,6 +81,20 @@ namespace RosNComWrapper
    */
   sensor_msgs::msg::NavSatFix        wrap_nav_sat_fix(const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
+
+  /**
+   * Wrap data from the NCom decoder to 
+   * geometry_msgs/msg/PoseWithCovarianceStamped. 
+   * 
+   * @param nrx Pointer to the decoded NCom data.
+   * @param head Header to be added to the published message.
+   * @return Pose of the IMU in the ECEF coordinate frame.
+   */
+  geometry_msgs::msg::PoseWithCovarianceStamped wrap_pose_ecef
+                                                (
+                                                const NComRxC *nrx,
+                                                std_msgs::msg::Header head
+                                                );
   /**
    * Wrap position data from NCom decoder to std_msgs/msg/String
    * Not really a permanent function, more for easy testing.

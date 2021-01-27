@@ -36,7 +36,6 @@ void NComPublisherNode::timer_string_callback()
   }
 }
 
-
 void NComPublisherNode::timer_nav_sat_fix_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
@@ -45,6 +44,17 @@ void NComPublisherNode::timer_nav_sat_fix_callback()
     header = RosNComWrapper::wrap_header(this->get_timestamp(), "ins");
     auto msg    = RosNComWrapper::wrap_nav_sat_fix(this->nrx, header);
     pubNavSatFix_->publish(msg);
+  }
+}
+
+void NComPublisherNode::timer_pose_callback()
+{
+  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
+  {
+    std_msgs::msg::Header header;
+    header = RosNComWrapper::wrap_header(this->get_timestamp(), "earth");
+    auto msg    = RosNComWrapper::wrap_pose_ecef(this->nrx, header);
+    pubPose_->publish(msg);
   }
 }
 
@@ -80,18 +90,6 @@ void NComPublisherNode::timer_time_reference_callback()
     pubTimeReference_->publish(msg);
   }
 }
-
-void NComPublisherNode::timer_tf2_callback()
-{
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "earth");
-    auto msg    = RosNComWrapper::wrap_tf2(this->nrx, header);
-    pubTf2_->publish(msg);
-  }
-}
-
 
 rclcpp::Time NComPublisherNode::get_timestamp()
 {

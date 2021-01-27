@@ -123,6 +123,48 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(
 }
 
 
+geometry_msgs::msg::PoseWithCovarianceStamped RosNComWrapper::wrap_pose_ecef
+                                              (
+                                              const NComRxC *nrx,
+                                              std_msgs::msg::Header head
+                                              )
+{
+  auto msg = geometry_msgs::msg::PoseWithCovarianceStamped();
+  msg.header = head;
+
+  std::vector<double> ecef = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
+
+  msg.pose.pose.position.x    = ecef[0]; 
+  msg.pose.pose.position.y    = ecef[1];
+  msg.pose.pose.position.z    = ecef[2];
+
+  auto q_vat = tf2::Quaternion();
+  auto veh_o = tf2::Quaternion();
+  auto imu_o = tf2::Quaternion();
+
+  // Construct vehicle-imu frame transformation --------------------------------
+  q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
+  // Get vehicle orientation from HPR ------------------------------------------
+  // Since the INS is outputting w.r.t NED, P&R are swapped and H is flipped
+  veh_o.setRPY(
+               NAV_CONST::DEG2RADS * nrx->mPitch,
+               NAV_CONST::DEG2RADS * nrx->mRoll,
+               -NAV_CONST::DEG2RADS * nrx->mHeading
+               );
+  imu_o =  q_vat * veh_o;
+  
+  msg.pose.pose.orientation.x = imu_o.getY();
+  msg.pose.pose.orientation.y = imu_o.getX();
+  msg.pose.pose.orientation.z = imu_o.getZ();
+  msg.pose.pose.orientation.w = imu_o.getW();
+
+  msg.pose.covariance[0] = 0;
+  // ...
+  msg.pose.covariance[35] = 0;
+
+  return msg;
+}
+
 std_msgs::msg::String RosNComWrapper::wrap_string (const NComRxC *nrx)
 {
   auto msg = std_msgs::msg::String();
@@ -155,10 +197,13 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   // Construct vehicle-imu frame transformation --------------------------------
   q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
   r_vat = tf2::Matrix3x3(q_vat);
-  // Get vehicle orientation from HPR -------------------------------------------
-  veh_o.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
+  // Get vehicle orientation from HPR ------------------------------------------
+  // Order would be RPY, we give it PR-Y to convert from NED to ENU
+  veh_o.setRPY(
                NAV_CONST::DEG2RADS * nrx->mPitch,
-               NAV_CONST::DEG2RADS * nrx->mHeading);
+               NAV_CONST::DEG2RADS * nrx->mRoll,
+               -NAV_CONST::DEG2RADS * nrx->mHeading
+               );
   imu_o =  q_vat * veh_o;
   tf2::convert(imu_o,msg.orientation);
 
@@ -167,7 +212,7 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   // ...
   msg.orientation_covariance[8] = 0.0;
 
-  // Rotate angular rate data ----------------------------------
+  // Rotate angular rate data before copying into message ----------------------
   veh_w.setX(NAV_CONST::DEG2RADS * nrx->mWx);
   veh_w.setY(NAV_CONST::DEG2RADS * nrx->mWy);
   veh_w.setZ(NAV_CONST::DEG2RADS * nrx->mWz);
@@ -176,11 +221,11 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.angular_velocity.y = imu_w.getY();
   msg.angular_velocity.z = imu_w.getZ();
 
-  msg.angular_velocity_covariance[0] = 0.0;//Row major about x, y, z axes
+  msg.angular_velocity_covariance[0] = 0.0; //Row major about x, y, z axes
   // ...
   msg.angular_velocity_covariance[8] = 0.0;
 
-  // Rotate linear acceleration data ---------------------------
+  // Rotate linear acceleration data -------------------------------------------
   veh_a.setX(nrx->mAx);
   veh_a.setY(nrx->mAy);
   veh_a.setZ(nrx->mAz);
