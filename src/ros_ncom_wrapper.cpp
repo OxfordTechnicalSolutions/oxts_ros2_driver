@@ -145,13 +145,17 @@ geometry_msgs::msg::PoseWithCovarianceStamped RosNComWrapper::wrap_pose_ecef
   // Construct vehicle-imu frame transformation --------------------------------
   q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
   // Get vehicle orientation from HPR ------------------------------------------
-  // Since the INS is outputting w.r.t NED, P&R are swapped and H is flipped
   veh_o.setRPY(
-               NAV_CONST::DEG2RADS * nrx->mPitch,
                NAV_CONST::DEG2RADS * nrx->mRoll,
-               -NAV_CONST::DEG2RADS * nrx->mHeading
+               NAV_CONST::DEG2RADS * nrx->mPitch,
+               NAV_CONST::DEG2RADS * nrx->mHeading
                );
-  imu_o =  q_vat * veh_o;
+
+  // NED to ENU rotation
+  auto q_ned_enu = tf2::Quaternion();
+  q_ned_enu.setRPY(180*NAV_CONST::DEG2RADS,0,90*NAV_CONST::DEG2RADS);
+
+  imu_o =  q_vat * veh_o * q_ned_enu;
   
   msg.pose.pose.orientation.x = imu_o.getY();
   msg.pose.pose.orientation.y = imu_o.getX();
@@ -200,13 +204,18 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   // Get vehicle orientation from HPR ------------------------------------------
   // Order would be RPY, we give it PR-Y to convert from NED to ENU
   veh_o.setRPY(
-               NAV_CONST::DEG2RADS * nrx->mPitch,
                NAV_CONST::DEG2RADS * nrx->mRoll,
-               -NAV_CONST::DEG2RADS * nrx->mHeading
+               NAV_CONST::DEG2RADS * nrx->mPitch,
+               NAV_CONST::DEG2RADS * nrx->mHeading
                );
-  imu_o =  q_vat * veh_o;
-  tf2::convert(imu_o,msg.orientation);
+  // NED to ENU rotation
+  auto q_ned_enu = tf2::Quaternion();
+  q_ned_enu.setRPY(180*NAV_CONST::DEG2RADS,0,90*NAV_CONST::DEG2RADS);
 
+  // Find imu orientation
+  imu_o =  q_vat * veh_o * q_ned_enu;
+  tf2::convert(imu_o,msg.orientation);
+  
   // Covariance = 0 => unknown. -1 => invalid
   msg.orientation_covariance[0] = 0.0;
   // ...
@@ -220,7 +229,7 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.angular_velocity.x = imu_w.getX();
   msg.angular_velocity.y = imu_w.getY();
   msg.angular_velocity.z = imu_w.getZ();
-
+  //std::cout << "gyroscope:   " << imu_w.getX() << ", " << imu_w.getY() << ", " << imu_w.getY() << std::endl;
   msg.angular_velocity_covariance[0] = 0.0; //Row major about x, y, z axes
   // ...
   msg.angular_velocity_covariance[8] = 0.0;
@@ -233,6 +242,7 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.linear_acceleration.x = imu_a.getX();
   msg.linear_acceleration.y = imu_a.getY();
   msg.linear_acceleration.z = imu_a.getZ();
+  //std::cout << "lin acc:     " << imu_a.getX() << ", " << imu_a.getY() << ", " << imu_a.getY() << std::endl;
 
   msg.linear_acceleration_covariance[0] = 0.0;//Row major about x, y, z axes
   // ...
