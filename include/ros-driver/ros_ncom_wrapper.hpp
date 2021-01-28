@@ -22,7 +22,7 @@
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include <geometry_msgs/msg/quaternion.h>
-#include <geometry_msgs/msg/pose.h>
+#include <geometry_msgs/msg/point.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "tf2_kdl/tf2_kdl.h"
@@ -38,7 +38,6 @@
  */
 namespace RosNComWrapper
 {
-  
   /**
    * Calculate the rotational component of the transform from frame1 to frame2
    * based on Euler angles
@@ -84,13 +83,13 @@ namespace RosNComWrapper
 
   /**
    * Wrap data from the NCom decoder to 
-   * geometry_msgs/msg/PoseWithCovarianceStamped. 
+   * geometry_msgs/msg/PointStamped. 
    * 
    * @param nrx Pointer to the decoded NCom data.
    * @param head Header to be added to the published message.
-   * @return Pose of the IMU in the ECEF coordinate frame.
+   * @return Position of the IMU in the ECEF coordinate frame.
    */
-  geometry_msgs::msg::PoseWithCovarianceStamped wrap_pose_ecef
+  geometry_msgs::msg::PointStamped wrap_ecef_pos
                                                 (
                                                 const NComRxC *nrx,
                                                 std_msgs::msg::Header head

@@ -19,7 +19,7 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
-#include <geometry_msgs/msg/pose_with_covariance.h>
+#include <geometry_msgs/msg/point.h>
 // Boost includes
 #include <boost/asio.hpp>
 
@@ -87,8 +87,8 @@ private:
   double pub_velocity_rate;
   /*! Publishing rate for TimeReference message.*/
   double pub_time_reference_rate; 
-  /*! Publishing rate for PoseWithCovarianceStamped message. */
-  double pub_pose_rate;
+  /*! Publishing rate for PointStamped message. */
+  double pub_ecef_pos_rate;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
   std::chrono::duration<uint64_t,std::milli> pubStringInterval;
@@ -96,7 +96,7 @@ private:
   std::chrono::duration<uint64_t,std::milli> pubImuInterval;
   std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
   std::chrono::duration<uint64_t,std::milli> pubTimeReferenceInterval;
-  std::chrono::duration<uint64_t,std::milli> pubPoseInterval;
+  std::chrono::duration<uint64_t,std::milli> pubEcefPosInterval;
   // ...
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
@@ -105,7 +105,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_imu_;
   rclcpp::TimerBase::SharedPtr timer_velocity_;
   rclcpp::TimerBase::SharedPtr timer_time_reference_;
-  rclcpp::TimerBase::SharedPtr timer_pose_;
+  rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
 
   /**
    * Callback function for NCom sampling. Receives data from chosen source
@@ -137,10 +137,10 @@ private:
    */
   void timer_velocity_callback();
   /** 
-   * Callback function for PoseWithCovarianceStamped message. Wraps message and 
+   * Callback function for PointStamped message. Wraps message and 
    * publishes.
    */
-  void timer_pose_callback();
+  void timer_ecef_pos_callback();
 
 
   /**
@@ -167,7 +167,7 @@ private:
   /**
    * Publisher for /geometry_msgs/msg/TransformStamped
    */
-  rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr  pubPose_;
+  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr  pubEcefPos_;
   /**
    * Node clock.
    */ 
@@ -193,7 +193,7 @@ public:
     pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);
-    pub_pose_rate           = this->declare_parameter("pub_pose_rate", 1.0);
+    pub_ecef_pos_rate           = this->declare_parameter("pub_ecef_pos_rate", 1.0);
 
     ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));
@@ -201,7 +201,7 @@ public:
     pubImuInterval           = std::chrono::milliseconds(int(1000.0 / pub_imu_rate));
     pubVelocityInterval      = std::chrono::milliseconds(int(1000.0 / pub_velocity_rate));
     pubTimeReferenceInterval = std::chrono::milliseconds(int(1000.0 / pub_time_reference_rate));
-    pubPoseInterval          = std::chrono::milliseconds(int(1000.0 / pub_pose_rate));
+    pubEcefPosInterval          = std::chrono::milliseconds(int(1000.0 / pub_ecef_pos_rate));
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
@@ -215,8 +215,8 @@ public:
                                                    ("ins/velocity",         10); 
     pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>            
                                                    ("ins/time_reference",   10);
-    pubPose_          = this->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>
-                                                   ("ins/pose",             10);
+    pubEcefPos_          = this->create_publisher<geometry_msgs::msg::PointStamped>
+                                                   ("ins/ecef_pos",             10);
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
@@ -245,8 +245,8 @@ public:
                   pubVelocityInterval, std::bind(&NComPublisherNode::timer_velocity_callback, this));
     timer_time_reference_ = this->create_wall_timer(
                   pubTimeReferenceInterval, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
-    timer_pose_   = this->create_wall_timer(
-                  pubPoseInterval, std::bind(&NComPublisherNode::timer_pose_callback, this));
+    timer_ecef_pos_   = this->create_wall_timer(
+                  pubEcefPosInterval, std::bind(&NComPublisherNode::timer_ecef_pos_callback, this));
 
     nrx = NComCreateNComRxC();
 

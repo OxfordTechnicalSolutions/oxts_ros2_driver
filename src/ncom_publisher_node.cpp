@@ -47,14 +47,14 @@ void NComPublisherNode::timer_nav_sat_fix_callback()
   }
 }
 
-void NComPublisherNode::timer_pose_callback()
+void NComPublisherNode::timer_ecef_pos_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::wrap_header(this->get_timestamp(), "earth");
-    auto msg    = RosNComWrapper::wrap_pose_ecef(this->nrx, header);
-    pubPose_->publish(msg);
+    auto msg    = RosNComWrapper::wrap_ecef_pos(this->nrx, header);
+    pubEcefPos_->publish(msg);
   }
 }
 
@@ -63,7 +63,7 @@ void NComPublisherNode::timer_imu_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "imu");
+    header = RosNComWrapper::wrap_header(this->get_timestamp(), "ins");
     auto msg    = RosNComWrapper::wrap_imu(this->nrx, header);
     pubImu_->publish(msg);
   }
