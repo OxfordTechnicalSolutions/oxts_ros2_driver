@@ -48,6 +48,11 @@ To launch only the ncom publisher, use basic_launch.py like so:
     ros2 launch basic_launch.py
 ```
 
+or, to replay from an ncom file:
+
+```bash
+    ros2 launch basic_launch.py ncom:=<absolute_path_to_ncom>
+```
 
 
 ## Output ROS messages
@@ -55,7 +60,7 @@ To launch only the ncom publisher, use basic_launch.py like so:
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network.
 
 - **ins/debug_string_pos** std_msgs/msg/String
-- **ins/odom** nav_msgs/msg/Odometry
+- **ins/pose_ecef** geometry_msgs/msg/PoseWithCovarianceStamped
 - **ins/nav_sat_fix** sensor_msgs/msg/NavSatFix
 - **imu/data** sensor_msgs/msg/Imu
 - **ins/velocity** geometry_msgs/msg/TwistStamped
@@ -63,6 +68,8 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 
 
 ## Input ROS messages
+
+Subscriber node not yet created.
 
 The subscriber node included in this driver listens for particular ROS topics to be sent from external aiding devices. These messages are converted from ROS to Generic Aiding messages, which are then sent to an INS. This allows straightforward integration of ROS devices as aiding sources to an OxTS INS.
 
@@ -89,7 +96,7 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
     "command": "bash",
     "args": [
         "-c"
-    ],
+        ],
     "tasks": [
         {
             "type": "shell",
