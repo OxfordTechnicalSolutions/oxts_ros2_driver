@@ -193,7 +193,7 @@ public:
     pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);
-    pub_ecef_pos_rate           = this->declare_parameter("pub_ecef_pos_rate", 1.0);
+    pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1.0);
 
     ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));

@@ -18,7 +18,6 @@
  */
 namespace Convert
 {
-
   /**
    * @fn hpr_to_quaternion
    * @brief Convert Euler angles (Heading, Pitch, Roll) to Quaternions. 
@@ -29,8 +28,6 @@ namespace Convert
    * @return Quaternion (x, y, z, w)
    */
   std::vector<double> hpr_to_quaternion(double h, double p, double r);
-
-
   /**
    * @fn lla_to_ecef
    * @brief Convert Lat, Long, Alt to ECEF x,y,z 
@@ -41,9 +38,6 @@ namespace Convert
    * @return ECEF (x, y, z)
    */
   std::vector<double> lla_to_ecef(double lat, double lon, double alt);
-
-
-
 }
 
 

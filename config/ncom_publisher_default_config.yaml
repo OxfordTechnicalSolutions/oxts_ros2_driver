@@ -6,12 +6,7 @@ ncom_publisher:
     unit_ip: 195.0.0.96
     ## Unit Port (3000 unless intentionally configured otherwise on the INS)
     unit_port: 3000
-#===============================================================================
-    # OR if reading from file
-    #use_sim_time: true
 
-    ncom: "/home/smccarthy/data/driver/harry.ncom"
-    #ncom: ""
 #===============================================================================
     # Configure ROS messages to be published by the node.
     ## Frames
@@ -28,13 +23,15 @@ ncom_publisher:
     ### Publish ROS Imu message
     pub_imu_rate              : 100.0
     ### Publish ROS Velocity message
-    pub_velocity_rate         : 5.0
+    pub_velocity_rate         : 10.0
     ### Publish ROS TimeReference message
     pub_time_reference_rate   : 1.0
+    ### Publish ROS PoseWithCovarianceStamped message
+    pub_ecef_pos_rate   : 10.0
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver
 
     # 0 => Timestamped by the ROS node time (future default)
     # 1 => Timestamped from NCom
-    timestamp_mode : 1
+    timestamp_mode : 0
