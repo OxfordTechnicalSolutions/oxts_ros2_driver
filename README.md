@@ -60,7 +60,7 @@ or, to replay from an ncom file:
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network.
 
 - **ins/debug_string_pos** std_msgs/msg/String
-- **ins/pose_ecef** geometry_msgs/msg/PoseWithCovarianceStamped
+- **ins/pose_ecef** geometry_msgs/msg/PointStamped
 - **ins/nav_sat_fix** sensor_msgs/msg/NavSatFix
 - **imu/data** sensor_msgs/msg/Imu
 - **ins/velocity** geometry_msgs/msg/TwistStamped
