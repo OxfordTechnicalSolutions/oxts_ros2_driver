@@ -65,7 +65,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Contains a timestamped position of the INS in the ECEF reference frame.
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
-* **ins/imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html)
+* **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html)
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/hydro/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame.
