@@ -123,44 +123,19 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::wrap_nav_sat_fix(
 }
 
 
-geometry_msgs::msg::PoseWithCovarianceStamped RosNComWrapper::wrap_pose_ecef
+geometry_msgs::msg::PointStamped RosNComWrapper::wrap_ecef_pos
                                               (
                                               const NComRxC *nrx,
                                               std_msgs::msg::Header head
                                               )
 {
-  auto msg = geometry_msgs::msg::PoseWithCovarianceStamped();
+  auto msg = geometry_msgs::msg::PointStamped();
   msg.header = head;
 
   std::vector<double> ecef = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-
-  msg.pose.pose.position.x    = ecef[0]; 
-  msg.pose.pose.position.y    = ecef[1];
-  msg.pose.pose.position.z    = ecef[2];
-
-  auto q_vat = tf2::Quaternion();
-  auto veh_o = tf2::Quaternion();
-  auto imu_o = tf2::Quaternion();
-
-  // Construct vehicle-imu frame transformation --------------------------------
-  q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
-  // Get vehicle orientation from HPR ------------------------------------------
-  // Since the INS is outputting w.r.t NED, P&R are swapped and H is flipped
-  veh_o.setRPY(
-               NAV_CONST::DEG2RADS * nrx->mPitch,
-               NAV_CONST::DEG2RADS * nrx->mRoll,
-               -NAV_CONST::DEG2RADS * nrx->mHeading
-               );
-  imu_o =  q_vat * veh_o;
-  
-  msg.pose.pose.orientation.x = imu_o.getY();
-  msg.pose.pose.orientation.y = imu_o.getX();
-  msg.pose.pose.orientation.z = imu_o.getZ();
-  msg.pose.pose.orientation.w = imu_o.getW();
-
-  msg.pose.covariance[0] = 0;
-  // ...
-  msg.pose.covariance[35] = 0;
+  msg.point.x    = ecef[0]; 
+  msg.point.y    = ecef[1];
+  msg.point.z    = ecef[2];
 
   return msg;
 }
@@ -186,13 +161,13 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.header = head;
 
   auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
-  auto r_vat = tf2::Matrix3x3();
-  auto veh_o = tf2::Quaternion();
-  auto imu_o = tf2::Quaternion();
-  auto veh_w = tf2::Vector3();
-  auto imu_w = tf2::Vector3();
-  auto veh_a = tf2::Vector3();
-  auto imu_a = tf2::Vector3();
+  auto r_vat = tf2::Matrix3x3();  // Rotation matrix representation of the vehicle-imu alignment
+  auto veh_o = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
+  auto imu_o = tf2::Quaternion(); // Orientation of the IMU (ENU frame)
+  auto veh_w = tf2::Vector3();    // Angular rate in vehicle frame (rads)
+  auto imu_w = tf2::Vector3();    // Angular rate in imu frame (rads)
+  auto veh_a = tf2::Vector3();    // Linear Acceleration in the vehicle frame (rads)
+  auto imu_a = tf2::Vector3();    // Linear Acceleration in the imu frame (rads)
 
   // Construct vehicle-imu frame transformation --------------------------------
   q_vat = RosNComWrapper::wrap_vat_to_quaternion(nrx);
@@ -200,11 +175,17 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   // Get vehicle orientation from HPR ------------------------------------------
   // Order would be RPY, we give it PR-Y to convert from NED to ENU
   veh_o.setRPY(
-               NAV_CONST::DEG2RADS * nrx->mPitch,
                NAV_CONST::DEG2RADS * nrx->mRoll,
-               -NAV_CONST::DEG2RADS * nrx->mHeading
+               NAV_CONST::DEG2RADS * nrx->mPitch,
+               NAV_CONST::DEG2RADS * nrx->mHeading
                );
-  imu_o =  q_vat * veh_o;
+  // NED to ENU rotation
+  auto q_ned_enu = tf2::Quaternion();
+  q_ned_enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,-90.0*NAV_CONST::DEG2RADS);
+
+  // Find imu orientation
+  imu_o =  q_vat * veh_o * q_ned_enu;
+  imu_o.normalize();
   tf2::convert(imu_o,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
@@ -220,7 +201,6 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   msg.angular_velocity.x = imu_w.getX();
   msg.angular_velocity.y = imu_w.getY();
   msg.angular_velocity.z = imu_w.getZ();
-
   msg.angular_velocity_covariance[0] = 0.0; //Row major about x, y, z axes
   // ...
   msg.angular_velocity_covariance[8] = 0.0;
@@ -248,12 +228,27 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::wrap_velocity   (
   auto msg = geometry_msgs::msg::TwistStamped();
   msg.header = head;
 
-  msg.twist.linear.x  = nrx->mVf;
-  msg.twist.linear.y  = nrx->mVl;
-  msg.twist.linear.z  = nrx->mVd;
-  msg.twist.angular.x = nrx->mWf;
-  msg.twist.angular.y = nrx->mWl;
-  msg.twist.angular.z = nrx->mWd;
+  // Construct vehicle-imu frame transformation --------------------------------
+  auto q_vat      = RosNComWrapper::wrap_vat_to_quaternion(nrx);
+  auto r_vat      = tf2::Matrix3x3(q_vat);
+  auto veh_v      = tf2::Vector3(nrx->mIsoVoX,nrx->mIsoVoY,nrx->mIsoVoZ);
+  auto veh_w      = tf2::Vector3(nrx->mWx,nrx->mWy,nrx->mWz);
+  auto imu_w      = tf2::Vector3();
+  auto imu_v      = tf2::Vector3();
+  auto q_iso_oxts = tf2::Quaternion();
+
+  q_iso_oxts.setRPY(180.0*NAV_CONST::DEG2RADS,0.0,0.0);
+  auto r_iso_oxts = tf2::Matrix3x3(q_iso_oxts);
+
+  imu_v = r_vat * r_iso_oxts * veh_v;
+  imu_w = r_vat * veh_w;
+
+  msg.twist.linear.x  = imu_v.getX();
+  msg.twist.linear.y  = imu_v.getY();
+  msg.twist.linear.z  = imu_v.getZ();
+  msg.twist.angular.x = imu_w.getX();
+  msg.twist.angular.y = imu_w.getY();
+  msg.twist.angular.z = imu_w.getZ();
 
   return msg;
 }

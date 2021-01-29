@@ -10,7 +10,7 @@ The ROS driver has been built with ROS release Foxy Fitzroy as a pre-built binar
 
 Dependencies:
 
-- ROS2 (Foxy Fitzroy)
+- ROS2 (Foxy Fitzroy). For an install guide, see the bottom of this README for a link to ROS documentation.
 
 ```bash
 sudo apt install doxygen
@@ -48,21 +48,37 @@ To launch only the ncom publisher, use basic_launch.py like so:
     ros2 launch basic_launch.py
 ```
 
+or, to replay from an ncom file:
+
+```bash
+    ros2 launch basic_launch.py ncom:=<absolute_path_to_ncom>
+```
 
 
 ## Output ROS messages
 
-The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network.
+The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network. Reference frames for each message can be found in headers. Where NCom is typically vehicle frame, ROS messages are output in INS/IMU frame.
 
-- **ins/debug_string_pos** std_msgs/msg/String
-- **ins/odom** nav_msgs/msg/Odometry
-- **ins/nav_sat_fix** sensor_msgs/msg/NavSatFix
-- **imu/data** sensor_msgs/msg/Imu
-- **ins/velocity** geometry_msgs/msg/TwistStamped
-- **ins/tf2** geometry_msgs/msg/TransformStamped
+* **ins/debug_string_pos** [std_msgs/msg/String](http://docs.ros.org/en/melodic/api/std_msgs/html/msg/String.html)
+    This message is not useful for general use. It is currently included for debug purposes. It contains a timestamp from NCom and WGS84 coordinates in string form, which is output to the console.
+* **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/melodic/api/geometry_msgs/html/msg/PointStamped.html)
+    Contains a timestamped position of the INS in the ECEF reference frame.
+* **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
+    Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
+* **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html)
+    Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
+* **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/hydro/api/geometry_msgs/html/msg/TwistStamped.html)
+    Velocity of the INS, in the INS frame.
+* **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/TimeReference.html)
 
+Useful sources of information around frames used for these messages can be found in:
+
+- [REP103](https://www.ros.org/reps/rep-0103.html)
+- [REP105](https://www.ros.org/reps/rep-0105.html#id8)
 
 ## Input ROS messages
+
+Subscriber node not yet created.
 
 The subscriber node included in this driver listens for particular ROS topics to be sent from external aiding devices. These messages are converted from ROS to Generic Aiding messages, which are then sent to an INS. This allows straightforward integration of ROS devices as aiding sources to an OxTS INS.
 
@@ -89,7 +105,7 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
     "command": "bash",
     "args": [
         "-c"
-    ],
+        ],
     "tasks": [
         {
             "type": "shell",

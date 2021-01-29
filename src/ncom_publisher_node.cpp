@@ -47,7 +47,7 @@ void NComPublisherNode::timer_nav_sat_fix_callback()
   }
 }
 
-void NComPublisherNode::timer_pose_callback()
+void NComPublisherNode::timer_ecef_pos_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
@@ -60,7 +60,8 @@ void NComPublisherNode::timer_pose_callback()
 
 void NComPublisherNode::timer_imu_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
+  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
+     && this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::wrap_header(this->get_timestamp(), "imu_link");
@@ -81,7 +82,8 @@ void NComPublisherNode::timer_imu_callback()
 
 void NComPublisherNode::timer_velocity_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
+  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
+     && this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::wrap_header(this->get_timestamp(), "oxts_link");
