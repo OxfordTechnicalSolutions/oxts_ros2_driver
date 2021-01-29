@@ -8,7 +8,7 @@ import yaml
 from pathlib import Path
 
 parameters_file_name = 'ncom_publisher_default_config.yaml'
-urdf_file_name = 'Small_core.urdf'
+urdf_file_name = 'medium.urdf.xml'
 
 
 def generate_launch_description():
