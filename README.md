@@ -69,6 +69,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/hydro/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame.
+* **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/TimeReference.html)
 
 Useful sources of information around frames used for these messages can be found in:
 
