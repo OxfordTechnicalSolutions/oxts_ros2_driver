@@ -53,8 +53,8 @@ void NComPublisherNode::timer_ecef_pos_callback()
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::wrap_header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::wrap_pose_ecef(this->nrx, header);
-    pubPose_->publish(msg);
+    auto msg    = RosNComWrapper::wrap_ecef_pos(this->nrx, header);
+    pubEcefPos_->publish(msg);
   }
 }
 
