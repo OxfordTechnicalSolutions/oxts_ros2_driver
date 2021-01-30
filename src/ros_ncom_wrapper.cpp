@@ -181,11 +181,11 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
                );
   // NED to ENU rotation
   auto q_ned_enu = tf2::Quaternion();
-  q_ned_enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,-90.0*NAV_CONST::DEG2RADS);
+  q_ned_enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,90.0*NAV_CONST::DEG2RADS);
 
   // Find imu orientation
-  imu_o =  q_vat * veh_o * q_ned_enu;
-  imu_o.normalize();
+  imu_o = q_ned_enu * veh_o; // NED to ENU
+  imu_o = imu_o * q_vat.inverse(); // vehicle to body
   tf2::convert(imu_o,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
