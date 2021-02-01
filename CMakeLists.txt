@@ -53,7 +53,7 @@ install(TARGETS ncom_publisher
         DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch 
-        config
+        config urdf rviz
         DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

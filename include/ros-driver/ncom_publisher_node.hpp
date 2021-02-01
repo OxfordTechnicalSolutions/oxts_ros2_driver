@@ -19,6 +19,9 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include <geometry_msgs/msg/pose_with_covariance.h>
+#include <geometry_msgs/msg/transform_stamped.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/point.h>
 // Boost includes
 #include <boost/asio.hpp>
@@ -172,6 +175,10 @@ private:
    * Node clock.
    */ 
   rclcpp::Clock clock_;
+  /**
+   * TF broadcaster
+   */
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
 public:
   /**
@@ -180,6 +187,8 @@ public:
    */
   explicit NComPublisherNode(const rclcpp::NodeOptions & options) : Node("ncom_publisher", options)
   {
+    // Initilize tf broadcaster
+    tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate               = this->declare_parameter("ncom_rate", 100.0);
@@ -187,7 +196,7 @@ public:
     unit_port               = this->declare_parameter("unit_port", 3000);
     ncom_path               = this->declare_parameter("ncom", std::string(""));
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
-    frame_id                = this->declare_parameter("frame_id", "base_link");
+    frame_id                = this->declare_parameter("frame_id", "oxts_link");
     pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);
     pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);
     pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
