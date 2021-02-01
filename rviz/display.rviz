@@ -7,8 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1
+        - /TF1/Frames1
         - /TF1/Tree1
-        - /TF1/Tree1/base_link1
         - /RobotModel1
         - /RobotModel1/Description Topic1
       Splitter Ratio: 0.5
@@ -49,7 +49,7 @@ Visualization Manager:
       Value: true
     - Class: rviz_default_plugins/TF
       Enabled: true
-      Frame Timeout: 15
+      Frame Timeout: 1
       Frames:
         All Enabled: false
         base_link:
@@ -153,7 +153,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.2969025373458862
+      Distance: 0.939093291759491
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -168,10 +168,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.785398006439209
+      Pitch: 0.7147971391677856
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.785398006439209
+      Yaw: 5.228567123413086
     Saved: ~
 Window Geometry:
   Displays:
@@ -187,5 +187,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 72
-  Y: 60
+  X: 73
+  Y: 59
