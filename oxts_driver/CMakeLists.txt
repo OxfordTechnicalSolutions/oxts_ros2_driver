@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(ros-driver VERSION 0.1.0)
+project(oxts_driver VERSION 0.1.0)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,7 +17,7 @@ endif()
 
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -29,11 +29,11 @@ find_package(tf2_kdl REQUIRED)
 
 
 add_executable(ncom_publisher 
-               src/ncom_publisher.cpp 
-               include/nav/NComRxC.c 
-               src/ncom_publisher_node.cpp 
-               src/ros_ncom_wrapper.cpp
-               src/convert.cpp)
+               src/driver/ncom_publisher.cpp 
+               src/lib/NComRxC.c 
+               src/driver/ncom_publisher_node.cpp 
+               src/driver/ros_ncom_wrapper.cpp
+               src/driver/convert.cpp)
 
 ament_target_dependencies(ncom_publisher 
                           rclcpp

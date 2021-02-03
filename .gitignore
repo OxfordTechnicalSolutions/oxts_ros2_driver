@@ -2,7 +2,7 @@
 build/
 log/
 .vscode/
-install/ros-driver/
+install/
 # temo files
 *.pyc
 # doc files

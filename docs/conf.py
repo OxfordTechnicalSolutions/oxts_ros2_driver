@@ -32,7 +32,7 @@ gitlab_ci_build = True # os.environ.get('READTHEDOCS', None) == 'True'
 breathe_projects = {}
 
 if gitlab_ci_build:
-    input_dir = '../include/ros-driver" "../src'
+    input_dir = '../oxts_driver/include/oxts_driver" "../oxts_driver/src'
     output_dir = 'doxygen'
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
