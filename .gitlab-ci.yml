@@ -20,7 +20,7 @@ stages:
 
 before_script:
   # install package dependencies
-  - apt update && apt install libboost-all-dev -y
+  - apt update && apt install libboost-all-dev python3-pip -y
   # setup python environment
   - pip3 install virtualenv
   - virtualenv venv
