@@ -7,10 +7,11 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 find_package(Doxygen REQUIRED)
 find_package(Sphinx REQUIRED)
 
-# Add target
-file(GLOB SOURCES "../**/**/*.*pp")
+# Add oxts_driver target
+file(GLOB SOURCES "../*/include/*/*.h*")
 add_library (oxts_driver ${SOURCES})
 target_include_directories(oxts_driver PUBLIC ../oxts_driver/include /opt/ros/foxy/include)
+set_target_properties(oxts_driver PROPERTIES LINKER_LANGUAGE CXX)
 
 # Find all the public headers
 get_target_property(ROS_DRIVER_PUBLIC_HEADER_DIR oxts_driver INTERFACE_INCLUDE_DIRECTORIES)

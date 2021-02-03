@@ -25,9 +25,6 @@ Docs
 .. doxygenclass:: NComPublisherNode
    :members:
 
-.. doxygenclass:: OxtsDevice
-   :members:
-
 .. doxygennamespace:: RosNComWrapper
    :members:
 
