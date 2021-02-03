@@ -23,11 +23,11 @@
 #include "std_msgs/msg/string.hpp"
 
 // Other includes
-#include "ros-driver/ncom_publisher_node.hpp"
-#include "ros-driver/udp_server_client.h"
+#include "oxts_driver/ncom_publisher_node.hpp"
+#include "oxts_driver/udp_server_client.h"
 
 // gad-sdk includes
-#include "nav/NComRxC.h"
+#include "oxts_driver/NComRxC.h"
 #include <map>
 
 using namespace std::chrono_literals;

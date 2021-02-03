@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "NComRxC.h"
+#include "oxts_driver/NComRxC.h"
 
 
 //============================================================================================================

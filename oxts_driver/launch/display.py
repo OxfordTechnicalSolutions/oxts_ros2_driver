@@ -15,7 +15,7 @@ urdf_file_name = 'medium.urdf.xml'
 
 def generate_launch_description():
     # get current path and go one level up
-    share_dir = get_package_share_directory('ros-driver')
+    share_dir = get_package_share_directory('oxts_driver')
     param_path = os.path.join(share_dir, 'config', parameters_file_name)
     urdf_path = os.path.join(share_dir, 'urdf', urdf_file_name)
     rviz_path = os.path.join(share_dir, 'rviz', 'display.rviz')
@@ -40,7 +40,7 @@ def generate_launch_description():
 
 
     oxts_driver_node = Node(
-        package='ros-driver',
+        package='oxts_driver',
         #namespace='unit1',
         executable='ncom_publisher',
         # name='ncom_publisher',

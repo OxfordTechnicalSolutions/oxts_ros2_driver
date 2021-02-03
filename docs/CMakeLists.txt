@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(ros-driver-doc)
+project(oxts_doc)
 
 # Add the cmake folder so the FindSphinx module is found
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -8,12 +8,12 @@ find_package(Doxygen REQUIRED)
 find_package(Sphinx REQUIRED)
 
 # Add target
-file(GLOB SOURCES "../**/*.*pp")
-add_library (ros-driver ${SOURCES})
-target_include_directories(ros-driver PUBLIC ../include /opt/ros/foxy/include)
+file(GLOB SOURCES "../**/**/*.*pp")
+add_library (oxts_driver ${SOURCES})
+target_include_directories(oxts_driver PUBLIC ../oxts_driver/include /opt/ros/foxy/include)
 
 # Find all the public headers
-get_target_property(ROS_DRIVER_PUBLIC_HEADER_DIR ros-driver INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(ROS_DRIVER_PUBLIC_HEADER_DIR oxts_driver INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB_RECURSE ROS_DRIVER_PUBLIC_HEADERS ${ROS_DRIVER_PUBLIC_HEADER_DIR}/*.hpp)
 
 set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR})
@@ -51,7 +51,7 @@ add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    COMMAND 
                      ${SPHINX_EXECUTABLE} -b html
                      # Tell Breathe where to find the Doxygen output
-                     -Dbreathe_projects.ros-driver=${DOXYGEN_OUTPUT_DIR}/xml
+                     -Dbreathe_projects.oxts_driver=${DOXYGEN_OUTPUT_DIR}/xml
                    ${SPHINX_SOURCE} ${SPHINX_BUILD}
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS

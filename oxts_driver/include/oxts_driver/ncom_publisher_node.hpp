@@ -27,10 +27,10 @@
 #include <boost/asio.hpp>
 
 // gad-sdk includes
-#include "nav/NComRxC.h"
-#include "ros-driver/nav_const.hpp"
-#include "ros-driver/ros_ncom_wrapper.hpp"
-#include "ros-driver/udp_server_client.h"
+#include "oxts_driver/NComRxC.h"
+#include "oxts_driver/nav_const.hpp"
+#include "oxts_driver/ros_ncom_wrapper.hpp"
+#include "oxts_driver/udp_server_client.h"
 
 using namespace std::chrono_literals;
 

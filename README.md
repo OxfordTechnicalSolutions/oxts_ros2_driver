@@ -1,6 +1,6 @@
 # ROS2 Driver
 
-[![pipeline status](https://gitlab.com/oxts/navigation/generic-aiding/ros-driver/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/generic-aiding/ros-driver/-/commits/master)
+[![pipeline status](https://gitlab.com/oxts/navigation/generic-aiding/oxts/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/generic-aiding/oxts/-/commits/master)
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Includes NCOM decoding and GAD encoding functionality. Where ROS is mentioned in this document this is in reference to ROS2. References to ROS1 will be explicit.
 
@@ -21,8 +21,8 @@ Build instructions will look something like this:
 
 1. . /opt/ros/foxy/setup.bash
 2. cd <colcon_ws>/src
-3. git clone https://gitlab.com/oxts/navigation/generic-aiding/ros-driver.git
-4. cd ros-driver
+3. git clone https://gitlab.com/oxts/navigation/generic-aiding/oxts.git
+4. cd oxts
 5. rosdep update
 6. rosdep install --from-path .
 7. cd ../..
@@ -35,7 +35,7 @@ Build instructions will look something like this:
 The driver is configured using .yaml files, as is the norm for ROS2 nodes. These should be kept in /config, and can be used to configure the node at run time like so:
 
 ```bash
-    ros2 run ros-driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/ros-driver/config/ncom_publisher_default_config.yaml
+    ros2 run oxts_driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/oxts_driver/config/ncom_publisher_default_config.yaml
 ```
 
 The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
@@ -45,13 +45,13 @@ If you (quite rightly) don't want to write that into the command line each time,
 To launch only the ncom publisher, use basic_launch.py like so:
 
 ```bash
-    ros2 launch basic_launch.py
+    ros2 launch oxts_driver basic_launch.py
 ```
 
 or, to replay from an ncom file:
 
 ```bash
-    ros2 launch basic_launch.py ncom:=<absolute_path_to_ncom>
+    ros2 launch oxts_driver basic_launch.py ncom:=<absolute_path_to_ncom>
 ```
 
 
