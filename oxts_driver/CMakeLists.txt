@@ -28,14 +28,14 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
 
 
-add_executable(ncom_publisher 
+add_executable(oxts_driver 
                src/driver/ncom_publisher.cpp 
                src/lib/NComRxC.c 
                src/driver/ncom_publisher_node.cpp 
                src/driver/ros_ncom_wrapper.cpp
                src/driver/convert.cpp)
 
-ament_target_dependencies(ncom_publisher 
+ament_target_dependencies(oxts_driver 
                           rclcpp
                           std_msgs
                           sensor_msgs
@@ -43,13 +43,13 @@ ament_target_dependencies(ncom_publisher
                           nav_msgs
                           tf2
                           tf2_kdl)
-target_include_directories(ncom_publisher PUBLIC
+target_include_directories(oxts_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
 
-install(TARGETS ncom_publisher
+install(TARGETS oxts_driver
         DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch 

@@ -1,4 +1,4 @@
-ncom_publisher:
+oxts_driver:
   ros__parameters:
 #===============================================================================
     # INS configuration (set up to match the unit)
@@ -34,4 +34,4 @@ ncom_publisher:
 
     # 0 => Timestamped by the ROS node time (future default)
     # 1 => Timestamped from NCom
-    timestamp_mode : 0
+    timestamp_mode : 1

@@ -185,7 +185,7 @@ public:
    * Default constructor for the NComPublisherNode. Parses options from the 
    * .yaml params/config file, sets up UDP connection to unit.
    */
-  explicit NComPublisherNode(const rclcpp::NodeOptions & options) : Node("ncom_publisher", options)
+  explicit NComPublisherNode(const rclcpp::NodeOptions & options) : Node("oxts_driver", options)
   {
     // Initilize tf broadcaster
     tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
