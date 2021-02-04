@@ -18,6 +18,6 @@
     <exec_depend>oxts_driver</exec_depend>
 
     <export>
-        <build_type>amend_cmake</build_type>
+        <build_type>ament_cmake</build_type>
     </export>
 </package>
