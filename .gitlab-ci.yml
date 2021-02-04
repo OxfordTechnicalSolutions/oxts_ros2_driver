@@ -20,12 +20,8 @@ stages:
 
 before_script:
   # install package dependencies
-  - apt update && apt install libboost-all-dev python3-pip -y
-  # setup python environment
-  - pip3 install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-  - touch venv/COLCON_IGNORE
+  - apt update && apt install libboost-all-dev -y
+  - source /opt/ros/foxy/setup.bash
 
 # deploy pages only on master branch
 pages:
