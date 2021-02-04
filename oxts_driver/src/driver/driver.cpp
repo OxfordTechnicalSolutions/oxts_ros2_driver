@@ -1,7 +1,9 @@
-#include "oxts_driver/ncom_publisher_node.hpp"
+#include "oxts_driver/driver.hpp"
 
+namespace oxts_driver
+{
 
-void NComPublisherNode::timer_ncom_callback()
+void OxtsDriver::timer_ncom_callback()
 {
   // Read from open socket
   std::size_t size = this->udpClient.receive_from(this->buff, 72, this->unitEndpointNCom);
@@ -9,7 +11,7 @@ void NComPublisherNode::timer_ncom_callback()
   NComNewChars(this->nrx, this->buff, size); 
 }
 
-void NComPublisherNode::timer_ncom_file_callback()
+void OxtsDriver::timer_ncom_file_callback()
 {
   char c;
 
@@ -24,7 +26,7 @@ void NComPublisherNode::timer_ncom_file_callback()
 
 }
 
-void NComPublisherNode::timer_string_callback()
+void OxtsDriver::timer_string_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
@@ -36,7 +38,7 @@ void NComPublisherNode::timer_string_callback()
   }
 }
 
-void NComPublisherNode::timer_nav_sat_fix_callback()
+void OxtsDriver::timer_nav_sat_fix_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
@@ -47,7 +49,7 @@ void NComPublisherNode::timer_nav_sat_fix_callback()
   }
 }
 
-void NComPublisherNode::timer_ecef_pos_callback()
+void OxtsDriver::timer_ecef_pos_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
@@ -58,7 +60,7 @@ void NComPublisherNode::timer_ecef_pos_callback()
   }
 }
 
-void NComPublisherNode::timer_imu_callback()
+void OxtsDriver::timer_imu_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
      && this->nrx->mIsImu2VehHeadingValid)
@@ -80,7 +82,7 @@ void NComPublisherNode::timer_imu_callback()
   }
 }
 
-void NComPublisherNode::timer_velocity_callback()
+void OxtsDriver::timer_velocity_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
      && this->nrx->mIsImu2VehHeadingValid)
@@ -92,7 +94,7 @@ void NComPublisherNode::timer_velocity_callback()
   }
 }
 
-void NComPublisherNode::timer_time_reference_callback()
+void OxtsDriver::timer_time_reference_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
@@ -103,7 +105,7 @@ void NComPublisherNode::timer_time_reference_callback()
   }
 }
 
-rclcpp::Time NComPublisherNode::get_timestamp()
+rclcpp::Time OxtsDriver::get_timestamp()
 {
   if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
     return clock_.now();
@@ -111,12 +113,14 @@ rclcpp::Time NComPublisherNode::get_timestamp()
     return RosNComWrapper::ncom_time_to_time(nrx);
 }
 
-std::string NComPublisherNode::get_unit_ip()
+std::string OxtsDriver::get_unit_ip()
 {
   return this->unit_ip;
 }
 
-short       NComPublisherNode::get_unit_port()
+short       OxtsDriver::get_unit_port()
 {
   return this->unit_port;
 }
+
+} // namespace oxts_driver

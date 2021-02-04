@@ -12,26 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <chrono>
-#include <functional>
-#include <memory>
-#include <string>
-#include <fstream> // Will be used for NCom streaming from file (or recording to bag)
-
-// ROS includes
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
 
-// Other includes
-#include "oxts_driver/ncom_publisher_node.hpp"
-#include "oxts_driver/udp_server_client.h"
+#include <memory>
 
-// gad-sdk includes
-#include "oxts_driver/NComRxC.h"
-#include <map>
-
-using namespace std::chrono_literals;
-
+#include "oxts_driver/driver.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -40,12 +25,10 @@ int main(int argc, char ** argv)
 
   rclcpp::init(argc, argv);
 
-  auto ncomNode = std::make_shared<NComPublisherNode>(rclcpp::NodeOptions());
+  auto node = std::make_shared<oxts_driver::OxtsDriver>(rclcpp::NodeOptions());
 
-  //! @todo Add try/catch 
-  RCLCPP_INFO(ncomNode->get_logger(), "Starting up node");
-  
-  rclcpp::spin(ncomNode);
+  rclcpp::spin(node);
+
   rclcpp::shutdown();
   return 0;
 }

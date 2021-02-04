@@ -1,10 +1,10 @@
 /**
- * \file ncom_publisher_node.hpp
+ * \file driver.hpp
  * Defines node to take NCom data and publish it in ROS messages.
  */
 
-#ifndef NCOM_PUBLISHER_NODE_HPP
-#define NCOM_PUBLISHER_NODE_HPP
+#ifndef OXTS_DRIVER__DRIVER_HPP_
+#define OXTS_DRIVER__DRIVER_HPP_
 
 #include <chrono>
 #include <functional>
@@ -34,6 +34,8 @@
 
 using namespace std::chrono_literals;
 
+namespace oxts_driver
+{
 
 /**
  * Enumeration of driver timestamp modes for published topics
@@ -61,7 +63,7 @@ enum PUB_TIMESTAMP_MODE
  * @todo Refactor timestamping if statements out of callback functions and into
  *       node initialisation.
  */
-class NComPublisherNode : public rclcpp::Node
+class OxtsDriver : public rclcpp::Node
 {
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
@@ -182,10 +184,10 @@ private:
 
 public:
   /**
-   * Default constructor for the NComPublisherNode. Parses options from the 
+   * Default constructor for the OxtsDriver. Parses options from the 
    * .yaml params/config file, sets up UDP connection to unit.
    */
-  explicit NComPublisherNode(const rclcpp::NodeOptions & options) : Node("oxts_driver", options)
+  explicit OxtsDriver(const rclcpp::NodeOptions & options) : Node("oxts_driver", options)
   {
     // Initilize tf broadcaster
     tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -237,25 +239,25 @@ public:
     if (!ncom_path.empty())
     {
       timer_ncom_ = this->create_wall_timer(
-                   ncomInterval, std::bind(&NComPublisherNode::timer_ncom_file_callback, this));
+                   ncomInterval, std::bind(&OxtsDriver::timer_ncom_file_callback, this));
     }
     else 
     {
       timer_ncom_ = this->create_wall_timer(
-                    ncomInterval, std::bind(&NComPublisherNode::timer_ncom_callback, this));
+                    ncomInterval, std::bind(&OxtsDriver::timer_ncom_callback, this));
     }
     timer_string_ = this->create_wall_timer(
-                  pubStringInterval, std::bind(&NComPublisherNode::timer_string_callback, this));
+                  pubStringInterval, std::bind(&OxtsDriver::timer_string_callback, this));
     timer_nav_sat_fix_ = this->create_wall_timer(
-                  pubNavSatFixInterval, std::bind(&NComPublisherNode::timer_nav_sat_fix_callback, this));
+                  pubNavSatFixInterval, std::bind(&OxtsDriver::timer_nav_sat_fix_callback, this));
     timer_imu_    = this->create_wall_timer(
-                  pubImuInterval, std::bind(&NComPublisherNode::timer_imu_callback, this));
+                  pubImuInterval, std::bind(&OxtsDriver::timer_imu_callback, this));
     timer_velocity_ = this->create_wall_timer(
-                  pubVelocityInterval, std::bind(&NComPublisherNode::timer_velocity_callback, this));
+                  pubVelocityInterval, std::bind(&OxtsDriver::timer_velocity_callback, this));
     timer_time_reference_ = this->create_wall_timer(
-                  pubTimeReferenceInterval, std::bind(&NComPublisherNode::timer_time_reference_callback, this));
+                  pubTimeReferenceInterval, std::bind(&OxtsDriver::timer_time_reference_callback, this));
     timer_ecef_pos_   = this->create_wall_timer(
-                  pubEcefPosInterval, std::bind(&NComPublisherNode::timer_ecef_pos_callback, this));
+                  pubEcefPosInterval, std::bind(&OxtsDriver::timer_ecef_pos_callback, this));
 
     nrx = NComCreateNComRxC();
 
@@ -316,9 +318,6 @@ public:
 
 };
 
+} // namespace oxts_driver
 
-
-
-
-
-#endif //NCOM_PUBLISHER_NODE_HPP
+#endif //OXTS_DRIVER__DRIVER_HPP_

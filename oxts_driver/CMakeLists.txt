@@ -29,11 +29,11 @@ find_package(tf2_kdl REQUIRED)
 
 
 add_executable(oxts_driver 
-               src/driver/ncom_publisher.cpp 
+               src/driver/oxts_node.cpp 
                src/lib/NComRxC.c 
-               src/driver/ncom_publisher_node.cpp 
+               src/driver/driver.cpp 
                src/driver/ros_ncom_wrapper.cpp
-               src/driver/convert.cpp)
+               src/lib/convert.cpp)
 
 ament_target_dependencies(oxts_driver 
                           rclcpp
