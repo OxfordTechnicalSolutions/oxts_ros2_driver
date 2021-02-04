@@ -28,7 +28,7 @@ pages:
   stage: Deploy
   script:
     # Install python dependencies
-    - apt install python3-pip -y
+    - apt install python3-pip doxygen -y
     - pip3 install sphinx sphinx_rtd_theme breathe
     # Create documentation dir and move to build dir
     - mkdir public
