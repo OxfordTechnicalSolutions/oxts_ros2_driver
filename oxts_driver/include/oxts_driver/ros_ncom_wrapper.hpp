@@ -43,12 +43,23 @@ namespace RosNComWrapper
    * based on Euler angles
    * 
    * @param nrx Pointer to the decoded NCom data
-   * @return A transform which can be applied to data in the vehicle frame to 
-   *         convert it to the imu frame. Timestamp is not used.
-   * 
-   * @todo Translation component?
+   * @return A quaternion representing the rotation between vehicle frame and imu frame
    */
-  tf2::Quaternion wrap_vat_to_quaternion(const NComRxC *nrx);
+  tf2::Quaternion getVat(const NComRxC *nrx);
+  /**
+   * Calculate the lateral no slip component of the transform from frame1 to frame2
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @return A transform representing the translation between the vehicle rear axle and the imu frame
+   */
+  tf2::Vector3 getVaa(const NComRxC *nrx);
+  /**
+   * Get the NCOM orientation in vehicle frame
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @return A quaterntion representing the rotation between the vehicle frame and NED
+   */
+  tf2::Quaternion getRPY(const NComRxC *nrx);
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.

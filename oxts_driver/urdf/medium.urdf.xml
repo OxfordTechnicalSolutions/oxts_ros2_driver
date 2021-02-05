@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot name="RT1003">
-<!-- 1.57079632679 -->
+
+  <link name="vehicle_link"></link>
+
   <link name="oxts_link">
     <visual>
       <origin rpy="0 0 -1.57079632679" xyz="-0.102 0.053 -0.015"/>
@@ -12,13 +14,11 @@
       </material>
     </visual>
   </link>
-
-  <!-- <link name="base_link"></link>
-  <joint name="base_link_joint" type="fixed">
-    <parent link="base_link"/>
+  <joint name="vehicle_link_joint" type="floating">
+    <parent link="vehicle_link"/>
     <child link="oxts_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
-  </joint> -->
+  </joint>
 
   <link name="imu_link"> </link>
   <joint name="imu_joint" type="fixed">

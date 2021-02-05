@@ -52,7 +52,7 @@ Visualization Manager:
       Frame Timeout: 1
       Frames:
         All Enabled: false
-        base_link:
+        map:
           Value: true
         imu_link:
           Value: false
@@ -66,7 +66,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        base_link:
+        map:
           oxts_link:
             imu_link:
               {}
@@ -113,7 +113,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
