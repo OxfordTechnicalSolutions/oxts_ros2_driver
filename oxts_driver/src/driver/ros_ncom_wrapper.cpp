@@ -199,7 +199,7 @@ sensor_msgs::msg::Imu RosNComWrapper::wrap_imu (
   // Get vehicle orientation from HPR ------------------------------------------
   veh_o = RosNComWrapper::getRPY(nrx); // ENU frame
   // Find imu orientation
-  imu_o = imu_o * q_vat.inverse(); // vehicle to body
+  imu_o = veh_o * q_vat.inverse(); // vehicle to body
   tf2::convert(imu_o,msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
