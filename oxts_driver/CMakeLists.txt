@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(oxts_driver VERSION 0.1.0)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -43,6 +38,7 @@ ament_target_dependencies(oxts_driver
                           nav_msgs
                           tf2
                           tf2_kdl)
+
 target_include_directories(oxts_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
