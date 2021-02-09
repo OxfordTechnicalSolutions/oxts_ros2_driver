@@ -30,7 +30,7 @@ void OxtsDriver::timer_string_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
-    auto msgString = RosNComWrapper::wrap_string(this->nrx);
+    auto msgString = RosNComWrapper::string(this->nrx);
     pubString_->publish(msgString);
 
     RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", 
@@ -43,8 +43,8 @@ void OxtsDriver::timer_nav_sat_fix_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "navsat_link");
-    auto msg    = RosNComWrapper::wrap_nav_sat_fix(this->nrx, header);
+    header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+    auto msg    = RosNComWrapper::nav_sat_fix(this->nrx, header);
     pubNavSatFix_->publish(msg);
   }
 }
@@ -54,8 +54,8 @@ void OxtsDriver::timer_ecef_pos_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::wrap_ecef_pos(this->nrx, header);
+    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+    auto msg    = RosNComWrapper::ecef_pos(this->nrx, header);
     pubEcefPos_->publish(msg);
   }
 }
@@ -66,8 +66,8 @@ void OxtsDriver::timer_imu_callback()
      && this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "imu_link");
-    auto msg    = RosNComWrapper::wrap_imu(this->nrx, header);
+    header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
+    auto msg    = RosNComWrapper::imu(this->nrx, header);
     pubImu_->publish(msg);
  
     auto rpyENU    = RosNComWrapper::getRPY(this->nrx);
@@ -106,8 +106,8 @@ void OxtsDriver::timer_velocity_callback()
      && this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::wrap_velocity(this->nrx, header);
+    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+    auto msg    = RosNComWrapper::velocity(this->nrx, header);
     pubVelocity_->publish(msg);
   }
 }
@@ -117,8 +117,8 @@ void OxtsDriver::timer_time_reference_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::wrap_header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::wrap_time_reference(this->nrx, header);
+    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+    auto msg    = RosNComWrapper::time_reference(this->nrx, header);
     pubTimeReference_->publish(msg);
   }
 }
@@ -128,7 +128,7 @@ rclcpp::Time OxtsDriver::get_timestamp()
   if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
     return clock_.now();
   else
-    return RosNComWrapper::ncom_time_to_time(nrx);
+    return RosNComWrapper::ncomTime(nrx);
 }
 
 std::string OxtsDriver::get_unit_ip()
