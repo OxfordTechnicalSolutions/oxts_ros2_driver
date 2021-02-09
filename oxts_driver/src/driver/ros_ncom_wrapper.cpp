@@ -6,18 +6,20 @@ namespace RosNComWrapper
 tf2::Quaternion getVat(const NComRxC *nrx)
 {
   tf2::Quaternion vat; 
-  vat.setRPY(nrx->mImu2VehRoll, nrx->mImu2VehPitch, nrx->mImu2VehHeading);
-  vat *= NAV_CONST::DEG2RADS;
+  vat.setRPY(
+    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading);
   return vat;
 }
 
 tf2::Vector3 getNsp(const NComRxC *nrx)
 {
-  tf2::Vector3 nsp; // Translation of rear axle in imu frame
-  nsp.setX(nrx->mNoSlipLeverArmX);
-  nsp.setY(nrx->mNoSlipLeverArmY);
-  nsp.setZ(nrx->mNoSlipLeverArmZ);
-  return nsp;
+  // Translation of rear axle in imu frame
+  return tf2::Vector3(
+    nrx->mNoSlipLeverArmX,
+    nrx->mNoSlipLeverArmY,
+    nrx->mNoSlipLeverArmZ);
 }
 
 tf2::Quaternion getRPY(const NComRxC *nrx)
