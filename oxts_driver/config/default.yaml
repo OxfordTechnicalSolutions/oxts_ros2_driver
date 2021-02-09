@@ -15,19 +15,21 @@ oxts_driver:
     ## Rates must be factors of the ncom_rate, configured above.
     ## Rates are in Hz. 0 Hz => Message will not be published
     ### Configure sample rate of NCom (do not exceed output rate of ncom)
-    ncom_rate: 100.0
+    ncom_rate               : 100.0
     ### Publish ROS string message
-    pub_string_rate           : 1.0
+    pub_string_rate         : 1.0
     ### Publish ROS NavSatFix message
-    pub_nav_sat_fix_rate      : 5.0
+    pub_nav_sat_fix_rate    : 5.0
     ### Publish ROS Imu message
-    pub_imu_rate              : 100.0
+    pub_imu_rate            : 100.0
     ### Publish ROS Velocity message
-    pub_velocity_rate         : 10.0
+    pub_velocity_rate       : 10.0
     ### Publish ROS TimeReference message
-    pub_time_reference_rate   : 1.0
+    pub_time_reference_rate : 1.0
     ### Publish ROS PoseWithCovarianceStamped message
-    pub_ecef_pos_rate   : 10.0
+    pub_ecef_pos_rate       : 10.0
+    ### Broadcast Tf messages for rviz visualisation
+    pub_tf_flag             : 1
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver

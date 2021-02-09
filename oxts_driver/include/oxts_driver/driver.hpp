@@ -94,11 +94,14 @@ private:
   double pub_time_reference_rate; 
   /*! Publishing rate for PointStamped message. */
   double pub_ecef_pos_rate;
+  /*! Publish Tf messages. */
+  bool pub_tf_flag;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
   std::chrono::duration<uint64_t,std::milli> pubStringInterval;
   std::chrono::duration<uint64_t,std::milli> pubNavSatFixInterval;
   std::chrono::duration<uint64_t,std::milli> pubImuInterval;
+  std::chrono::duration<uint64_t,std::milli> pubTfInterval;
   std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
   std::chrono::duration<uint64_t,std::milli> pubTimeReferenceInterval;
   std::chrono::duration<uint64_t,std::milli> pubEcefPosInterval;
@@ -108,6 +111,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_string_;
   rclcpp::TimerBase::SharedPtr timer_nav_sat_fix_;
   rclcpp::TimerBase::SharedPtr timer_imu_;
+  rclcpp::TimerBase::SharedPtr timer_tf_;
   rclcpp::TimerBase::SharedPtr timer_velocity_;
   rclcpp::TimerBase::SharedPtr timer_time_reference_;
   rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
@@ -116,7 +120,7 @@ private:
    * Callback function for NCom sampling. Receives data from chosen source
    * (UDP or file) and parses a packet to nrx.
    * 
-   * @todo Implement file parsing.
+   * @todo Refactor into input class
    */
   void timer_ncom_callback();
   void timer_ncom_file_callback();
@@ -133,6 +137,10 @@ private:
    * Callback function for Imu message. Wraps message and publishes.
    */
   void timer_imu_callback();
+  /** 
+   * Callback function for Tf messages. Wraps messages and broadcasts.
+   */
+  void timer_tf_callback();
   /** 
    * Callback function for TimeReference message. Wraps message and publishes.
    */
@@ -205,6 +213,7 @@ public:
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);
     pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1.0);
+    pub_tf_flag             = this->declare_parameter("pub_tf_flag", 1);
 
     ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));
@@ -212,7 +221,7 @@ public:
     pubImuInterval           = std::chrono::milliseconds(int(1000.0 / pub_imu_rate));
     pubVelocityInterval      = std::chrono::milliseconds(int(1000.0 / pub_velocity_rate));
     pubTimeReferenceInterval = std::chrono::milliseconds(int(1000.0 / pub_time_reference_rate));
-    pubEcefPosInterval          = std::chrono::milliseconds(int(1000.0 / pub_ecef_pos_rate));
+    pubEcefPosInterval       = std::chrono::milliseconds(int(1000.0 / pub_ecef_pos_rate));
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
@@ -230,9 +239,6 @@ public:
                                                    ("ins/ecef_pos",             10);
 
     clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
-
-
-    //this->get_parameter("use_sim_time");
 
     // Assign callback functions to timers (callbacks are called at a rate
     // dictated by the associated timer)
@@ -258,6 +264,11 @@ public:
                   pubTimeReferenceInterval, std::bind(&OxtsDriver::timer_time_reference_callback, this));
     timer_ecef_pos_   = this->create_wall_timer(
                   pubEcefPosInterval, std::bind(&OxtsDriver::timer_ecef_pos_callback, this));
+    if (pub_tf_flag)
+    {
+      timer_tf_   = this->create_wall_timer(
+                  pubImuInterval, std::bind(&OxtsDriver::timer_tf_callback, this));
+    } 
 
     nrx = NComCreateNComRxC();
 
