@@ -52,7 +52,7 @@ namespace RosNComWrapper
    * @param nrx Pointer to the decoded NCom data
    * @return A transform representing the translation between the vehicle rear axle and the imu frame
    */
-  tf2::Vector3 getVaa(const NComRxC *nrx);
+  tf2::Vector3 getNsp(const NComRxC *nrx);
   /**
    * Get the NCOM orientation in vehicle frame
    * 

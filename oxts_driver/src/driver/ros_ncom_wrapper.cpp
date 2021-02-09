@@ -12,13 +12,13 @@ tf2::Quaternion RosNComWrapper::getVat(const NComRxC *nrx)
   return vat;
 }
 
-tf2::Vector3 RosNComWrapper::getVaa(const NComRxC *nrx)
+tf2::Vector3 RosNComWrapper::getNsp(const NComRxC *nrx)
 {
-  tf2::Vector3 vaa; // Translation of rear axle in imu frame
-  vaa.setX(nrx->mNoSlipLeverArmX);
-  vaa.setY(nrx->mNoSlipLeverArmY);
-  vaa.setZ(nrx->mNoSlipLeverArmZ);
-  return vaa;
+  tf2::Vector3 nsp; // Translation of rear axle in imu frame
+  nsp.setX(nrx->mNoSlipLeverArmX);
+  nsp.setY(nrx->mNoSlipLeverArmY);
+  nsp.setZ(nrx->mNoSlipLeverArmZ);
+  return nsp;
 }
 
 tf2::Quaternion RosNComWrapper::getRPY(const NComRxC *nrx)

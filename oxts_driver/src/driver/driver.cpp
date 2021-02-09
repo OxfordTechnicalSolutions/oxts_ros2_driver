@@ -82,16 +82,16 @@ void OxtsDriver::timer_imu_callback()
     tf_broadcaster_->sendTransform(tf_oxts);
 
     auto vat    = RosNComWrapper::getVat(this->nrx);
-    auto vaa    = RosNComWrapper::getVaa(this->nrx);
-    // convert vaa from imu->axle to axle->imu
-    vaa = tf2::quatRotate(vat.inverse(), -vaa);
+    auto nsp    = RosNComWrapper::getNsp(this->nrx);
+    // convert nsp from imu->axle to axle->imu
+    nsp = tf2::quatRotate(vat.inverse(), -nsp);
     geometry_msgs::msg::TransformStamped tf_vat;
     tf_vat.header = header;
     tf_vat.header.frame_id = "vehicle_link";
     tf_vat.child_frame_id = "oxts_link";
-    tf_vat.transform.translation.x = vaa.x();
-    tf_vat.transform.translation.y = vaa.y();
-    tf_vat.transform.translation.z = vaa.z();
+    tf_vat.transform.translation.x = nsp.x();
+    tf_vat.transform.translation.y = nsp.y();
+    tf_vat.transform.translation.z = nsp.z();
     tf_vat.transform.rotation.x = vat.inverse().x();
     tf_vat.transform.rotation.y = vat.inverse().y();
     tf_vat.transform.rotation.z = vat.inverse().z();
