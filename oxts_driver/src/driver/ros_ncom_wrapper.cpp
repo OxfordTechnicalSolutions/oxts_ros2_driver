@@ -6,11 +6,8 @@ namespace RosNComWrapper
 tf2::Quaternion getVat(const NComRxC *nrx)
 {
   tf2::Quaternion vat; 
-  vat.setRPY(
-    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
-    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
-    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading
-  );
+  vat.setRPY(nrx->mImu2VehRoll, nrx->mImu2VehPitch, nrx->mImu2VehHeading);
+  vat *= NAV_CONST::DEG2RADS;
   return vat;
 }
 

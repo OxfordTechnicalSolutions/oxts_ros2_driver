@@ -26,6 +26,7 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
+find_package(oxts_msgs REQUIRED)
 
 
 add_executable(oxts_driver 
@@ -42,7 +43,8 @@ ament_target_dependencies(oxts_driver
                           geometry_msgs
                           nav_msgs
                           tf2
-                          tf2_kdl)
+                          tf2_kdl
+                          oxts_msgs)
 target_include_directories(oxts_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
