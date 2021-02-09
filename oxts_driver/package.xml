@@ -22,5 +22,6 @@
     <depend>tf2</depend>
     <depend>tf2_ros</depend>
     <depend>tf2_kdl</depend>
+    <depend>oxts_msgs</depend>
   </export>
 </package>
