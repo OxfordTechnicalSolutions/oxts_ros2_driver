@@ -79,6 +79,16 @@ void OxtsDriver::timer_imu_callback()
     header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
     auto msg    = RosNComWrapper::imu(this->nrx, header);
     pubImu_->publish(msg);
+  }
+}
+
+void OxtsDriver::timer_tf_callback()
+{
+  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
+     && this->nrx->mIsImu2VehHeadingValid)
+  {
+    std_msgs::msg::Header header;
+    header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
  
     auto rpyENU    = RosNComWrapper::getRPY(this->nrx);
     geometry_msgs::msg::TransformStamped tf_oxts;
@@ -109,6 +119,8 @@ void OxtsDriver::timer_imu_callback()
     tf_broadcaster_->sendTransform(tf_vat);
   }
 }
+
+
 
 void OxtsDriver::timer_velocity_callback()
 {
