@@ -1,27 +1,28 @@
 #include "oxts_driver/ros_ncom_wrapper.hpp"
 
+namespace RosNComWrapper
+{
 
-tf2::Quaternion RosNComWrapper::getVat(const NComRxC *nrx)
+tf2::Quaternion getVat(const NComRxC *nrx)
 {
   tf2::Quaternion vat; 
   vat.setRPY(
-    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
-    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
-    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading
-  );
+    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading);
   return vat;
 }
 
-tf2::Vector3 RosNComWrapper::getNsp(const NComRxC *nrx)
+tf2::Vector3 getNsp(const NComRxC *nrx)
 {
-  tf2::Vector3 nsp; // Translation of rear axle in imu frame
-  nsp.setX(nrx->mNoSlipLeverArmX);
-  nsp.setY(nrx->mNoSlipLeverArmY);
-  nsp.setZ(nrx->mNoSlipLeverArmZ);
-  return nsp;
+  // Translation of rear axle in imu frame
+  return tf2::Vector3(
+    nrx->mNoSlipLeverArmX,
+    nrx->mNoSlipLeverArmY,
+    nrx->mNoSlipLeverArmZ);
 }
 
-tf2::Quaternion RosNComWrapper::getRPY(const NComRxC *nrx)
+tf2::Quaternion getRPY(const NComRxC *nrx)
 {
   auto rpyNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
   auto rpyENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
@@ -38,7 +39,7 @@ tf2::Quaternion RosNComWrapper::getRPY(const NComRxC *nrx)
 }
 
 
-rclcpp::Time      RosNComWrapper::ncomTime(const NComRxC *nrx)
+rclcpp::Time      ncomTime(const NComRxC *nrx)
 {
   auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
                            (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 
@@ -49,7 +50,7 @@ rclcpp::Time      RosNComWrapper::ncomTime(const NComRxC *nrx)
   return time;
 }
 
-std_msgs::msg::Header       RosNComWrapper::header(rclcpp::Time time,
+std_msgs::msg::Header       header(rclcpp::Time time,
                                                         std::string frame)
 {
   auto header = std_msgs::msg::Header();
@@ -60,7 +61,7 @@ std_msgs::msg::Header       RosNComWrapper::header(rclcpp::Time time,
   return header;
 }
 
-sensor_msgs::msg::NavSatStatus RosNComWrapper::nav_sat_status(
+sensor_msgs::msg::NavSatStatus nav_sat_status(
                                                     const NComRxC *nrx)
 {
   auto msg = sensor_msgs::msg::NavSatStatus();
@@ -123,14 +124,14 @@ sensor_msgs::msg::NavSatStatus RosNComWrapper::nav_sat_status(
   return msg;
 }
 
-sensor_msgs::msg::NavSatFix RosNComWrapper::nav_sat_fix(
+sensor_msgs::msg::NavSatFix nav_sat_fix(
                             const NComRxC *nrx,
                             std_msgs::msg::Header head)
 {
   auto msg = sensor_msgs::msg::NavSatFix();
   msg.header = head;
 
-  msg.status = RosNComWrapper::nav_sat_status(nrx);
+  msg.status = nav_sat_status(nrx);
 
   msg.latitude  = nrx->mLat;
   msg.longitude = nrx->mLon;
@@ -146,8 +147,20 @@ sensor_msgs::msg::NavSatFix RosNComWrapper::nav_sat_fix(
   return msg;
 }
 
+oxts_msgs::msg::NavSatRef nav_sat_ref(
+                            const NComRxC *nrx,
+                            std_msgs::msg::Header head)
+{
+  auto msg = oxts_msgs::msg::NavSatRef();
+  msg.header = head;
+  msg.latitude  = nrx->mRefLat;
+  msg.longitude = nrx->mRefLon;
+  msg.altitude  = nrx->mRefAlt;
+  msg.heading  = 90 - nrx->mRefHeading; // NED to ENU
+  return msg;
+}
 
-geometry_msgs::msg::PointStamped RosNComWrapper::ecef_pos
+geometry_msgs::msg::PointStamped ecef_pos
                                               (
                                               const NComRxC *nrx,
                                               std_msgs::msg::Header head
@@ -164,7 +177,7 @@ geometry_msgs::msg::PointStamped RosNComWrapper::ecef_pos
   return msg;
 }
 
-std_msgs::msg::String RosNComWrapper::string (const NComRxC *nrx)
+std_msgs::msg::String string (const NComRxC *nrx)
 {
   auto msg = std_msgs::msg::String();
   msg.data = "Time, Lat, Long, Alt : "
@@ -177,7 +190,7 @@ std_msgs::msg::String RosNComWrapper::string (const NComRxC *nrx)
 }
 
 
-sensor_msgs::msg::Imu RosNComWrapper::imu (
+sensor_msgs::msg::Imu imu (
                       const NComRxC *nrx,
                       std_msgs::msg::Header head)
 {
@@ -193,9 +206,9 @@ sensor_msgs::msg::Imu RosNComWrapper::imu (
   auto imu_a = tf2::Vector3();    // Linear Acceleration in the imu frame (rads)
 
   // Construct vehicle-imu frame transformation --------------------------------
-  q_vat = RosNComWrapper::getVat(nrx);
+  q_vat = getVat(nrx);
   // Get vehicle orientation from HPR ------------------------------------------
-  veh_o = RosNComWrapper::getRPY(nrx); // ENU frame
+  veh_o = getRPY(nrx); // ENU frame
   // Find imu orientation
   imu_o = veh_o * q_vat.inverse(); // vehicle to body
   tf2::convert(imu_o, msg.orientation);
@@ -230,7 +243,7 @@ sensor_msgs::msg::Imu RosNComWrapper::imu (
   return msg;
 }
 
-geometry_msgs::msg::TwistStamped   RosNComWrapper::velocity   (
+geometry_msgs::msg::TwistStamped   velocity   (
                                    const NComRxC *nrx,
                                    std_msgs::msg::Header head)
 {
@@ -238,7 +251,7 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::velocity   (
   msg.header = head;
 
   // Construct vehicle-imu frame transformation --------------------------------
-  auto q_vat      = RosNComWrapper::getVat(nrx);
+  auto q_vat      = getVat(nrx);
   auto r_vat      = tf2::Matrix3x3(q_vat);
   auto veh_v      = tf2::Vector3(nrx->mIsoVoX,nrx->mIsoVoY,nrx->mIsoVoZ);
   auto veh_w      = tf2::Vector3(nrx->mWx,nrx->mWy,nrx->mWz);
@@ -262,8 +275,7 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::velocity   (
   return msg;
 }
 
-
-  sensor_msgs::msg::TimeReference   RosNComWrapper::time_reference  (
+sensor_msgs::msg::TimeReference   time_reference   (
                                     const NComRxC *nrx,
                                     std_msgs::msg::Header head)
 {
@@ -280,4 +292,5 @@ geometry_msgs::msg::TwistStamped   RosNComWrapper::velocity   (
   return msg;
 }
 
+} // namespace RosNComWrapper
 

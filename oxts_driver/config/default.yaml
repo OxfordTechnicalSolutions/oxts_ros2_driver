@@ -3,7 +3,7 @@ oxts_driver:
 #===============================================================================
     # INS configuration (set up to match the unit)
     ## Unit IP address
-    unit_ip: 195.0.0.96
+    unit_ip: 192.168.25.44
     ## Unit Port (3000 unless intentionally configured otherwise on the INS)
     unit_port: 3000
 
@@ -28,6 +28,8 @@ oxts_driver:
     pub_time_reference_rate : 1.0
     ### Publish ROS PoseWithCovarianceStamped message
     pub_ecef_pos_rate       : 10.0
+    ### Publish OxTS NavSatRef message
+    pub_nav_sat_ref_rate    : 10.0
     ### Broadcast Tf messages for rviz visualisation
     pub_tf_flag             : 1
 

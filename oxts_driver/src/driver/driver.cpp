@@ -49,6 +49,16 @@ void OxtsDriver::timer_nav_sat_fix_callback()
   }
 }
 
+void OxtsDriver::timer_nav_sat_ref_callback()
+{
+  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
+  {
+    std_msgs::msg::Header header;
+    header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+    auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
+    pubNavSatRef_->publish(msg);
+  }
+}
 void OxtsDriver::timer_ecef_pos_callback()
 {
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)

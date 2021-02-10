@@ -24,6 +24,7 @@
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/point.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <oxts_msgs/msg/nav_sat_ref.hpp>
 
 #include "tf2_kdl/tf2_kdl.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
@@ -90,6 +91,14 @@ namespace RosNComWrapper
    * @param head Header to be added to the published message
    */
   sensor_msgs::msg::NavSatFix        nav_sat_fix(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
+  /**
+   * Wrap data for local reference point using oxts_msgs/msg/NavSatRef
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
+   */
+  oxts_msgs::msg::NavSatRef        nav_sat_ref(const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
 
   /**
