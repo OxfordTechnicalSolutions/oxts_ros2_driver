@@ -54,7 +54,7 @@ void OxtsDriver::timer_nav_sat_ref_callback()
   if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
   {
     std_msgs::msg::Header header;
-    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+    header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
     auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
     pubNavSatRef_->publish(msg);
   }

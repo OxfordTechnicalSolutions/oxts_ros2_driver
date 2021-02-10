@@ -156,7 +156,7 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
   msg.latitude  = nrx->mRefLat;
   msg.longitude = nrx->mRefLon;
   msg.altitude  = nrx->mRefAlt;
-  msg.heading  = nrx->mRefHeading;
+  msg.heading  = 90 - nrx->mRefHeading; // NED to ENU
   return msg;
 }
 
