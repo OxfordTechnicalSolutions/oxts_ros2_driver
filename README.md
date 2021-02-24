@@ -21,7 +21,7 @@ Build instructions will look something like this:
 
 1. . /opt/ros/foxy/setup.bash
 2. cd <colcon_ws>/src
-3. git clone https://gitlab.com/oxts/navigation/generic-aiding/oxts.git
+3. git clone https://gitlab.com/oxts/navigation/ros/oxts.git
 4. cd oxts
 5. rosdep update
 6. rosdep install --from-path .
