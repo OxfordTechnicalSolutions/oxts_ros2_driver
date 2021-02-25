@@ -3,7 +3,7 @@
 namespace oxts_driver
 {
 
-void OxtsDriver::timer_ncom_callback()
+void OxtsDriver::timer_ncom_socket_callback()
 {
   // Read from open socket
   std::size_t size = this->udpClient.receive_from(this->buff, 72, this->unitEndpointNCom);
@@ -28,52 +28,39 @@ void OxtsDriver::timer_ncom_file_callback()
 
 void OxtsDriver::timer_string_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    auto msgString = RosNComWrapper::string(this->nrx);
-    pubString_->publish(msgString);
+  auto msgString = RosNComWrapper::string(this->nrx);
+  pubString_->publish(msgString);
 
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", 
-                                    msgString.data.c_str());
-  }
+  RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", 
+                                  msgString.data.c_str());
 }
 
 void OxtsDriver::timer_nav_sat_fix_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
-    auto msg    = RosNComWrapper::nav_sat_fix(this->nrx, header);
-    pubNavSatFix_->publish(msg);
-  }
+  std_msgs::msg::Header header;
+  header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+  auto msg    = RosNComWrapper::nav_sat_fix(this->nrx, header);
+  pubNavSatFix_->publish(msg);
 }
 
 void OxtsDriver::timer_nav_sat_ref_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
-    auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
-    pubNavSatRef_->publish(msg);
-  }
+  std_msgs::msg::Header header;
+  header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+  auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
+  pubNavSatRef_->publish(msg);
 }
 void OxtsDriver::timer_ecef_pos_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::ecef_pos(this->nrx, header);
-    pubEcefPos_->publish(msg);
-  }
+  std_msgs::msg::Header header;
+  header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+  auto msg    = RosNComWrapper::ecef_pos(this->nrx, header);
+  pubEcefPos_->publish(msg);
 }
 
 void OxtsDriver::timer_imu_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
-     && this->nrx->mIsImu2VehHeadingValid)
+  if(this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
@@ -84,8 +71,7 @@ void OxtsDriver::timer_imu_callback()
 
 void OxtsDriver::timer_tf_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
-     && this->nrx->mIsImu2VehHeadingValid)
+  if(this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
@@ -124,8 +110,7 @@ void OxtsDriver::timer_tf_callback()
 
 void OxtsDriver::timer_velocity_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME
-     && this->nrx->mIsImu2VehHeadingValid)
+  if(this->nrx->mIsImu2VehHeadingValid)
   {
     std_msgs::msg::Header header;
     header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
@@ -136,13 +121,10 @@ void OxtsDriver::timer_velocity_callback()
 
 void OxtsDriver::timer_time_reference_callback()
 {
-  if(this->nrx->mInsNavMode == NAV_CONST::NAV_MODE::REAL_TIME)
-  {
-    std_msgs::msg::Header header;
-    header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
-    auto msg    = RosNComWrapper::time_reference(this->nrx, header);
-    pubTimeReference_->publish(msg);
-  }
+  std_msgs::msg::Header header;
+  header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+  auto msg    = RosNComWrapper::time_reference(this->nrx, header);
+  pubTimeReference_->publish(msg);
 }
 
 rclcpp::Time OxtsDriver::get_timestamp()
