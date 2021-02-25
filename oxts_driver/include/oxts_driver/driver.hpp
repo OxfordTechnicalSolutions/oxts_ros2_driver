@@ -76,6 +76,7 @@ private:
   /*! File path to NCom file to be used as input. Not required if running
     in real time. */
   std::string ncom_path;
+  /*! Function pointer to the necesary NCom file/socket callback */
   void (oxts_driver::OxtsDriver::*timer_ncom_callback)();
   /*! Timestamp type to be applied to published packets
     {0 : Driver time, 1 : NCom time} */
