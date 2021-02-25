@@ -24,8 +24,10 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_tim_time', default='false')
     use_rviz = LaunchConfiguration('use_rviz')
+    wait_for_init = LaunchConfiguration('wait_for_init')
     ncom = LaunchConfiguration('ncom', default='')
     params['ncom'] = ncom
+    params['wait_for_init'] = wait_for_init
 
     # declare launch arguments
     launch_argument = DeclareLaunchArgument(
@@ -35,6 +37,10 @@ def generate_launch_description():
         'use_rviz',
         default_value='False',
         description='Whether to start RVIZ')
+    declare_wait_for_init = DeclareLaunchArgument(
+        'wait_for_init',
+        default_value='True',
+        description='Whether to publish before NCOM initialisation')
     declare_ncom = DeclareLaunchArgument(
         'ncom',
         default_value='',
@@ -71,6 +77,7 @@ def generate_launch_description():
     # launch options
     ld.add_action(launch_argument)
     ld.add_action(declare_use_rviz)
+    ld.add_action(declare_wait_for_init)
     # launch nodes
     ld.add_action(oxts_driver_node)
     ld.add_action(robot_state_publisher)

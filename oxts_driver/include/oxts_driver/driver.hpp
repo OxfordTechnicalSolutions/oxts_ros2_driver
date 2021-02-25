@@ -76,12 +76,15 @@ private:
   /*! File path to NCom file to be used as input. Not required if running
     in real time. */
   std::string ncom_path;
+  void (oxts_driver::OxtsDriver::*timer_ncom_callback)();
   /*! Timestamp type to be applied to published packets
     {0 : Driver time, 1 : NCom time} */
   int timestamp_mode;
   /*! Frame ID of outgoing packets. @todo Having a general frame ID may not
     make sense. This isn't implemented. */
   std::string frame_id;
+  /*! Whether ot not to wait for NCom initialisation before publishing messages. */
+  bool wait_for_init;
   /*! Publishing rate for debug String message. */
   double pub_string_rate;
   /*! Publishing rate for NavSatFix message. */
@@ -126,7 +129,7 @@ private:
    * 
    * @todo Refactor into input class
    */
-  void timer_ncom_callback();
+  void timer_ncom_socket_callback();
   void timer_ncom_file_callback();
   /** 
    * Callback function for debug String message. Wraps message, publishes, and
@@ -220,6 +223,7 @@ public:
     ncom_path               = this->declare_parameter("ncom", std::string(""));
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
     frame_id                = this->declare_parameter("frame_id", "oxts_link");
+    wait_for_init           = this->declare_parameter("wait_for_init", true);
     pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);
     pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);
     pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
@@ -261,14 +265,14 @@ public:
     // dictated by the associated timer)
     if (!ncom_path.empty())
     {
-      timer_ncom_ = this->create_wall_timer(
-                   ncomInterval, std::bind(&OxtsDriver::timer_ncom_file_callback, this));
+      timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
     }
     else 
     {
-      timer_ncom_ = this->create_wall_timer(
-                    ncomInterval, std::bind(&OxtsDriver::timer_ncom_callback, this));
+      timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
     }
+    timer_ncom_ = this->create_wall_timer(
+                  ncomInterval, std::bind(timer_ncom_callback, this));
     timer_string_ = this->create_wall_timer(
                   pubStringInterval, std::bind(&OxtsDriver::timer_string_callback, this));
     timer_nav_sat_fix_ = this->create_wall_timer(
@@ -311,6 +315,20 @@ public:
       RCLCPP_INFO(this->get_logger(), "Connecting: %s:%d", this->unit_ip.c_str(), this->unit_port);
     }
 
+    // Wait call the initialiser
+    if (wait_for_init)
+    {
+      RCLCPP_INFO(this->get_logger(), "Waiting for initialisation");
+      while (nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME)
+      {
+        (*this.*timer_ncom_callback)();
+      }
+      RCLCPP_INFO(this->get_logger(), "NCOM initialised");
+    }
+    else
+    {
+      RCLCPP_INFO(this->get_logger(), "Publishing before NCOM initialisation");
+    }
   }
 
   /**
