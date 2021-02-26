@@ -153,6 +153,8 @@ private:
   rclcpp::Publisher<oxts_msgs::msg::NavSatRef>::SharedPtr  pubNavSatRef_;
   /** TF broadcaster */
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  /** Error strings */
+  std::string notFactorError = " publish rate is not a factor of NCom rate, true output rate would not be %dHz.";
 
 public:
   /**
@@ -177,12 +179,29 @@ public:
     pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 1);
     pub_tf_flag             = this->declare_parameter("pub_tf_flag", true);
 
+    /** @todo Improve error handling */
+    if (ncom_rate == 0)
+      RCLCPP_ERROR(this->get_logger(), "NCom publish rate is set to zero. No messages will be output."); return;
+
     pubStringInterval        = (pub_string_rate         == 0) ? 0 : ncom_rate / pub_string_rate;
     pubNavSatFixInterval     = (pub_nav_sat_fix_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
     pubVelocityInterval      = (pub_velocity_rate       == 0) ? 0 : ncom_rate / pub_velocity_rate;
     pubTimeReferenceInterval = (pub_time_reference_rate == 0) ? 0 : ncom_rate / pub_time_reference_rate;
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
+
+    if (ncom_rate % pubStringInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;
+    if (ncom_rate % pubNavSatFixInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;
+    if (ncom_rate % pubVelocityInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;
+    if (ncom_rate % pubTimeReferenceInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;
+    if (ncom_rate % pubEcefPosInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;
+    if (ncom_rate % pubNavSatRefInterval != 0)
+      RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
