@@ -1,6 +1,6 @@
 # ROS2 Driver
 
-[![pipeline status](https://gitlab.com/oxts/navigation/generic-aiding/oxts/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/generic-aiding/oxts/-/commits/master)
+[![pipeline status](https://gitlab.com/oxts/navigation/ros/oxts/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/ros/oxts/-/commits/master)
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Includes NCOM decoding and GAD encoding functionality. Where ROS is mentioned in this document this is in reference to ROS2. References to ROS1 will be explicit.
 
@@ -32,26 +32,18 @@ Build instructions will look something like this:
 
 ## Configuring and Launching the Driver
 
-The driver is configured using .yaml files, as is the norm for ROS2 nodes. These should be kept in /config, and can be used to configure the node at run time like so:
+The driver is configured using .yaml files, as is the norm for ROS2 nodes. The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
+
+Launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine. They can be use like so:
 
 ```bash
-    ros2 run oxts_driver ncom_publisher --ros-args --params-file  ~/code/ros2_ws/src/oxts_driver/config/ncom_publisher_default_config.yaml
-```
-
-The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
-
-If you (quite rightly) don't want to write that into the command line each time, launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine.
-
-To launch only the ncom publisher, use basic_launch.py like so:
-
-```bash
-    ros2 launch oxts_driver basic_launch.py
+    ros2 launch oxts launch.py
 ```
 
 or, to replay from an ncom file:
 
 ```bash
-    ros2 launch oxts_driver basic_launch.py ncom:=<absolute_path_to_ncom>
+    ros2 launch oxts launch.py ncom:=<absolute_path_to_ncom>
 ```
 
 
@@ -59,17 +51,19 @@ or, to replay from an ncom file:
 
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network. Reference frames for each message can be found in headers. Where NCom is typically vehicle frame, ROS messages are output in INS/IMU frame.
 
-* **ins/debug_string_pos** [std_msgs/msg/String](http://docs.ros.org/en/melodic/api/std_msgs/html/msg/String.html)
+* **ins/debug_string_pos** [std_msgs/msg/String](http://docs.ros.org/en/noetic/api/std_msgs/html/msg/String.html)
     This message is not useful for general use. It is currently included for debug purposes. It contains a timestamp from NCom and WGS84 coordinates in string form, which is output to the console.
-* **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/melodic/api/geometry_msgs/html/msg/PointStamped.html)
+* **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PointStamped.html)
     Contains a timestamped position of the INS in the ECEF reference frame.
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
-* **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html)
+* **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Imu.html)
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
-* **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/hydro/api/geometry_msgs/html/msg/TwistStamped.html)
+* **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame.
-* **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/TimeReference.html)
+* **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
+
+\* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet
 
 Useful sources of information around frames used for these messages can be found in:
 
