@@ -30,9 +30,9 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 // OxTS includes
-#include "oxts_driver/NComRxC.h"
-#include "oxts_driver/nav_const.hpp"
-#include "oxts_driver/convert.hpp"
+#include "oxts_ins/NComRxC.h"
+#include "oxts_ins/nav_const.hpp"
+#include "oxts_ins/nav_conversions.hpp"
 
 /**
  * Functions to convert data from the NCom decoder to ROS messages

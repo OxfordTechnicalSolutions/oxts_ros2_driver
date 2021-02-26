@@ -17,6 +17,7 @@
 
     <exec_depend>oxts_driver</exec_depend>
     <exec_depend>oxts_msgs</exec_depend>
+    <exec_depend>oxts_ins</exec_depend>
 
     <export>
         <build_type>ament_cmake</build_type>

@@ -1,4 +1,6 @@
-#include "oxts_driver/ros_ncom_wrapper.hpp"
+#include "oxts_ins/wrapper.hpp"
+
+
 
 namespace RosNComWrapper
 {
@@ -169,7 +171,7 @@ geometry_msgs::msg::PointStamped ecef_pos
   auto msg = geometry_msgs::msg::PointStamped();
   msg.header = head;
 
-  std::vector<double> ecef = Convert::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
+  std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
   msg.point.x    = ecef[0]; 
   msg.point.y    = ecef[1];
   msg.point.z    = ecef[2];

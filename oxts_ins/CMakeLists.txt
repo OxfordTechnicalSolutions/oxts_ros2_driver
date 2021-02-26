@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(oxts_driver VERSION 0.1.0)
+project(oxts_ins VERSION 0.1.0)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -24,12 +24,15 @@ find_package(tf2_kdl REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
 
-add_executable(oxts_driver 
-               src/driver/oxts_node.cpp 
-               src/lib/NComRxC.c 
-               src/driver/driver.cpp)
+add_executable(oxts_ins 
+               src/conversions/convert.cpp 
+               src/conversions/convert_node.cpp
+               src/conversions/wrapper.cpp
+               src/lib/NComRxC.c
+               src/lib/nav_conversions.cpp
+)
 
-ament_target_dependencies(oxts_driver 
+ament_target_dependencies(oxts_ins 
                           rclcpp
                           std_msgs
                           sensor_msgs
@@ -38,16 +41,17 @@ ament_target_dependencies(oxts_driver
                           tf2
                           tf2_kdl
                           oxts_msgs)
-target_include_directories(oxts_driver PUBLIC
+target_include_directories(oxts_ins PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
 
-install(TARGETS oxts_driver
+install(TARGETS oxts_ins
         DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY config 
+install(DIRECTORY 
+        config urdf rviz
         DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
