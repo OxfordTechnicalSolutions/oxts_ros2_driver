@@ -45,7 +45,7 @@ class OxtsDriver : public rclcpp::Node
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
-  int ncom_rate;
+  uint8_t ncom_rate;
   /*! IP address of the INS to connect to */
   std::string unit_ip;
   /*! Endpoint Port of the INS to be connected to. Default 3000 for NCom. */
@@ -78,8 +78,6 @@ private:
    */
   rclcpp::Publisher<oxts_msgs::msg::Ncom>::SharedPtr pubNCom_;
 
-  rclcpp::Clock clock_;
-
 public:
   /**
    * Default constructor for the OxtsDriver. Parses options from the 
@@ -89,7 +87,7 @@ public:
   {
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
-    ncom_rate               = this->declare_parameter("ncom_rate", 100.0);
+    ncom_rate               = this->declare_parameter("ncom_rate", 100);
     unit_ip                 = this->declare_parameter("unit_ip", "0.0.0.0");
     unit_port               = this->declare_parameter("unit_port", 3000);
     ncom_path               = this->declare_parameter("ncom", std::string(""));
@@ -100,8 +98,6 @@ public:
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubNCom_ = this->create_publisher<oxts_msgs::msg::Ncom> ("ncom", 10); 
-
-    clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
 
     // Assign callback functions to timers (callbacks are called at a rate
     // dictated by the associated timer)
@@ -138,37 +134,37 @@ public:
       RCLCPP_INFO(this->get_logger(), "Connecting: %s:%d", this->unit_ip.c_str(), this->unit_port);
     }
 
-    // Wait call the initialiser
+    // Wait for config to be populated in NCOM packets
+    RCLCPP_INFO(this->get_logger(), "Waiting for INS config information...");
+    while (nrx->mSerialNumber == 0 || nrx->mIsImu2VehHeadingValid == 0)
+    {
+      (*this.*timer_ncom_callback)();
+    }
+    RCLCPP_INFO(this->get_logger(), "INS config information received");
+
+    // Wait for INS initialisation if option enabled
     if (wait_for_init)
     {
-      RCLCPP_INFO(this->get_logger(), "Waiting for initialisation");
+      RCLCPP_INFO(this->get_logger(), "Waiting for initialisation...");
       while (nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME)
       {
         (*this.*timer_ncom_callback)();
       }
-      RCLCPP_INFO(this->get_logger(), "NCOM initialised");
+      RCLCPP_INFO(this->get_logger(), "INS initialised");
     }
     else
     {
-      RCLCPP_INFO(this->get_logger(), "Publishing before NCOM initialisation");
+      RCLCPP_INFO(this->get_logger(), "Publishing before INS initialisation");
     }
   }
 
-  /**
-   * NCom decoder instance
-   */
+  /** NCom decoder instance */
   NComRxC *nrx;
-  /**
-   * Buffer for UDP data
-   */
+  /** Buffer for UDP data */
   unsigned char buff[1024];
-  /**
-   * UDP Client to receive data from the device. 
-   */
+  /** UDP Client to receive data from the device */
   networking_udp::client udpClient;
-  /**
-   * Endpoint for the udpClient to receive data from 
-   */
+  /** Endpoint for the udpClient to receive data from */
   boost::asio::ip::udp::endpoint unitEndpointNCom;
 
   std::fstream inFileNCom;

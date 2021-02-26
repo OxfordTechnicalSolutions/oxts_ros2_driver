@@ -49,7 +49,7 @@ target_include_directories(oxts_ncom PUBLIC
 install(TARGETS oxts_ncom
         DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY launch 
+install(DIRECTORY 
         config urdf rviz
         DESTINATION share/${PROJECT_NAME})
 

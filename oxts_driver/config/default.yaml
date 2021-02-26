@@ -8,9 +8,6 @@ oxts_driver:
     unit_port: 3000
 
 #===============================================================================
-    # Configure ROS messages to be published by the node.
-    ## Configure output rates of individual topics
-    ## Rates must be factors of the ncom_rate, configured above.
-    ## Rates are in Hz. 0 Hz => Message will not be published
+    ## Rate is in Hz. 0 Hz => Message will not be published
     ### Configure sample rate of NCom (do not exceed output rate of ncom)
-    ncom_rate               : 100.0
+    ncom_rate               : 100

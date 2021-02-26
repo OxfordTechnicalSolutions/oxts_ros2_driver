@@ -15,23 +15,29 @@ urdf_file_name = 'medium.urdf.xml'
 
 def generate_launch_description():
     # get current path and go one level up
-    share_dir = get_package_share_directory('oxts_ncom')
-    param_path = os.path.join(share_dir, 'config', parameters_file_name)
-    urdf_path = os.path.join(share_dir, 'urdf', urdf_file_name)
-    rviz_path = os.path.join(share_dir, 'rviz', 'display.rviz')
-    with open(param_path, 'r') as f:
-        params = yaml.safe_load(f)['oxts_driver']['ros__parameters']
+    driver_dir = get_package_share_directory('oxts_driver')
+    ncom_dir = get_package_share_directory('oxts_ncom')
+
+    driver_param_path = os.path.join(driver_dir, 'config', parameters_file_name)
+    with open(driver_param_path, 'r') as f:
+        driver_params = yaml.safe_load(f)['oxts_driver']['ros__parameters']
+
+    ncom_param_path = os.path.join(ncom_dir, 'config', parameters_file_name)
+    urdf_path = os.path.join(ncom_dir, 'urdf', urdf_file_name)
+    rviz_path = os.path.join(ncom_dir, 'rviz', 'display.rviz')
+    with open(ncom_param_path, 'r') as f:
+        ncom_params = yaml.safe_load(f)['oxts_ncom']['ros__parameters']
 
     use_sim_time = LaunchConfiguration('use_tim_time', default='false')
     use_rviz = LaunchConfiguration('use_rviz')
     wait_for_init = LaunchConfiguration('wait_for_init')
     ncom = LaunchConfiguration('ncom', default='')
-    params['ncom'] = ncom
-    params['wait_for_init'] = wait_for_init
+    driver_params['ncom'] = ncom
+    driver_params['wait_for_init'] = wait_for_init
 
     # declare launch arguments
     launch_argument = DeclareLaunchArgument(
-        'use_tim_time',
+        'use_sim_time',
         default_value='false')
     declare_use_rviz = DeclareLaunchArgument(
         'use_rviz',
@@ -53,7 +59,7 @@ def generate_launch_description():
         executable='oxts_driver',
         name='oxts_driver',
         output='screen',
-        parameters=[params])
+        parameters=[driver_params])
 
     oxts_ncom_node = Node(
         package='oxts_ncom',
@@ -61,7 +67,7 @@ def generate_launch_description():
         executable='oxts_ncom',
         name='oxts_ncom',
         output='screen',
-        parameters=[params])
+        parameters=[ncom_params])
 
     robot_state_publisher = Node(
         package='robot_state_publisher',

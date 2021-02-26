@@ -36,7 +36,6 @@
 #include "oxts_ncom/nav_const.hpp"
 #include "oxts_ncom/wrapper.hpp"
 
-using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 namespace oxts_ncom
@@ -47,13 +46,9 @@ namespace oxts_ncom
  */
 enum PUB_TIMESTAMP_MODE
 {
-  /**
-   * Use ROS time.
-   */
+  /** Use ROS time. */
   ROS = 0,
-  /**
-   * Use NCom time.
-   */
+  /** Use NCom time. */
   NCOM = 1
 };
 
@@ -73,7 +68,7 @@ class OxtsNCom : public rclcpp::Node
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
-  int ncom_rate;
+  uint8_t ncom_rate;
   /*! Timestamp type to be applied to published packets
     {0 : ROS time, 1 : NCom time} */
   int timestamp_mode;
@@ -81,31 +76,30 @@ private:
     make sense. This isn't implemented. */
   std::string frame_id;
   /*! Publishing rate for debug String message. */
-  double pub_string_rate;
+  uint8_t pub_string_rate;
   /*! Publishing rate for NavSatFix message. */
-  double pub_nav_sat_fix_rate;
-  /*! Publishing rate for Imu message. */
-  double pub_imu_rate;
+  uint8_t pub_nav_sat_fix_rate;
   /*! Publishing rate for Velocity message. */
-  double pub_velocity_rate;
+  uint8_t pub_velocity_rate;
   /*! Publishing rate for TimeReference message.*/
-  double pub_time_reference_rate; 
+  uint8_t pub_time_reference_rate; 
   /*! Publishing rate for PointStamped message. */
-  double pub_ecef_pos_rate;
+  uint8_t pub_ecef_pos_rate;
   /*! Publishing rate for PointStamped message. */
-  double pub_nav_sat_ref_rate;
-  /*! Publish Tf messages. */
+  uint8_t pub_nav_sat_ref_rate;
+  /*! Flag to enable publishing of Imu message. */
+  bool pub_imu_flag;
+  /*! Flag to enable publishing of Tf messages. */
   bool pub_tf_flag;
 
-  std::chrono::duration<uint64_t,std::milli> ncomInterval;
-  std::chrono::duration<uint64_t,std::milli> pubStringInterval;
-  std::chrono::duration<uint64_t,std::milli> pubNavSatFixInterval;
-  std::chrono::duration<uint64_t,std::milli> pubImuInterval;
-  std::chrono::duration<uint64_t,std::milli> pubTfInterval;
-  std::chrono::duration<uint64_t,std::milli> pubVelocityInterval;
-  std::chrono::duration<uint64_t,std::milli> pubTimeReferenceInterval;
-  std::chrono::duration<uint64_t,std::milli> pubEcefPosInterval;
-  std::chrono::duration<uint64_t,std::milli> pubNavSatRefInterval;
+  uint8_t ncomInterval;
+  uint8_t pubStringInterval;
+  uint8_t pubNavSatFixInterval;
+  uint8_t pubTfInterval;
+  uint8_t pubVelocityInterval;
+  uint8_t pubTimeReferenceInterval;
+  uint8_t pubEcefPosInterval;
+  uint8_t pubNavSatRefInterval;
   // ...
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
@@ -118,93 +112,46 @@ private:
   rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
   rclcpp::TimerBase::SharedPtr timer_nav_sat_ref_;
 
-  void NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg) const;
-
-  /**
-   * Callback function for NCom sampling. Receives data from chosen source
-   * (UDP or file) and parses a packet to nrx.
-   * 
-   * @todo Refactor into input class
-   */
-  void timer_ncom_socket_callback();
-  void timer_ncom_file_callback();
-  /** 
-   * Callback function for debug String message. Wraps message, publishes, and
-   * prints some information to the console.
-   */
-  void timer_string_callback();
-  /** 
-   * Callback function for NavSatFix message. Wraps message and publishes.
-   */
-  void timer_nav_sat_fix_callback();
-  /** 
-   * Callback function for Imu message. Wraps message and publishes.
-   */
-  void timer_imu_callback();
-  /** 
-   * Callback function for Tf messages. Wraps messages and broadcasts.
-   */
-  void timer_tf_callback();
-  /** 
-   * Callback function for TimeReference message. Wraps message and publishes.
-   */
-  void timer_time_reference_callback();
-  /** 
-   * Callback function for Velocity message. Wraps message and publishes.
-   */
-  void timer_velocity_callback();
-  /** 
-   * Callback function for PointStamped message. Wraps message and 
-   * publishes.
-   */
-  void timer_ecef_pos_callback();
-  /** 
-   * Callback function for OxTS NavSatRef message. Wraps message and 
-   * publishes.
-   */
-  void timer_nav_sat_ref_callback();
+  void NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg);
+  /** Callback function for debug String message. Wraps message, publishes, and
+   *  prints some information to the console.*/
+  void string();
+  /** Callback function for NavSatFix message. Wraps message and publishes. */
+  void nav_sat_fix();
+  /** Callback function for Imu message. Wraps message and publishes. */
+  void imu();
+  /** Callback function for Tf messages. Wraps messages and broadcasts. */
+  void tf();
+  /** Callback function for TimeReference message. Wraps message and publishes. */
+  void time_reference();
+  /** Callback function for Velocity message. Wraps message and publishes. */
+  void velocity();
+  /** Callback function for PointStamped message. Wraps message and 
+   *  publishes.*/
+  void ecef_pos();
+  /** Callback function for OxTS NavSatRef message. Wraps message and 
+   *  publishes.*/
+  void nav_sat_ref();
 
 
-  /** 
-   * Subscriber for oxts_msgs/msg/NCom.
-   */
+  /**  Subscriber for oxts_msgs/msg/NCom. */
   rclcpp::Subscription<oxts_msgs::msg::Ncom>::SharedPtr     subNCom_;
-  /**
-   * Publisher for std_msgs/msg/string. Only used for debugging, currently 
-   * outputs lat, long, alt in string form.
-   */
+  /** Publisher for std_msgs/msg/string. Only used for debugging, currently 
+   *  outputs lat, long, alt in string form. */
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr       pubString_;
-  /**
-   * Publisher for /sensor_msgs/msg/NavSatFix
-   */
+  /** Publisher for /sensor_msgs/msg/NavSatFix */
   rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr pubNavSatFix_;
-  /**
-   * Publisher for /sensor_msgs/msg/Imu
-   */
+  /** Publisher for /sensor_msgs/msg/Imu */
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr       pubImu_;
-  /**
-   * Publisher for /sensor_msgs/msg/TwistStamped
-   */
+  /** Publisher for /sensor_msgs/msg/TwistStamped */
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
-  /**
-   * Publisher for /sensor_msgs/msg/TimeReference
-   */
+  /** Publisher for /sensor_msgs/msg/TimeReference */
   rclcpp::Publisher<sensor_msgs::msg::TimeReference>::SharedPtr  pubTimeReference_;
-  /**
-   * Publisher for /geometry_msgs/msg/PointStamped
-   */
+  /** Publisher for /geometry_msgs/msg/PointStamped */
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr  pubEcefPos_;
-  /**
-   * Publisher for /oxts_msgs/msg/NavSatRef
-   */
+  /** Publisher for /oxts_msgs/msg/NavSatRef */
   rclcpp::Publisher<oxts_msgs::msg::NavSatRef>::SharedPtr  pubNavSatRef_;
-  /**
-   * Node clock.
-   */ 
-  rclcpp::Clock clock_;
-  /**
-   * TF broadcaster
-   */
+  /** TF broadcaster */
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
 public:
@@ -218,29 +165,25 @@ public:
     tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
-    ncom_rate               = this->declare_parameter("ncom_rate", 100.0);
+    ncom_rate               = this->declare_parameter("ncom_rate", 100);
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
     frame_id                = this->declare_parameter("frame_id", "oxts_link");
-    pub_string_rate         = this->declare_parameter("pub_string_rate", 1.0);
-    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1.0);
-    pub_imu_rate            = this->declare_parameter("pub_imu_rate", 1.0);
-    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1.0);
-    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1.0);
-    pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1.0);
-    pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 1.0);
-    pub_tf_flag             = this->declare_parameter("pub_tf_flag", 1);
+    pub_string_rate         = this->declare_parameter("pub_string_rate", 1);
+    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1);
+    pub_imu_flag            = this->declare_parameter("pub_imu_flag", true);
+    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1);
+    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1);
+    pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1);
+    pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 1);
+    pub_tf_flag             = this->declare_parameter("pub_tf_flag", true);
 
-    pubStringInterval        = std::chrono::milliseconds(int(1000.0 / pub_string_rate));
-    pubNavSatFixInterval     = std::chrono::milliseconds(int(1000.0 / pub_nav_sat_fix_rate));
-    pubImuInterval           = std::chrono::milliseconds(int(1000.0 / pub_imu_rate));
-    pubVelocityInterval      = std::chrono::milliseconds(int(1000.0 / pub_velocity_rate));
-    pubTimeReferenceInterval = std::chrono::milliseconds(int(1000.0 / pub_time_reference_rate));
-    pubEcefPosInterval       = std::chrono::milliseconds(int(1000.0 / pub_ecef_pos_rate));
-    pubNavSatRefInterval     = std::chrono::milliseconds(int(1000.0 / pub_nav_sat_ref_rate));
+    pubStringInterval        = (pub_string_rate         == 0) ? 0 : ncom_rate / pub_string_rate;
+    pubNavSatFixInterval     = (pub_nav_sat_fix_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
+    pubVelocityInterval      = (pub_velocity_rate       == 0) ? 0 : ncom_rate / pub_velocity_rate;
+    pubTimeReferenceInterval = (pub_time_reference_rate == 0) ? 0 : ncom_rate / pub_time_reference_rate;
+    pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
+    pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
 
-    // Initialise subscriber for ncom message
-    subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
-                      ("ncom",10,std::bind(&OxtsNCom::NCom_callback,this,_1));
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubString_        = this->create_publisher<std_msgs::msg::String>                      
@@ -257,28 +200,9 @@ public:
                                                    ("ins/ecef_pos",         10);
     pubNavSatRef_     = this->create_publisher<oxts_msgs::msg::NavSatRef>
                                                    ("ins/nav_sat_ref",      10);
-
-    // clock_ = rclcpp::Clock(RCL_ROS_TIME); /*! @todo Add option for RCL_SYSTEM_TIME */
-
-    // timer_string_ = this->create_wall_timer(
-    //               pubStringInterval, std::bind(&OxtsNCom::timer_string_callback, this));
-    // timer_nav_sat_fix_ = this->create_wall_timer(
-    //               pubNavSatFixInterval, std::bind(&OxtsNCom::timer_nav_sat_fix_callback, this));
-    // timer_imu_    = this->create_wall_timer(
-    //               pubImuInterval, std::bind(&OxtsNCom::timer_imu_callback, this));
-    // timer_velocity_ = this->create_wall_timer(
-    //               pubVelocityInterval, std::bind(&OxtsNCom::timer_velocity_callback, this));
-    // timer_time_reference_ = this->create_wall_timer(
-    //               pubTimeReferenceInterval, std::bind(&OxtsNCom::timer_time_reference_callback, this));
-    // timer_ecef_pos_   = this->create_wall_timer(
-    //               pubEcefPosInterval, std::bind(&OxtsNCom::timer_ecef_pos_callback, this));
-    // timer_nav_sat_ref_   = this->create_wall_timer(
-    //               pubNavSatRefInterval, std::bind(&OxtsNCom::timer_nav_sat_ref_callback, this));
-    // if (pub_tf_flag)
-    // {
-    //   timer_tf_   = this->create_wall_timer(
-    //               pubImuInterval, std::bind(&OxtsNCom::timer_tf_callback, this));
-    // } 
+    // Initialise subscriber for ncom message
+    subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
+                      ("ncom",10,std::bind(&OxtsNCom::NCom_callback,this,_1));
 
     nrx = NComCreateNComRxC();
 
