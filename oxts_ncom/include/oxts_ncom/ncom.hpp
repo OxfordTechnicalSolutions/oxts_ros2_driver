@@ -181,7 +181,7 @@ public:
 
     /** @todo Improve error handling */
     if (ncom_rate == 0)
-      RCLCPP_ERROR(this->get_logger(), "NCom publish rate is set to zero. No messages will be output."); return;
+      {RCLCPP_ERROR(this->get_logger(), "NCom publish rate is set to zero. No messages will be output."); return;}
 
     pubStringInterval        = (pub_string_rate         == 0) ? 0 : ncom_rate / pub_string_rate;
     pubNavSatFixInterval     = (pub_nav_sat_fix_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
@@ -190,18 +190,18 @@ public:
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
 
-    if (ncom_rate % pubStringInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;
-    if (ncom_rate % pubNavSatFixInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;
-    if (ncom_rate % pubVelocityInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;
-    if (ncom_rate % pubTimeReferenceInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;
-    if (ncom_rate % pubEcefPosInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;
-    if (ncom_rate % pubNavSatRefInterval != 0)
-      RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;
+    if (pubStringInterval && ncom_rate % pubStringInterval != 0)
+      {RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;}
+    if (pubNavSatFixInterval && (ncom_rate % pubNavSatFixInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;}
+    if (pubVelocityInterval && (ncom_rate % pubVelocityInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;}
+    if (pubTimeReferenceInterval && (ncom_rate % pubTimeReferenceInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;}
+    if (pubEcefPosInterval && (ncom_rate % pubEcefPosInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;}
+    if (pubNavSatRefInterval && (ncom_rate % pubNavSatRefInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;}
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
