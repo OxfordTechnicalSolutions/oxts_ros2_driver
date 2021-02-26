@@ -16,17 +16,17 @@ urdf_file_name = 'medium.urdf.xml'
 def generate_launch_description():
     # get current path and go one level up
     driver_dir = get_package_share_directory('oxts_driver')
-    ncom_dir = get_package_share_directory('oxts_ncom')
+    ins_dir = get_package_share_directory('oxts_ins')
 
     driver_param_path = os.path.join(driver_dir, 'config', parameters_file_name)
     with open(driver_param_path, 'r') as f:
         driver_params = yaml.safe_load(f)['oxts_driver']['ros__parameters']
 
-    ncom_param_path = os.path.join(ncom_dir, 'config', parameters_file_name)
-    urdf_path = os.path.join(ncom_dir, 'urdf', urdf_file_name)
-    rviz_path = os.path.join(ncom_dir, 'rviz', 'display.rviz')
-    with open(ncom_param_path, 'r') as f:
-        ncom_params = yaml.safe_load(f)['oxts_ncom']['ros__parameters']
+    ins_param_path = os.path.join(ins_dir, 'config', parameters_file_name)
+    urdf_path = os.path.join(ins_dir, 'urdf', urdf_file_name)
+    rviz_path = os.path.join(ins_dir, 'rviz', 'display.rviz')
+    with open(ins_param_path, 'r') as f:
+        ins_params = yaml.safe_load(f)['oxts_ins']['ros__parameters']
 
     use_sim_time = LaunchConfiguration('use_tim_time', default='false')
     use_rviz = LaunchConfiguration('use_rviz')
@@ -61,20 +61,20 @@ def generate_launch_description():
         output='screen',
         parameters=[driver_params])
 
-    oxts_ncom_node = Node(
-        package='oxts_ncom',
+    oxts_ins_node = Node(
+        package='oxts_ins',
         #namespace='unit1',
-        executable='oxts_ncom',
-        name='oxts_ncom',
+        executable='oxts_ins',
+        name='oxts_ins',
         output='screen',
-        parameters=[ncom_params])
+        parameters=[ins_params])
 
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        # parameters=[{'use_tim_time': use_sim_time}],
+        # parameters=[{'use_sim_time': use_sim_time}],
         arguments=[urdf_path])
 
     rviz_cmd = Node(
@@ -94,7 +94,7 @@ def generate_launch_description():
     ld.add_action(declare_wait_for_init)
     # launch nodes
     ld.add_action(oxts_driver_node)
-    ld.add_action(oxts_ncom_node)
+    ld.add_action(oxts_ins_node)
     ld.add_action(robot_state_publisher)
     ld.add_action(rviz_cmd)
 

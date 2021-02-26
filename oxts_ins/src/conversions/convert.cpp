@@ -1,10 +1,10 @@
-#include "oxts_ncom/ncom.hpp"
+#include "oxts_ins/convert.hpp"
 
 
-namespace oxts_ncom
+namespace oxts_ins
 {
 
-void OxtsNCom::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
+void OxtsIns::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
 {
   // Add data to decoder
   if (NComNewChars(this->nrx, msg->raw_packet.data(), NCOM_PACKET_LENGTH) == COM_NEW_UPDATE)
@@ -45,7 +45,7 @@ void OxtsNCom::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
   }
 }
 
-void OxtsNCom::string()
+void OxtsIns::string()
 {
   auto msgString = RosNComWrapper::string(this->nrx);
   pubString_->publish(msgString);
@@ -54,7 +54,7 @@ void OxtsNCom::string()
                                   msgString.data.c_str());
 }
 
-void OxtsNCom::nav_sat_fix()
+void OxtsIns::nav_sat_fix()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
@@ -62,14 +62,14 @@ void OxtsNCom::nav_sat_fix()
   pubNavSatFix_->publish(msg);
 }
 
-void OxtsNCom::nav_sat_ref()
+void OxtsIns::nav_sat_ref()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
   auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
   pubNavSatRef_->publish(msg);
 }
-void OxtsNCom::ecef_pos()
+void OxtsIns::ecef_pos()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
@@ -77,7 +77,7 @@ void OxtsNCom::ecef_pos()
   pubEcefPos_->publish(msg);
 }
 
-void OxtsNCom::imu()
+void OxtsIns::imu()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
@@ -85,7 +85,7 @@ void OxtsNCom::imu()
   pubImu_->publish(msg);
 }
 
-void OxtsNCom::tf()
+void OxtsIns::tf()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
@@ -119,7 +119,7 @@ void OxtsNCom::tf()
   tf_broadcaster_->sendTransform(tf_vat);
 }
 
-void OxtsNCom::velocity()
+void OxtsIns::velocity()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
@@ -127,7 +127,7 @@ void OxtsNCom::velocity()
   pubVelocity_->publish(msg);
 }
 
-void OxtsNCom::time_reference()
+void OxtsIns::time_reference()
 {
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
@@ -135,7 +135,7 @@ void OxtsNCom::time_reference()
   pubTimeReference_->publish(msg);
 }
 
-rclcpp::Time OxtsNCom::get_timestamp()
+rclcpp::Time OxtsIns::get_timestamp()
 {
   if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
     return this->get_clock()->now();
@@ -143,4 +143,4 @@ rclcpp::Time OxtsNCom::get_timestamp()
     return RosNComWrapper::ncomTime(nrx);
 }
 
-} // namespace oxts_ncom
+} // namespace oxts_ins

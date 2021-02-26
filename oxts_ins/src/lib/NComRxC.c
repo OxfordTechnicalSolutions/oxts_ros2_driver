@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "oxts_ncom/NComRxC.h"
+#include "oxts_ins/NComRxC.h"
 
 
 //============================================================================================================

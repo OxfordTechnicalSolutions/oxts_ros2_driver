@@ -3,12 +3,12 @@
 
 
 /**
- * \file ncom.hpp
+ * \file convert.hpp
  * Defines node to take NCom data and publish it in ROS messages.
  */
 
-#ifndef OXTS_NCOM__NCOM_HPP_
-#define OXTS_NCOM__NCOM_HPP_
+#ifndef OXTS_INS__INS_HPP_
+#define OXTS_INS__INS_HPP_
 
 #include <chrono>
 #include <functional>
@@ -32,13 +32,13 @@
 #include <boost/asio.hpp>
 
 // gad-sdk includes
-#include "oxts_ncom/NComRxC.h"
-#include "oxts_ncom/nav_const.hpp"
-#include "oxts_ncom/wrapper.hpp"
+#include "oxts_ins/NComRxC.h"
+#include "oxts_ins/nav_const.hpp"
+#include "oxts_ins/wrapper.hpp"
 
 using std::placeholders::_1;
 
-namespace oxts_ncom
+namespace oxts_ins
 {
 
 /**
@@ -63,7 +63,7 @@ enum PUB_TIMESTAMP_MODE
  * @todo Refactor timestamping if statements out of callback functions and into
  *       node initialisation.
  */
-class OxtsNCom : public rclcpp::Node
+class OxtsIns : public rclcpp::Node
 {
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
@@ -158,10 +158,10 @@ private:
 
 public:
   /**
-   * Default constructor for the OxtsNCom. Parses options from the 
+   * Default constructor for the OxtsIns. Parses options from the 
    * .yaml params/config file, sets up UDP connection to unit.
    */
-  explicit OxtsNCom(const rclcpp::NodeOptions & options) : Node("oxts_ncom", options)
+  explicit OxtsIns(const rclcpp::NodeOptions & options) : Node("oxts_ins", options)
   {
     // Initilize tf broadcaster
     tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -221,7 +221,7 @@ public:
                                                    ("ins/nav_sat_ref",      10);
     // Initialise subscriber for ncom message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
-                      ("ncom",10,std::bind(&OxtsNCom::NCom_callback,this,_1));
+                      ("ncom",10,std::bind(&OxtsIns::NCom_callback,this,_1));
 
     nrx = NComCreateNComRxC();
 
@@ -240,6 +240,6 @@ public:
 
 };
 
-} // namespace oxts_ncom
+} // namespace oxts_ins
 
-#endif //OXTS_NCOM__NCOM_HPP_
+#endif //OXTS_INS__INS_HPP_

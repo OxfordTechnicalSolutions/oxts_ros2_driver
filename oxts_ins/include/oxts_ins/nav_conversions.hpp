@@ -9,14 +9,14 @@
 #include <vector>
 #include <math.h>
 
-#include "oxts_ncom/nav_const.hpp"
+#include "oxts_ins/nav_const.hpp"
 
 
 /**
- * @namespace Convert
+ * @namespace NavConversions
  * @brief Functions to convert measurements between frames etc.
  */
-namespace Convert
+namespace NavConversions
 {
   /**
    * @fn hpr_to_quaternion

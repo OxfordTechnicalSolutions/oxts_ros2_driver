@@ -1,4 +1,4 @@
-oxts_ncom:
+oxts_ins:
   ros__parameters:
 #===============================================================================
     # INS configuration (set up to match the unit)

@@ -16,7 +16,7 @@
 
 #include <memory>
 
-#include "oxts_ncom/ncom.hpp"
+#include "oxts_ins/convert.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
 
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<oxts_ncom::OxtsNCom>(rclcpp::NodeOptions());
+  auto node = std::make_shared<oxts_ins::OxtsIns>(rclcpp::NodeOptions());
 
   rclcpp::spin(node);
 

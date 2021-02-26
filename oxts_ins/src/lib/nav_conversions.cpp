@@ -1,8 +1,8 @@
-#include "oxts_ncom/convert.hpp"
+#include "oxts_ins/nav_conversions.hpp"
 
 
 
-std::vector<double> Convert::hpr_to_quaternion(double h, double p, double r)
+std::vector<double> NavConversions::hpr_to_quaternion(double h, double p, double r)
 {
   std::vector<double> q(4);  // q.x, q.y, q.z, q.w
   double h_rads, p_rads, r_rads;
@@ -23,7 +23,7 @@ std::vector<double> Convert::hpr_to_quaternion(double h, double p, double r)
 }
 
 
-std::vector<double> Convert::lla_to_ecef(double lat, double lon, double alt)
+std::vector<double> NavConversions::lla_to_ecef(double lat, double lon, double alt)
 {
   std::vector<double> posEcef(3);
 
