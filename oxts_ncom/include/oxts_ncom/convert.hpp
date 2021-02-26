@@ -9,7 +9,7 @@
 #include <vector>
 #include <math.h>
 
-#include "oxts_driver/nav_const.hpp"
+#include "oxts_ncom/nav_const.hpp"
 
 
 /**
