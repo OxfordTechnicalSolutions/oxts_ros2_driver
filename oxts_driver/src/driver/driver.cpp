@@ -24,7 +24,13 @@ void OxtsDriver::timer_ncom_file_callback()
   char c;
 
   while(NComNewChar(this->nrx, (unsigned char) c) != COM_NEW_UPDATE)
-    this->inFileNCom.get(c);
+    if (!this->inFileNCom.get(c))
+    {
+      RCLCPP_INFO(this->get_logger(), "End of NCom file reached");
+      rclcpp::shutdown();
+      return;
+    };
+
 
   auto msg = oxts_msgs::msg::Ncom();
   msg.header.stamp = this->get_clock()->now();
