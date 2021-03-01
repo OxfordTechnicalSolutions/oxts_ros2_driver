@@ -45,7 +45,7 @@ class OxtsDriver : public rclcpp::Node
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
-  uint8_t ncom_rate;
+  uint32_t ncom_rate;
   /*! IP address of the INS to connect to */
   std::string unit_ip;
   /*! Endpoint Port of the INS to be connected to. Default 3000 for NCom. */
