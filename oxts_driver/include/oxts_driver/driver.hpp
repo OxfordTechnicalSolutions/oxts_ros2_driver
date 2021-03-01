@@ -99,18 +99,6 @@ public:
     // configured
     pubNCom_ = this->create_publisher<oxts_msgs::msg::Ncom> ("ncom", 10); 
 
-    // Assign callback functions to timers (callbacks are called at a rate
-    // dictated by the associated timer)
-    if (!ncom_path.empty())
-    {
-      timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
-    }
-    else 
-    {
-      timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
-    }
-    timer_ncom_ = this->create_wall_timer(
-                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     nrx = NComCreateNComRxC();
 
@@ -119,8 +107,8 @@ public:
       inFileNCom.open(ncom_path);
       if(!inFileNCom.is_open())
       {
-        // error  
         RCLCPP_ERROR(this->get_logger(), "Unable to open NCOM: %s", ncom_path.c_str());
+        return;
       } else {
         RCLCPP_INFO(this->get_logger(), "Opened NCOM: %s", ncom_path.c_str());
       }
@@ -133,6 +121,19 @@ public:
       this->udpClient.set_local_port(this->unit_port);
       RCLCPP_INFO(this->get_logger(), "Connecting: %s:%d", this->unit_ip.c_str(), this->unit_port);
     }
+
+    // Assign callback functions to timers (callbacks are called at a rate
+    // dictated by the associated timer)
+    if (!ncom_path.empty())
+    {
+      timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
+    }
+    else 
+    {
+      timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
+    }
+    timer_ncom_ = this->create_wall_timer(
+                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     // Wait for config to be populated in NCOM packets
     RCLCPP_INFO(this->get_logger(), "Waiting for INS config information...");
@@ -156,6 +157,9 @@ public:
     {
       RCLCPP_INFO(this->get_logger(), "Publishing before INS initialisation");
     }
+
+    RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %iHz", ncom_rate);
+
   }
 
   /** NCom decoder instance */
