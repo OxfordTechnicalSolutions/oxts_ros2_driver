@@ -60,6 +60,7 @@ private:
   /*! Publishing rate for debug String message. */
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
+  double prevWeekSecond;
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
 
@@ -93,7 +94,8 @@ public:
     ncom_path               = this->declare_parameter("ncom", std::string(""));
     wait_for_init           = this->declare_parameter("wait_for_init", true);
 
-    ncomInterval             = std::chrono::milliseconds(int(1000.0 / ncom_rate));
+    ncomInterval            = std::chrono::milliseconds(int(1000.0 / ncom_rate));
+    prevWeekSecond          = -1;
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
