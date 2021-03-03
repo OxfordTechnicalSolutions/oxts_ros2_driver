@@ -26,19 +26,21 @@ void OxtsDriver::timer_ncom_file_callback()
   while(NComNewChar(this->nrx, (unsigned char) c) != COM_NEW_UPDATE)
     if (!this->inFileNCom.get(c))
     {
-      RCLCPP_INFO(this->get_logger(), "End of NCom file reached");
+      RCLCPP_INFO(this->get_logger(), "End of NCom file reached.");
       rclcpp::shutdown();
       return;
     };
 
 
   auto msg = oxts_msgs::msg::Ncom();
+  if (this->prevWeekSecond > 0 && nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
+    RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
   msg.header.stamp = this->get_clock()->now();
   msg.header.frame_id = "oxts_sn" + std::to_string(nrx->mSerialNumber);
   for (int i=0; i < NCOM_PACKET_LENGTH ;++i)
     msg.raw_packet[i] = nrx->mInternal->mCurPkt[i];
   this->pubNCom_->publish(msg);
-  
+  this->prevWeekSecond = nrx->mTimeWeekSecond;
 }
 
 std::string OxtsDriver::get_unit_ip()
