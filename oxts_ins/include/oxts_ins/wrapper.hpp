@@ -128,7 +128,6 @@ namespace RosNComWrapper
    * @param head Header to be added to the published message
    * 
    * \todo Covariances
-   * \todo Validate Quaternion conversions
    */
   sensor_msgs::msg::Imu              imu      (const NComRxC *nrx,
                                                     std_msgs::msg::Header head);

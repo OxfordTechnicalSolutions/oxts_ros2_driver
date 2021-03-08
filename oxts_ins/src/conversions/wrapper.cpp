@@ -139,12 +139,12 @@ sensor_msgs::msg::NavSatFix nav_sat_fix(
   msg.longitude = nrx->mLon;
   msg.altitude  = nrx->mAlt;
 
-  //!< @todo This accuracy is not actually a covariance. Also should be in ENU
-  msg.position_covariance[0] = nrx->mEastAcc;
-  msg.position_covariance[4] = nrx->mNorthAcc;
-  msg.position_covariance[8] = nrx->mAltAcc;
+  // Square accuracy to get variance (could be incorrect)
+  msg.position_covariance[0] = std::pow(nrx->mEastAcc, 2);
+  msg.position_covariance[4] = std::pow(nrx->mNorthAcc, 2);
+  msg.position_covariance[8] = std::pow(nrx->mAltAcc, 2);
 
-  msg.position_covariance_type = 2; /*! @todo Change to ROS code */
+  msg.position_covariance_type = msg.COVARIANCE_TYPE_DIAGONAL_KNOWN;
   
   return msg;
 }
