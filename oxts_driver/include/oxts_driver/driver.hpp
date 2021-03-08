@@ -36,9 +36,6 @@ namespace oxts_driver
  * 
  * @todo Add config struct to hold data which will hold config parsed from the 
  *       .yaml file.
- * @todo Change topic names to a standard form /imu/.. 
- * @todo Refactor timestamping if statements out of callback functions and into
- *       node initialisation.
  */
 class OxtsDriver : public rclcpp::Node
 {
