@@ -285,9 +285,9 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   // pose with covariance ======================================================
   // Position from NCom is converted frmo LLA to ECEF
   std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-  msg.pose.pose.x    = ecef[0]; 
-  msg.pose.pose.y    = ecef[1];
-  msg.pose.pose.z    = ecef[2];
+  msg.pose.pose.position.x    = ecef[0]; 
+  msg.pose.pose.position.y    = ecef[1];
+  msg.pose.pose.position.z    = ecef[2];
 
   // Orientation must be taken from NCom (NED) and rotated into ECEF
   
