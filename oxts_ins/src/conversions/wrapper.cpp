@@ -277,6 +277,35 @@ geometry_msgs::msg::TwistStamped   velocity   (
   return msg;
 }
 
+nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
+                                  std_msgs::msg::Header head)
+{
+  auto msg = nav_msgs::msg::Odometry();
+
+  // pose with covariance ======================================================
+  // Position from NCom is converted frmo LLA to ECEF
+  std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
+  msg.pose.pose.x    = ecef[0]; 
+  msg.pose.pose.y    = ecef[1];
+  msg.pose.pose.z    = ecef[2];
+
+  // Orientation must be taken from NCom (NED) and rotated into ECEF
+  
+
+
+  // Covariance from NCom is in the NED local coordinate frame. This must be 
+  // rotated into the ECEF frame
+
+  msg.pose.covariance;
+
+
+  // twist with covariance =====================================================
+
+
+
+  return msg;
+}
+
 sensor_msgs::msg::TimeReference   time_reference   (
                                     const NComRxC *nrx,
                                     std_msgs::msg::Header head)

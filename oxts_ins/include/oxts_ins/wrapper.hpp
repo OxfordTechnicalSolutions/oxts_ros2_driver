@@ -21,6 +21,7 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/point.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -142,6 +143,15 @@ namespace RosNComWrapper
    */
   geometry_msgs::msg::TwistStamped   velocity (const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
+  /**
+   * Wrap navigation data from NCom decoder to nav_msgs/msg/Odometry
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
+   * @returns 
+   */
+  nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
+                                    std_msgs::msg::Header head);
   /**
    * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
    * 

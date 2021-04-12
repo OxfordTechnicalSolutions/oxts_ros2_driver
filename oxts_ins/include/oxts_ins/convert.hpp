@@ -78,6 +78,8 @@ private:
   uint8_t pub_nav_sat_fix_rate;
   /*! Publishing rate for Velocity message. */
   uint8_t pub_velocity_rate;
+  /*! Publishing rate for Odometry message. */
+  uint8_t pub_odometry_rate;
   /*! Publishing rate for TimeReference message.*/
   uint8_t pub_time_reference_rate; 
   /*! Publishing rate for PointStamped message. */
@@ -94,6 +96,7 @@ private:
   uint8_t pubNavSatFixInterval;
   uint8_t pubTfInterval;
   uint8_t pubVelocityInterval;
+  uint8_t pubOdometryInterval;
   uint8_t pubTimeReferenceInterval;
   uint8_t pubEcefPosInterval;
   uint8_t pubNavSatRefInterval;
@@ -105,6 +108,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_imu_;
   rclcpp::TimerBase::SharedPtr timer_tf_;
   rclcpp::TimerBase::SharedPtr timer_velocity_;
+  rclcpp::TimerBase::SharedPtr timer_odometry_;
   rclcpp::TimerBase::SharedPtr timer_time_reference_;
   rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
   rclcpp::TimerBase::SharedPtr timer_nav_sat_ref_;
@@ -123,6 +127,8 @@ private:
   void time_reference();
   /** Callback function for Velocity message. Wraps message and publishes. */
   void velocity();
+  /** Callback function for Odometry message. Wraps message and publishes. */
+  void odometry();
   /** Callback function for PointStamped message. Wraps message and 
    *  publishes.*/
   void ecef_pos();
@@ -142,6 +148,8 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr       pubImu_;
   /** Publisher for /sensor_msgs/msg/TwistStamped */
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
+  /** Publisher for /nav_msgs/msg/Odometry */
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr  pubOdometry_;
   /** Publisher for /sensor_msgs/msg/TimeReference */
   rclcpp::Publisher<sensor_msgs::msg::TimeReference>::SharedPtr  pubTimeReference_;
   /** Publisher for /geometry_msgs/msg/PointStamped */
@@ -171,6 +179,7 @@ public:
     pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1);
     pub_imu_flag            = this->declare_parameter("pub_imu_flag", true);
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1);
+    pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 1);
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1);
     pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1);
     pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 1);
@@ -183,6 +192,7 @@ public:
     pubStringInterval        = (pub_string_rate         == 0) ? 0 : ncom_rate / pub_string_rate;
     pubNavSatFixInterval     = (pub_nav_sat_fix_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
     pubVelocityInterval      = (pub_velocity_rate       == 0) ? 0 : ncom_rate / pub_velocity_rate;
+    pubOdometryInterval      = (pub_odometry_rate       == 0) ? 0 : ncom_rate / pub_odometry_rate;
     pubTimeReferenceInterval = (pub_time_reference_rate == 0) ? 0 : ncom_rate / pub_time_reference_rate;
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
@@ -193,6 +203,8 @@ public:
       {RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;}
     if (pubVelocityInterval && (ncom_rate % pubVelocityInterval != 0))
       {RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;}
+    if (pubOdometryInterval && (ncom_rate % pubOdometryInterval != 0))
+      {RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;}
     if (pubTimeReferenceInterval && (ncom_rate % pubTimeReferenceInterval != 0))
       {RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;}
     if (pubEcefPosInterval && (ncom_rate % pubEcefPosInterval != 0))
@@ -210,6 +222,8 @@ public:
                                                    ("imu/data",             10); 
     pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>           
                                                    ("ins/velocity",         10); 
+    pubOdometry_      = this->create_publisher<nav_msgs::msg::Odometry>           
+                                                   ("ins/odometry",         10); 
     pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>            
                                                    ("ins/time_reference",   10);
     pubEcefPos_       = this->create_publisher<geometry_msgs::msg::PointStamped>

@@ -117,6 +117,9 @@ void OxtsIns::tf()
   tf_vat.transform.rotation.z = vat.inverse().z();
   tf_vat.transform.rotation.w = vat.inverse().w();
   tf_broadcaster_->sendTransform(tf_vat);
+
+  // Earth (ECEF) to map (LRF)
+  
 }
 
 void OxtsIns::velocity()
