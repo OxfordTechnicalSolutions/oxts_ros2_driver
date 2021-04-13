@@ -298,6 +298,39 @@ geometry_msgs::msg::TwistStamped   velocity   (
   return msg;
 }
 
+tf2::Matrix3x3 getRotEcefToEnu(double lat0, double lon0)
+{
+  double lambda = (lon0 + 90.0) * NAV_CONST::DEG2RADS;
+  double phi    = (90.0 - lat0) * NAV_CONST::DEG2RADS;
+
+  double s_phi = std::sin(phi);
+  double c_phi = std::cos(phi);
+  double s_lambda = std::sin(lambda);
+  double c_lambda = std::cos(lambda);
+
+  auto r = tf2::Matrix3x3(
+                            -s_lambda, -c_lambda * s_phi, c_lambda * c_phi,
+                             c_lambda, -s_lambda * s_phi, s_lambda * c_phi,
+                                    0,             c_phi,            s_phi
+                            );
+
+  return r;
+}
+
+tf2::Matrix3x3 getRotEnuToLrf(double theta)
+{
+  double s_theta = std::sin(90 - theta);
+  double c_theta = std::cos(90 - theta);
+
+  return tf2::Matrix3x3(
+                        c_theta, -s_theta, 0,
+                        s_theta,  c_theta, 0,
+                              0,        0, 1
+                        );
+
+}
+
+
 nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
                                   std_msgs::msg::Header head)
 {
@@ -322,10 +355,37 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
 
   // Orientation must be taken from NCom (NED - pseudo polar) and rotated into ENU - tangent
 
+  msg.pose.pose.orientation.x = 0;
+  msg.pose.pose.orientation.y = 0;
+  msg.pose.pose.orientation.z = 0;
+  msg.pose.pose.orientation.w = 1;
+
+
   // Covariance from NCom is in the NED local coordinate frame. This must be 
   // rotated into the LRF
 
-  msg.pose.covariance;
+  // rotation from the ENU frame defined by the LRF origin to the full LRF frame 
+  tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading);
+  // rotation from ECEF frame to the ENU frame defined by the LRF origin
+  tf2::Matrix3x3 r_ecef_enu = getRotEcefToEnu(lrf.lat, lrf.lon); 
+  // rotation from ECEF frame to the ENU frame defined by the current position
+  tf2::Matrix3x3 r_ecef_pos = getRotEcefToEnu(nrx->mLat, nrx->mLon); 
+
+  auto diff = tf2::Matrix3x3(r_enu_lrf);
+  diff *= r_ecef_enu;
+  diff *= r_ecef_pos.transpose();
+
+  auto tmp = tf2::Matrix3x3(diff);
+  auto cov = tf2::Matrix3x3 (
+                              nrx->mEastAcc,             0.0,         0.0,
+                              0.0,            nrx->mNorthAcc,         0.0,
+                              0.0,                       0.0, nrx->mAltAcc
+                            );
+  // cov_b = R * cov_a * R^T
+  tmp *= cov;
+  tmp *= diff.transpose();
+
+  msg.pose.covariance[0] ;
 
 
   // twist with covariance =====================================================

@@ -62,8 +62,8 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 {
   Point::Cart p_ecef;
   // Convert to radians in notation consistent with the paper:
-  double lambda = NAV_CONST::DEG2RADS  *(lat);
-  double phi = NAV_CONST::DEG2RADS  *(lon);
+  double lambda = NAV_CONST::DEG2RADS * (lat);
+  double phi = NAV_CONST::DEG2RADS * (lon);
   double s = std::sin(lambda);
   double N = a / std::sqrt(1 - e_sq * s * s);
 
