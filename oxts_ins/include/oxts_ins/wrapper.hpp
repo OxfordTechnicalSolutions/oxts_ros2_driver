@@ -40,6 +40,22 @@
  */
 namespace RosNComWrapper
 {
+  struct Lrf
+  {
+    double lat;
+    double lon;
+    double alt;
+    double heading;
+
+    Lrf(double lat, double lon, double alt, double heading)
+    {
+      this->lat = lat;
+      this->lon = lon;
+      this->alt = alt;
+      this->heading = heading;
+    }
+  };
+
   /**
    * Calculate the rotational component of the transform from frame1 to frame2
    * based on Euler angles
@@ -56,12 +72,19 @@ namespace RosNComWrapper
    */
   tf2::Vector3 getNsp(const NComRxC *nrx);
   /**
+   * Get the NCOM orientation in body (IMU) frame
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @return A quaterntion representing the rotation between the vehicle frame and NED
+   */
+  tf2::Quaternion getBodyRPY(const NComRxC *nrx);
+  /**
    * Get the NCOM orientation in vehicle frame
    * 
    * @param nrx Pointer to the decoded NCom data
    * @return A quaterntion representing the rotation between the vehicle frame and NED
    */
-  tf2::Quaternion getRPY(const NComRxC *nrx);
+  tf2::Quaternion getVehRPY(const NComRxC *nrx);
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.

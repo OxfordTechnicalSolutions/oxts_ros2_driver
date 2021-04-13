@@ -24,20 +24,45 @@ tf2::Vector3 getNsp(const NComRxC *nrx)
     nrx->mNoSlipLeverArmZ);
 }
 
-tf2::Quaternion getRPY(const NComRxC *nrx)
+tf2::Quaternion getVehRPY(const NComRxC *nrx)
 {
-  auto rpyNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
-  auto rpyENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
+  auto rpyVehNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
+  auto rpyVehENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
   auto ned2enu = tf2::Quaternion(); // NED to ENU rotation
 
-  rpyNED.setRPY(
+  rpyVehNED.setRPY(
     NAV_CONST::DEG2RADS * nrx->mRoll,
     NAV_CONST::DEG2RADS * nrx->mPitch,
     NAV_CONST::DEG2RADS * nrx->mHeading
   );
+  // NED to ENU rotation
   ned2enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,90.0*NAV_CONST::DEG2RADS);
-  rpyENU = ned2enu * rpyNED;
-  return rpyENU;
+  // transform from NED to ENU
+  rpyVehENU = ned2enu * rpyVehNED;
+  return rpyVehENU;
+}
+
+tf2::Quaternion getBodyRPY(const NComRxC *nrx)
+{
+  auto rpyVehENU = RosNComWrapper::getVehRPY(nrx); // Orientation of the vehicle (ENU frame)
+  auto rpyBodENU = tf2::Quaternion();              // Orientation of the body (ENU frame)
+  auto vat = RosNComWrapper::getVat(nrx);          // Body to vehicle frame rotation
+
+  // transform from vehicle to body
+  rpyBodENU = rpyVehENU * vat.inverse(); // vehicle to body
+  return rpyBodENU;
+}
+
+
+RosNComWrapper::Lrf getLrf(const NComRxC *nrx)
+{
+  // Origin to use for map frame
+  return RosNComWrapper::Lrf(
+    nrx->mRefLat,
+    nrx->mRefLon,
+    nrx->mRefAlt,
+    90 - nrx->mRefHeading // NED to ENU
+  );
 }
 
 
@@ -154,11 +179,12 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
                             std_msgs::msg::Header head)
 {
   auto msg = oxts_msgs::msg::NavSatRef();
+  auto lrf = getLrf(nrx);
   msg.header = head;
-  msg.latitude  = nrx->mRefLat;
-  msg.longitude = nrx->mRefLon;
-  msg.altitude  = nrx->mRefAlt;
-  msg.heading  = 90 - nrx->mRefHeading; // NED to ENU
+  msg.latitude  = lrf.lat;
+  msg.longitude = lrf.lon;
+  msg.altitude  = lrf.alt;
+  msg.heading  = lrf.heading; // NED to ENU
   return msg;
 }
 
@@ -200,19 +226,14 @@ sensor_msgs::msg::Imu imu (
   msg.header = head;
 
   auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
-  auto veh_o = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
   auto imu_o = tf2::Quaternion(); // Orientation of the IMU (ENU frame)
   auto veh_w = tf2::Vector3();    // Angular rate in vehicle frame (rads)
   auto imu_w = tf2::Vector3();    // Angular rate in imu frame (rads)
   auto veh_a = tf2::Vector3();    // Linear Acceleration in the vehicle frame (rads)
   auto imu_a = tf2::Vector3();    // Linear Acceleration in the imu frame (rads)
 
-  // Construct vehicle-imu frame transformation --------------------------------
-  q_vat = getVat(nrx);
-  // Get vehicle orientation from HPR ------------------------------------------
-  veh_o = getRPY(nrx); // ENU frame
-  // Find imu orientation
-  imu_o = veh_o * q_vat.inverse(); // vehicle to body
+  // Get imu orientation from NCOM packet -------------------------------------
+  imu_o = getBodyRPY(nrx); // ENU frame
   tf2::convert(imu_o, msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
@@ -283,18 +304,26 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   auto msg = nav_msgs::msg::Odometry();
 
   // pose with covariance ======================================================
-  // Position from NCom is converted frmo LLA to ECEF
-  std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-  msg.pose.pose.position.x    = ecef[0]; 
-  msg.pose.pose.position.y    = ecef[1];
-  msg.pose.pose.position.z    = ecef[2];
+  auto lrf = RosNComWrapper::getLrf(nrx); // returns quaternion
 
-  // Orientation must be taken from NCom (NED) and rotated into ECEF
-  
+  Point::Cart p_enu;
+  p_enu = NavConversions::GeodeticToEnu(nrx->mLat, 
+                                        nrx->mLon, 
+                                        nrx->mAlt,
+                                        lrf.lat, 
+                                        lrf.lon, 
+                                        lrf.alt);
 
+  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x, p_enu.y, p_enu.z, lrf.heading);
+
+  msg.pose.pose.position.x = p_lrf.x;
+  msg.pose.pose.position.y = p_lrf.y;
+  msg.pose.pose.position.z = p_lrf.z;
+
+  // Orientation must be taken from NCom (NED - pseudo polar) and rotated into ENU - tangent
 
   // Covariance from NCom is in the NED local coordinate frame. This must be 
-  // rotated into the ECEF frame
+  // rotated into the LRF
 
   msg.pose.covariance;
 

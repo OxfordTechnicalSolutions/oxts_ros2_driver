@@ -90,15 +90,15 @@ void OxtsIns::tf()
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
 
-  auto rpyENU    = RosNComWrapper::getRPY(this->nrx);
+  auto rpyVehENU    = RosNComWrapper::getVehRPY(this->nrx);
   geometry_msgs::msg::TransformStamped tf_oxts;
   tf_oxts.header = header;
   tf_oxts.header.frame_id = "map";
   tf_oxts.child_frame_id = "vehicle_link";
-  tf_oxts.transform.rotation.x = rpyENU.x();
-  tf_oxts.transform.rotation.y = rpyENU.y();
-  tf_oxts.transform.rotation.z = rpyENU.z();
-  tf_oxts.transform.rotation.w = rpyENU.w();
+  tf_oxts.transform.rotation.x = rpyVehENU.x();
+  tf_oxts.transform.rotation.y = rpyVehENU.y();
+  tf_oxts.transform.rotation.z = rpyVehENU.z();
+  tf_oxts.transform.rotation.w = rpyVehENU.w();
   tf_broadcaster_->sendTransform(tf_oxts);
 
   auto vat    = RosNComWrapper::getVat(this->nrx);
