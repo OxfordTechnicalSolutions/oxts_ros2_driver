@@ -232,6 +232,9 @@ sensor_msgs::msg::Imu imu (
   auto veh_a = tf2::Vector3();    // Linear Acceleration in the vehicle frame (rads)
   auto imu_a = tf2::Vector3();    // Linear Acceleration in the imu frame (rads)
 
+  // Construct vehicle-imu frame transformation --------------------------------
+  q_vat = getVat(nrx);
+
   // Get imu orientation from NCOM packet -------------------------------------
   imu_o = getBodyRPY(nrx); // ENU frame
   tf2::convert(imu_o, msg.orientation);
