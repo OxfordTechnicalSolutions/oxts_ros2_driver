@@ -18,41 +18,64 @@ namespace Point
 class Point
 {
 private:
-  double x_0 = 0;
-  double x_1 = 0;
-  double x_2 = 0;
+  double x0_ = 0;
+  double x1_ = 0;
+  double x2_ = 0;
 public:
-  double x0(){ return x_0; };
-  double x1(){ return x_1; };
-  double x2(){ return x_2; };
-  void   x0(double x_0){this->x_0 = x_0;}
-  void   x1(double x_1){this->x_1 = x_1;}
-  void   x2(double x_2){this->x_2 = x_2;}
+  double x0() const;
+  double x1() const;
+  double x2() const;
+  void   x0(double x0_);
+  void   x1(double x1_);
+  void   x2(double x2_);
+
+  Point() : x0_(0), x1_(0), x2_(0){ }
+  Point(double x_0, double x_1, double x_2) : x0_(x_0), x1_(x_1), x2_(x_2){ }
+
+  Point operator+ (const Point& p)
+  {
+    return Point(x0() + p.x0(), x1() + p.x1(), x2() + p.x2());
+  }
+
+  Point operator- (const Point& p)
+  {
+    return Point(x0() - p.x0(), x1() - p.x1(), x2() - p.x2());
+  }
 };
 
 class Cart : protected Point
 {
 public:
-  double x(){ return x0(); }
-  double y(){ return x1(); }
-  double z(){ return x2(); }
-  void   x(double x){ x0(x); }
-  void   y(double y){ x1(y); }
-  void   z(double z){ x2(z); }
+  Cart() : Point() {}
+  Cart(double x, double y, double z) : Point(x,y,z) {}
+  double x() const;
+  double y() const;
+  double z() const;
+  void   x(double x);
+  void   y(double y);
+  void   z(double z);
+
+  Cart operator+ (const Cart& p);
+  Cart operator- (const Cart& p);
 };
 
-class LLA : protected Point
+class Geodetic : protected Point
 {
 public:
-  double lat(){ return x0(); }
-  double lon(){ return x1(); }
-  double alt(){ return x2(); }
-  void   lat(double x){ x0(x); }
-  void   lon(double y){ x1(y); }
-  void   alt(double z){ x2(z); }
+  Geodetic() : Point() {}
+  Geodetic(double lat, double lon, double alt) : Point(lat,lon,alt) {}
+  double lat() const;
+  double lon() const;
+  double alt() const;
+  void   lat(double x);
+  void   lon(double y);
+  void   alt(double z);
+
+  Geodetic operator+ (const Geodetic& p);
+  Geodetic operator- (const Geodetic& p);
 };
 
-}
+} // namespace Point
 
 
 
@@ -89,7 +112,12 @@ namespace NavConversions
   /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to 
    * (WGS-84) Geodetic point (lat, lon, h).
    */
-  Point::LLA EcefToGeodetic(double x, double y, double z);
+  Point::Geodetic EcefToGeodetic(double x, double y, double z);
+  /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to 
+   * East-North-Up coordinates in a Local Tangent Plane that is centered at the 
+   * (WGS-84) Geodetic point (lat0, lon0, alt).
+   */
+  Point::Cart EcefToEnu(Point::Cart p, double lat0, double lon0, double alt0);
   /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to 
    * East-North-Up coordinates in a Local Tangent Plane that is centered at the 
    * (WGS-84) Geodetic point (lat0, lon0, alt).

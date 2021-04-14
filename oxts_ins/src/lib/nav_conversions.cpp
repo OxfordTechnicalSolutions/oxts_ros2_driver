@@ -1,6 +1,49 @@
 #include "oxts_ins/nav_conversions.hpp"
 
 
+namespace Point
+{
+
+double Point::x0() const { return x0_; }
+double Point::x1() const { return x1_; }
+double Point::x2() const { return x2_; }
+void   Point::x0(double x_0){this->x0_ = x_0;}
+void   Point::x1(double x_1){this->x1_ = x_1;}
+void   Point::x2(double x_2){this->x2_ = x_2;}
+
+double Cart::x() const { return x0(); }
+double Cart::y() const { return x1(); }
+double Cart::z() const { return x2(); }
+void   Cart::x(double x){ x0(x); }
+void   Cart::y(double y){ x1(y); }
+void   Cart::z(double z){ x2(z); }
+Cart Cart::operator+ (const Cart& p)
+{
+  return Cart(x0() + p.x0(), x1() + p.x1(), x2() + p.x2());
+}
+
+Cart Cart::operator- (const Cart& p)
+{
+  return Cart(x0() - p.x0(), x1() - p.x1(), x2() - p.x2());
+}
+
+double Geodetic::lat() const { return x0(); }
+double Geodetic::lon() const { return x1(); }
+double Geodetic::alt() const { return x2(); }
+void   Geodetic::lat(double x){ x0(x); }
+void   Geodetic::lon(double y){ x1(y); }
+void   Geodetic::alt(double z){ x2(z); }
+Geodetic Geodetic::operator+ (const Geodetic& p)
+{
+  return Geodetic(x0() + p.x0(), x1() + p.x1(), x2() + p.x2());
+}
+Geodetic Geodetic::operator- (const Geodetic& p)
+{
+  return Geodetic(x0() - p.x0(), x1() - p.x1(), x2() - p.x2());
+}
+
+} // namespace Point
+
 
 std::vector<double> NavConversions::hpr_to_quaternion(double h, double p, double r)
 {
@@ -64,9 +107,9 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 }
 
 
-Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
+Point::Geodetic NavConversions::EcefToGeodetic(double x, double y, double z)
 {
-  Point::LLA p_geo;
+  Point::Geodetic p_geo;
 
   double eps = NAV_CONST::ECC2 / (1.0 - NAV_CONST::ECC2);
   double p = std::sqrt(x * x + y * y);
@@ -90,9 +133,8 @@ Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
 }
 
 
-Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
-                                      double lat0, double lon0, double alt0
-                                      )
+
+Point::Cart NavConversions::EcefToEnu(Point::Cart p, double lat0, double lon0, double alt0)
 {
   Point::Cart p_enu;
   // Convert to radians in notation consistent with the paper:
@@ -107,35 +149,38 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
   Point::Cart ecef0 = NavConversions::GeodeticToEcef(lat0, lon0, alt0);
   // Translate the position by the reference point to align the ECEF data to 
   // the ENU frame
-  double xd, yd, zd;
-  xd = x - ecef0.x();
-  yd = y - ecef0.y();
-  zd = z - ecef0.z();
+  Point::Cart p_d;
+  p_d = p - ecef0;
 
   // Matrix multiplication (x = East, y = North, z = Up) to rotate the data 
   // into the ENU frame.
-  p_enu.x(-sin_phi * xd + cos_phi * yd);
-  p_enu.y(-cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd);
-  p_enu.z(cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd);
+  p_enu.x(-sin_phi * p_d.x() + cos_phi * p_d.y());
+  p_enu.y(-cos_phi * sin_lambda * p_d.x() - sin_lambda * sin_phi * p_d.y() + cos_lambda * p_d.z());
+  p_enu.z(cos_lambda * cos_phi * p_d.x() + cos_lambda * sin_phi * p_d.y() + sin_lambda * p_d.z());
 
   return p_enu;
 }
 
+Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
+                                      double lat0, double lon0, double alt0
+                                      )
+{
+  Point::Cart p(x,y,z);
+  return NavConversions::EcefToEnu(p, lat0, lon0, alt0);
+}
 
 Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
                                       double lat0, double lon0, double alt0
                                       )
 {
   Point::Cart p_ecef;
-  // Convert to radians in notation consistent with the paper:
+  // Calculate parameters
   double lambda = NAV_CONST::DEG2RADS * lat0;
   double phi = NAV_CONST::DEG2RADS * lon0;
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
   double cos_phi = std::cos(phi);
   double sin_phi = std::sin(phi);
-  double N = NAV_CONST::EARTH_RADIUS / 
-            std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
   // Calculate the position of the reference point in ECEF
   Point::Cart ecef0 = NavConversions::GeodeticToEcef(lat0, lon0, alt0);
   // Rotate the ENU position into the orientation of the ECEF frame
