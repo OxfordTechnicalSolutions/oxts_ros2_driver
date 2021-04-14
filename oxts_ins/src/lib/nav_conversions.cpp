@@ -46,16 +46,15 @@ std::vector<double> NavConversions::lla_to_ecef(double lat, double lon, double a
 Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 {
   Point::Cart p_ecef;
-  // Convert to radians in notation consistent with the paper:
+  // Convert to radians
   double lambda = NAV_CONST::DEG2RADS * (lat);
   double phi = NAV_CONST::DEG2RADS * (lon);
-  double s = std::sin(lambda);
-  double N = NAV_CONST::EARTH_RADIUS / std::sqrt(1 - NAV_CONST::ECC2 * s * s);
-
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
   double cos_phi = std::cos(phi);
   double sin_phi = std::sin(phi);
+  double N = NAV_CONST::EARTH_RADIUS / 
+             std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
 
   p_ecef.x = (alt + N) * cos_lambda * cos_phi;
   p_ecef.y = (alt + N) * cos_lambda * sin_phi;
@@ -97,15 +96,15 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
 {
   Point::Cart p_enu;
   // Convert to radians in notation consistent with the paper:
-  double lambda = NAV_CONST::DEG2RADS  *(lat0);
-  double phi = NAV_CONST::DEG2RADS  *(lon0);
-  double s = std::sin(lambda);
-  double N =NAV_CONST::EARTH_RADIUS/ std::sqrt(1 - NAV_CONST::ECC2 * s * s);
-
+  double lambda = NAV_CONST::DEG2RADS * lat0;
+  double phi = NAV_CONST::DEG2RADS * lon0;
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
   double cos_phi = std::cos(phi);
   double sin_phi = std::sin(phi);
+  double N = NAV_CONST::EARTH_RADIUS / 
+             std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
+
 
   double x0 = (alt + N) * cos_lambda * cos_phi;
   double y0 = (alt + N) * cos_lambda * sin_phi;
@@ -131,15 +130,14 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
 {
   Point::Cart p_ecef;
   // Convert to radians in notation consistent with the paper:
-  double lambda = NAV_CONST::DEG2RADS * (lat0);
-  double phi = NAV_CONST::DEG2RADS * (lon0);
-  double s = std::sin(lambda);
-  double N =NAV_CONST::EARTH_RADIUS/ std::sqrt(1 - NAV_CONST::ECC2 * s * s);
-
+  double lambda = NAV_CONST::DEG2RADS * lat0;
+  double phi = NAV_CONST::DEG2RADS * lon0;
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
   double cos_phi = std::cos(phi);
   double sin_phi = std::sin(phi);
+  double N = NAV_CONST::EARTH_RADIUS / 
+            std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
 
   double x0 = (alt + N) * cos_lambda * cos_phi;
   double y0 = (alt + N) * cos_lambda * sin_phi;
@@ -171,11 +169,11 @@ Point::Cart NavConversions::EnuToLrf(double xEast, double yNorth, double zUp,
 }
 
 
-Point::Cart NavConversions::GeodeticToEnu(double lat, double lon, double h,
+Point::Cart NavConversions::GeodeticToEnu(double lat, double lon, double alt,
                                           double lat0, double lon0, double alt0
                                           )
 {
-  Point::Cart p_ecef = NavConversions::GeodeticToEcef(lat, lon, h);
+  Point::Cart p_ecef = NavConversions::GeodeticToEcef(lat, lon, alt);
   Point::Cart p_enu = NavConversions::EcefToEnu(p_ecef.x, p_ecef.y, p_ecef.z, 
                                                 lat0, lon0, alt0);
 
