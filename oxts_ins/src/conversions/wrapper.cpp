@@ -301,7 +301,7 @@ geometry_msgs::msg::TwistStamped   velocity   (
   return msg;
 }
 
-tf2::Matrix3x3 getRotEcefToEnu(double lat0, double lon0)
+tf2::Matrix3x3 getRotEnuToEcef(double lat0, double lon0)
 {
   double lambda = (lon0) * NAV_CONST::DEG2RADS;
   double phi    = (lat0) * NAV_CONST::DEG2RADS;
@@ -371,13 +371,13 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   // rotation from the ENU frame defined by the LRF origin to the full LRF frame 
   tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading);
   // rotation from ECEF frame to the ENU frame defined by the LRF origin
-  tf2::Matrix3x3 r_ecef_enu = getRotEcefToEnu(lrf.lat, lrf.lon);
+  tf2::Matrix3x3 r_ecef_enu = getRotEnuToEcef(lrf.lat, lrf.lon).transpose();
   // rotation from ECEF frame to the ENU frame defined by the current position
-  tf2::Matrix3x3 r_ecef_pos = getRotEcefToEnu(nrx->mLat, nrx->mLon);
+  tf2::Matrix3x3 r_pos_ecef = getRotEnuToEcef(nrx->mLat, nrx->mLon);
 
   auto diff = tf2::Matrix3x3(r_enu_lrf);
   diff *= r_ecef_enu;
-  diff *= r_ecef_pos.transpose();
+  diff *= r_pos_ecef;
 
   auto tmp = tf2::Matrix3x3(diff);
   auto cov = tf2::Matrix3x3 (
