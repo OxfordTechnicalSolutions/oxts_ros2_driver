@@ -15,18 +15,41 @@
 namespace Point
 {
 
-struct Cart
+class Point
 {
-  double x = 0;
-  double y = 0;
-  double z = 0;
+private:
+  double x_0 = 0;
+  double x_1 = 0;
+  double x_2 = 0;
+public:
+  double x0(){ return x_0; };
+  double x1(){ return x_1; };
+  double x2(){ return x_2; };
+  void   x0(double x_0){this->x_0 = x_0;}
+  void   x1(double x_1){this->x_1 = x_1;}
+  void   x2(double x_2){this->x_2 = x_2;}
 };
 
-struct LLA
+class Cart : protected Point
 {
-  double lat = 0;
-  double lon = 0;
-  double alt = 0;
+public:
+  double x(){ return x0(); }
+  double y(){ return x1(); }
+  double z(){ return x2(); }
+  void   x(double x){ x0(x); }
+  void   y(double y){ x1(y); }
+  void   z(double z){ x2(z); }
+};
+
+class LLA : protected Point
+{
+public:
+  double lat(){ return x0(); }
+  double lon(){ return x1(); }
+  double alt(){ return x2(); }
+  void   lat(double x){ x0(x); }
+  void   lon(double y){ x1(y); }
+  void   alt(double z){ x2(z); }
 };
 
 }

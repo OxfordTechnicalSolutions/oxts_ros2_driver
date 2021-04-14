@@ -56,9 +56,9 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
   double N = NAV_CONST::EARTH_RADIUS / 
              std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
   // Calculate the position in ECEF
-  p_ecef.x = (alt + N) * cos_lambda * cos_phi;
-  p_ecef.y = (alt + N) * cos_lambda * sin_phi;
-  p_ecef.z = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
+  p_ecef.x((alt + N) * cos_lambda * cos_phi);
+  p_ecef.y((alt + N) * cos_lambda * sin_phi);
+  p_ecef.z((alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda);
 
   return p_ecef;
 }
@@ -82,9 +82,9 @@ Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
   double v = NAV_CONST::EARTH_RADIUS / 
               std::sqrt(1.0 - NAV_CONST::ECC2 * std::sin(phi) * std::sin(phi));
 
-  p_geo.alt = (p / std::cos(phi)) - v;
-  p_geo.lat = NAV_CONST::RADS2DEG * (phi);
-  p_geo.lon = NAV_CONST::RADS2DEG * (lambda);
+  p_geo.alt((p / std::cos(phi)) - v);
+  p_geo.lat(NAV_CONST::RADS2DEG * (phi));
+  p_geo.lon(NAV_CONST::RADS2DEG * (lambda));
 
   return p_geo;
 }
@@ -108,15 +108,15 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
   // Translate the position by the reference point to align the ECEF data to 
   // the ENU frame
   double xd, yd, zd;
-  xd = x - ecef0.x;
-  yd = y - ecef0.y;
-  zd = z - ecef0.z;
+  xd = x - ecef0.x();
+  yd = y - ecef0.y();
+  zd = z - ecef0.z();
 
   // Matrix multiplication (x = East, y = North, z = Up) to rotate the data 
   // into the ENU frame.
-  p_enu.x = -sin_phi * xd + cos_phi * yd;
-  p_enu.y = -cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd;
-  p_enu.z = cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd;
+  p_enu.x(-sin_phi * xd + cos_phi * yd);
+  p_enu.y(-cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd);
+  p_enu.z(cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd);
 
   return p_enu;
 }
@@ -143,9 +143,9 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
   double yd = cos_phi * xEast - sin_lambda * sin_phi * yNorth + cos_lambda * sin_phi * zUp;
   double zd = cos_lambda * yNorth + sin_lambda * zUp;
   // Add the translation to the rotated ENU position to get the position in ECEF
-  p_ecef.x = xd + ecef0.x;
-  p_ecef.y = yd + ecef0.y;
-  p_ecef.z = zd + ecef0.z;
+  p_ecef.x(xd + ecef0.x());
+  p_ecef.y(yd + ecef0.y());
+  p_ecef.z(zd + ecef0.z());
 
   return p_ecef;
 }
@@ -157,9 +157,9 @@ Point::Cart NavConversions::EnuToLrf(double xEast, double yNorth, double zUp,
   // theta is the ref_heading angle in the enu frame
   double theta = (90.0 - ref_heading) * NAV_CONST::DEG2RADS;
 
-  p_lrf.x = xEast * std::cos(theta) - yNorth * std::sin(theta);
-  p_lrf.y = xEast * std::sin(theta) + yNorth * std::cos(theta);
-  p_lrf.z = zUp;
+  p_lrf.x(xEast * std::cos(theta) - yNorth * std::sin(theta));
+  p_lrf.y(xEast * std::sin(theta) + yNorth * std::cos(theta));
+  p_lrf.z(zUp);
 
   return p_lrf;
 }
@@ -170,8 +170,13 @@ Point::Cart NavConversions::GeodeticToEnu(double lat, double lon, double alt,
                                           )
 {
   Point::Cart p_ecef = NavConversions::GeodeticToEcef(lat, lon, alt);
-  Point::Cart p_enu = NavConversions::EcefToEnu(p_ecef.x, p_ecef.y, p_ecef.z, 
-                                                lat0, lon0, alt0);
+  Point::Cart p_enu = NavConversions::EcefToEnu(p_ecef.x(), 
+                                                p_ecef.y(), 
+                                                p_ecef.z(), 
+                                                lat0, 
+                                                lon0, 
+                                                alt0
+                                                );
 
   return p_enu;
 }

@@ -351,11 +351,11 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
                                         lrf.lon, 
                                         lrf.alt);
 
-  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x, p_enu.y, p_enu.z, lrf.heading);
+  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading);
 
-  msg.pose.pose.position.x = p_lrf.x;
-  msg.pose.pose.position.y = p_lrf.y;
-  msg.pose.pose.position.z = p_lrf.z;
+  msg.pose.pose.position.x = p_lrf.x();
+  msg.pose.pose.position.y = p_lrf.y();
+  msg.pose.pose.position.z = p_lrf.z();
 
   // Orientation must be taken from NCom (NED - pseudo polar) and rotated into ENU - tangent
 
