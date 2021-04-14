@@ -46,7 +46,7 @@ std::vector<double> NavConversions::lla_to_ecef(double lat, double lon, double a
 Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 {
   Point::Cart p_ecef;
-  // Convert to radians
+  // Calculate parameters
   double lambda = NAV_CONST::DEG2RADS * (lat);
   double phi = NAV_CONST::DEG2RADS * (lon);
   double sin_lambda = std::sin(lambda);
@@ -55,7 +55,7 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
   double sin_phi = std::sin(phi);
   double N = NAV_CONST::EARTH_RADIUS / 
              std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
-
+  // Calculate the position in ECEF
   p_ecef.x = (alt + N) * cos_lambda * cos_phi;
   p_ecef.y = (alt + N) * cos_lambda * sin_phi;
   p_ecef.z = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
@@ -91,7 +91,7 @@ Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
 
 
 Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
-                                      double lat0, double lon0, double alt
+                                      double lat0, double lon0, double alt0
                                       )
 {
   Point::Cart p_enu;
@@ -104,18 +104,19 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
   double sin_phi = std::sin(phi);
   double N = NAV_CONST::EARTH_RADIUS / 
              std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
-
-
-  double x0 = (alt + N) * cos_lambda * cos_phi;
-  double y0 = (alt + N) * cos_lambda * sin_phi;
-  double z0 = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
-
+  // Calculate the position of the reference point in ECEF
+  double x0 = (alt0 + N) * cos_lambda * cos_phi;
+  double y0 = (alt0 + N) * cos_lambda * sin_phi;
+  double z0 = (alt0 + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
+  // Translate the position by the reference point to align the ECEF data to 
+  // the ENU frame
   double xd, yd, zd;
   xd = x - x0;
   yd = y - y0;
   zd = z - z0;
 
-  // This is the matrix multiplication (x = East, y = North, z = Up)
+  // Matrix multiplication (x = East, y = North, z = Up) to rotate the data 
+  // into the ENU frame.
   p_enu.x = -sin_phi * xd + cos_phi * yd;
   p_enu.y = -cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd;
   p_enu.z = cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd;
@@ -125,7 +126,7 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
 
 
 Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
-                                      double lat0, double lon0, double alt
+                                      double lat0, double lon0, double alt0
                                       )
 {
   Point::Cart p_ecef;
@@ -138,15 +139,15 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
   double sin_phi = std::sin(phi);
   double N = NAV_CONST::EARTH_RADIUS / 
             std::sqrt(1 - NAV_CONST::ECC2 * sin_lambda * sin_lambda);
-
-  double x0 = (alt + N) * cos_lambda * cos_phi;
-  double y0 = (alt + N) * cos_lambda * sin_phi;
-  double z0 = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
-
+  // Calculate the position of the reference point in ECEF
+  double x0 = (alt0 + N) * cos_lambda * cos_phi;
+  double y0 = (alt0 + N) * cos_lambda * sin_phi;
+  double z0 = (alt0 + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
+  // Rotate the ENU position into the orientation of the ECEF frame
   double xd = -sin_phi * xEast - cos_phi * sin_lambda * yNorth + cos_lambda * cos_phi * zUp;
   double yd = cos_phi * xEast - sin_lambda * sin_phi * yNorth + cos_lambda * sin_phi * zUp;
   double zd = cos_lambda * yNorth + sin_lambda * zUp;
-
+  // Add the translation to the rotated ENU position to get the position in ECEF
   p_ecef.x = xd + x0;
   p_ecef.y = yd + y0;
   p_ecef.z = zd + z0;
