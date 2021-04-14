@@ -335,6 +335,7 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
                                   std_msgs::msg::Header head)
 {
   auto msg = nav_msgs::msg::Odometry();
+  msg.header = head;
 
   // pose with covariance ======================================================
   auto lrf = RosNComWrapper::getLrf(nrx); // returns quaternion
@@ -367,9 +368,9 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   // rotation from the ENU frame defined by the LRF origin to the full LRF frame 
   tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading);
   // rotation from ECEF frame to the ENU frame defined by the LRF origin
-  tf2::Matrix3x3 r_ecef_enu = getRotEcefToEnu(lrf.lat, lrf.lon); 
+  tf2::Matrix3x3 r_ecef_enu = getRotEcefToEnu(lrf.lat, lrf.lon);
   // rotation from ECEF frame to the ENU frame defined by the current position
-  tf2::Matrix3x3 r_ecef_pos = getRotEcefToEnu(nrx->mLat, nrx->mLon); 
+  tf2::Matrix3x3 r_ecef_pos = getRotEcefToEnu(nrx->mLat, nrx->mLon);
 
   auto diff = tf2::Matrix3x3(r_enu_lrf);
   diff *= r_ecef_enu;
@@ -385,7 +386,10 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   tmp *= cov;
   tmp *= diff.transpose();
 
-  msg.pose.covariance[0] ;
+  // Copy the position covariance data into the output message
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      msg.pose.covariance[(3*i)+j] = tmp[i][j];
 
 
   // twist with covariance =====================================================
