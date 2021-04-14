@@ -71,14 +71,17 @@ Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
 
   double eps = NAV_CONST::ECC2 / (1.0 - NAV_CONST::ECC2);
   double p = std::sqrt(x * x + y * y);
-  double q = std::atan2((z * NAV_CONST::EARTH_RADIUS), (p * NAV_CONST::EARTH_SEMI_MINOR));
+  double q = std::atan2((z * NAV_CONST::EARTH_RADIUS), 
+                        (p * NAV_CONST::EARTH_SEMI_MINOR));
   double sin_q = std::sin(q);
   double cos_q = std::cos(q);
   double sin_q_3 = sin_q * sin_q * sin_q;
   double cos_q_3 = cos_q * cos_q * cos_q;
-  double phi = std::atan2((z + eps * NAV_CONST::EARTH_SEMI_MINOR * sin_q_3), (p - NAV_CONST::ECC2 *NAV_CONST::EARTH_RADIUS* cos_q_3));
+  double phi = std::atan2((z + eps * NAV_CONST::EARTH_SEMI_MINOR * sin_q_3), 
+                      (p - NAV_CONST::ECC2 *NAV_CONST::EARTH_RADIUS* cos_q_3));
   double lambda = std::atan2(y, x);
-  double v =NAV_CONST::EARTH_RADIUS/ std::sqrt(1.0 - NAV_CONST::ECC2 * std::sin(phi) * std::sin(phi));
+  double v = NAV_CONST::EARTH_RADIUS / 
+              std::sqrt(1.0 - NAV_CONST::ECC2 * std::sin(phi) * std::sin(phi));
 
   p_geo.alt = (p / std::cos(phi)) - v;
   p_geo.lat = NAV_CONST::RADS2DEG * (phi);
