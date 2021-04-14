@@ -300,8 +300,8 @@ geometry_msgs::msg::TwistStamped   velocity   (
 
 tf2::Matrix3x3 getRotEcefToEnu(double lat0, double lon0)
 {
-  double lambda = (lon0 + 90.0) * NAV_CONST::DEG2RADS;
-  double phi    = (90.0 - lat0) * NAV_CONST::DEG2RADS;
+  double lambda = (lon0) * NAV_CONST::DEG2RADS;
+  double phi    = (lat0) * NAV_CONST::DEG2RADS;
 
   double s_phi = std::sin(phi);
   double c_phi = std::cos(phi);
