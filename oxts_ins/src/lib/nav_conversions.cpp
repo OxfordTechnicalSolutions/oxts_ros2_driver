@@ -42,16 +42,6 @@ std::vector<double> NavConversions::lla_to_ecef(double lat, double lon, double a
   return posEcef;
 }
 
-// WGS-84 geodetic constants
-const double a = 6378137.0;         // WGS-84 Earth semimajor axis (m)
-const double f_inv = 298.257223563; // WGS-84 Flattening Factor of the Earth 
-const double b = a - a / f_inv;
-const double f = 1.0 / f_inv;
-
-// const double a_sq = a * a;
-// const double b_sq = b * b;
-const double e_sq = f * (2 - f);    // Square of Eccentricity
-
 
 Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 {
@@ -60,7 +50,7 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
   double lambda = NAV_CONST::DEG2RADS * (lat);
   double phi = NAV_CONST::DEG2RADS * (lon);
   double s = std::sin(lambda);
-  double N = a / std::sqrt(1 - e_sq * s * s);
+  double N = NAV_CONST::EARTH_RADIUS / std::sqrt(1 - NAV_CONST::ECC2 * s * s);
 
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
@@ -69,7 +59,7 @@ Point::Cart NavConversions::GeodeticToEcef(double lat, double lon, double alt)
 
   p_ecef.x = (alt + N) * cos_lambda * cos_phi;
   p_ecef.y = (alt + N) * cos_lambda * sin_phi;
-  p_ecef.z = (alt + (1 - e_sq) * N) * sin_lambda;
+  p_ecef.z = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
 
   return p_ecef;
 }
@@ -79,16 +69,16 @@ Point::LLA NavConversions::EcefToGeodetic(double x, double y, double z)
 {
   Point::LLA p_geo;
 
-  double eps = e_sq / (1.0 - e_sq);
+  double eps = NAV_CONST::ECC2 / (1.0 - NAV_CONST::ECC2);
   double p = std::sqrt(x * x + y * y);
-  double q = std::atan2((z * a), (p * b));
+  double q = std::atan2((z * NAV_CONST::EARTH_RADIUS), (p * NAV_CONST::EARTH_SEMI_MINOR));
   double sin_q = std::sin(q);
   double cos_q = std::cos(q);
   double sin_q_3 = sin_q * sin_q * sin_q;
   double cos_q_3 = cos_q * cos_q * cos_q;
-  double phi = std::atan2((z + eps * b * sin_q_3), (p - e_sq * a * cos_q_3));
+  double phi = std::atan2((z + eps * NAV_CONST::EARTH_SEMI_MINOR * sin_q_3), (p - NAV_CONST::ECC2 *NAV_CONST::EARTH_RADIUS* cos_q_3));
   double lambda = std::atan2(y, x);
-  double v = a / std::sqrt(1.0 - e_sq * std::sin(phi) * std::sin(phi));
+  double v =NAV_CONST::EARTH_RADIUS/ std::sqrt(1.0 - NAV_CONST::ECC2 * std::sin(phi) * std::sin(phi));
 
   p_geo.alt = (p / std::cos(phi)) - v;
   p_geo.lat = NAV_CONST::RADS2DEG * (phi);
@@ -107,7 +97,7 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
   double lambda = NAV_CONST::DEG2RADS  *(lat0);
   double phi = NAV_CONST::DEG2RADS  *(lon0);
   double s = std::sin(lambda);
-  double N = a / std::sqrt(1 - e_sq * s * s);
+  double N =NAV_CONST::EARTH_RADIUS/ std::sqrt(1 - NAV_CONST::ECC2 * s * s);
 
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
@@ -116,7 +106,7 @@ Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
 
   double x0 = (alt + N) * cos_lambda * cos_phi;
   double y0 = (alt + N) * cos_lambda * sin_phi;
-  double z0 = (alt + (1 - e_sq) * N) * sin_lambda;
+  double z0 = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
 
   double xd, yd, zd;
   xd = x - x0;
@@ -141,7 +131,7 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
   double lambda = NAV_CONST::DEG2RADS * (lat0);
   double phi = NAV_CONST::DEG2RADS * (lon0);
   double s = std::sin(lambda);
-  double N = a / std::sqrt(1 - e_sq * s * s);
+  double N =NAV_CONST::EARTH_RADIUS/ std::sqrt(1 - NAV_CONST::ECC2 * s * s);
 
   double sin_lambda = std::sin(lambda);
   double cos_lambda = std::cos(lambda);
@@ -150,7 +140,7 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
 
   double x0 = (alt + N) * cos_lambda * cos_phi;
   double y0 = (alt + N) * cos_lambda * sin_phi;
-  double z0 = (alt + (1 - e_sq) * N) * sin_lambda;
+  double z0 = (alt + (1 - NAV_CONST::ECC2) * N) * sin_lambda;
 
   double xd = -sin_phi * xEast - cos_phi * sin_lambda * yNorth + cos_lambda * cos_phi * zUp;
   double yd = cos_phi * xEast - sin_lambda * sin_phi * yNorth + cos_lambda * sin_phi * zUp;
