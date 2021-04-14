@@ -44,11 +44,6 @@ std::vector<double> NavConversions::lla_to_ecef(double lat, double lon, double a
 
 // WGS-84 geodetic constants
 const double a = 6378137.0;         // WGS-84 Earth semimajor axis (m)
-
-// const double b = 6356752.314245;     // Derived Earth semiminor axis (m)
-// const double f = (a - b) / a;           // Ellipsoid Flatness
-// const double f_inv = 1.0 / f;       // Inverse flattening
-
 const double f_inv = 298.257223563; // WGS-84 Flattening Factor of the Earth 
 const double b = a - a / f_inv;
 const double f = 1.0 / f_inv;
