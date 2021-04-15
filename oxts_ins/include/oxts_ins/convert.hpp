@@ -175,14 +175,14 @@ public:
     ncom_rate               = this->declare_parameter("ncom_rate", 100);
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
     frame_id                = this->declare_parameter("frame_id", "oxts_link");
-    pub_string_rate         = this->declare_parameter("pub_string_rate", 1);
-    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 1);
+    pub_string_rate         = this->declare_parameter("pub_string_rate", 0);
+    pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 0);
     pub_imu_flag            = this->declare_parameter("pub_imu_flag", true);
-    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 1);
-    pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 1);
-    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 1);
-    pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 1);
-    pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 1);
+    pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 0);
+    pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 0);
+    pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 0);
+    pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 0);
+    pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 0);
     pub_tf_flag             = this->declare_parameter("pub_tf_flag", true);
 
     /** @todo Improve error handling */
