@@ -32,15 +32,8 @@ public:
   Point() : x0_(0), x1_(0), x2_(0){ }
   Point(double x_0, double x_1, double x_2) : x0_(x_0), x1_(x_1), x2_(x_2){ }
 
-  Point operator+ (const Point& p)
-  {
-    return Point(x0() + p.x0(), x1() + p.x1(), x2() + p.x2());
-  }
-
-  Point operator- (const Point& p)
-  {
-    return Point(x0() - p.x0(), x1() - p.x1(), x2() - p.x2());
-  }
+  Point operator+ (const Point& p);
+  Point operator- (const Point& p);
 };
 
 class Cart : protected Point

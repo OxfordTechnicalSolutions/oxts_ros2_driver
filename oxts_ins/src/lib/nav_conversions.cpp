@@ -10,6 +10,15 @@ double Point::x2() const { return x2_; }
 void   Point::x0(double x_0){this->x0_ = x_0;}
 void   Point::x1(double x_1){this->x1_ = x_1;}
 void   Point::x2(double x_2){this->x2_ = x_2;}
+Point Point::operator+ (const Point& p)
+{
+  return Point(x0() + p.x0(), x1() + p.x1(), x2() + p.x2());
+}
+
+Point Point::operator- (const Point& p)
+{
+  return Point(x0() - p.x0(), x1() - p.x1(), x2() - p.x2());
+}
 
 double Cart::x() const { return x0(); }
 double Cart::y() const { return x1(); }
