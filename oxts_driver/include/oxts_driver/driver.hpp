@@ -52,6 +52,8 @@ private:
   std::string ncom_path;
   /*! Function pointer to the necesary NCom file/socket callback */
   void (oxts_driver::OxtsDriver::*timer_ncom_callback)();
+  /*! Function pointer to the necesary NCom updater */
+  void (oxts_driver::OxtsDriver::*update_ncom)();
   /*! Whether ot not to wait for NCom initialisation before publishing messages. */
   bool wait_for_init;
   /*! Publishing rate for debug String message. */
@@ -69,6 +71,9 @@ private:
    */
   void timer_ncom_socket_callback();
   void timer_ncom_file_callback();
+  void get_file_packet();
+  void get_socket_packet();
+  void publish_packet();
 
   /**
    * Publisher for std_msgs/msg/string. Only used for debugging, currently 
@@ -126,19 +131,19 @@ public:
     if (!ncom_path.empty())
     {
       timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
+      update_ncom = &OxtsDriver::get_file_packet;
     }
     else 
     {
       timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
+      update_ncom = &OxtsDriver::get_socket_packet;
     }
-    timer_ncom_ = this->create_wall_timer(
-                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     // Wait for config to be populated in NCOM packets
     RCLCPP_INFO(this->get_logger(), "Waiting for INS config information...");
     while (nrx->mSerialNumber == 0 || nrx->mIsImu2VehHeadingValid == 0)
     {
-      (*this.*timer_ncom_callback)();
+      (*this.*update_ncom)();
     }
     RCLCPP_INFO(this->get_logger(), "INS config information received");
 
@@ -146,9 +151,18 @@ public:
     if (wait_for_init)
     {
       RCLCPP_INFO(this->get_logger(), "Waiting for initialisation...");
-      while (nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME)
+      // Only block things that are required for 100% of OxTS navigation
+      while (
+        nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME &&
+        nrx->mIsLatValid == 0 &&
+        nrx->mIsLonValid == 0 &&
+        nrx->mIsAltValid == 0 &&
+        nrx->mIsHeadingValid == 0 &&
+        nrx->mIsPitchValid == 0 &&
+        nrx->mIsRollValid == 0
+      )
       {
-        (*this.*timer_ncom_callback)();
+        (*this.*update_ncom)();
       }
       RCLCPP_INFO(this->get_logger(), "INS initialised");
     }
@@ -156,6 +170,9 @@ public:
     {
       RCLCPP_INFO(this->get_logger(), "Publishing before INS initialisation");
     }
+
+    timer_ncom_ = this->create_wall_timer(
+                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %iHz", ncom_rate);
 
