@@ -24,6 +24,15 @@ tf2::Vector3 getNsp(const NComRxC *nrx)
     nrx->mNoSlipLeverArmZ);
 }
 
+// tf2::Vector3 getNvsp(const NComRxC *nrx)
+// {
+//   // Translation of rear axle in imu frame
+//   return tf2::Vector3(
+//     nrx->mNoSlipLeverArmX,
+//     nrx->mNoSlipLeverArmY,
+//     nrx->mNoSlipLeverArmZ);
+// }
+
 tf2::Quaternion getVehRPY(const NComRxC *nrx)
 {
   auto rpyVehNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)

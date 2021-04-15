@@ -1,22 +1,43 @@
 <?xml version="1.0"?>
 <robot name="RT1003">
 
-  <link name="vehicle_link"></link>
-
   <link name="oxts_link">
     <visual>
       <origin rpy="0 0 -1.57079632679" xyz="-0.102 0.053 -0.015"/>
       <geometry>
-        <mesh filename="package://oxts_driver/urdf/medium.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://oxts_ins/urdf/medium.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="oxts_red">
         <color rgba="0.792 0.094 0.11 1.0"/>
       </material>
     </visual>
   </link>
-  <joint name="vehicle_link_joint" type="floating">
-    <parent link="vehicle_link"/>
-    <child link="oxts_link" />
+
+  <link name="rear_axle_link">
+    <visual>
+      <origin rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder length="1.6" radius="0.2"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="rear_axle_link_joint" type="floating">
+    <parent link="oxts_link"/>
+    <child link="rear_axle_link" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+
+  <link name="front_axle_link">
+    <visual>
+      <origin rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder length="1.6" radius="0.2"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="front_axle_link_joint" type="floating">
+    <parent link="oxts_link"/>
+    <child link="front_axle_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
   </joint>
 
