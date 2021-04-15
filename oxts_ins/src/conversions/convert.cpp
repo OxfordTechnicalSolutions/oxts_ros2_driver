@@ -31,6 +31,8 @@ void OxtsIns::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
           this->nav_sat_fix();
         if (this->pubVelocityInterval && (sec_idx % this->pubVelocityInterval == 0))
           this->velocity();
+        if (this->pubOdometryInterval && (sec_idx % this->pubOdometryInterval == 0))
+          this->odometry();
         if (this->pubTimeReferenceInterval && (sec_idx % this->pubTimeReferenceInterval == 0))
           this->time_reference();
         break;
@@ -90,15 +92,18 @@ void OxtsIns::tf()
   std_msgs::msg::Header header;
   header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
 
-  auto rpyVehENU    = RosNComWrapper::getVehRPY(this->nrx);
+  auto odometry = RosNComWrapper::odometry(this->nrx, header, this->lrf);
   geometry_msgs::msg::TransformStamped tf_oxts;
   tf_oxts.header = header;
-  tf_oxts.header.frame_id = "map";
-  tf_oxts.child_frame_id = "vehicle_link";
-  tf_oxts.transform.rotation.x = rpyVehENU.x();
-  tf_oxts.transform.rotation.y = rpyVehENU.y();
-  tf_oxts.transform.rotation.z = rpyVehENU.z();
-  tf_oxts.transform.rotation.w = rpyVehENU.w();
+  tf_oxts.header.frame_id = this->pub_odometry_frame_id;
+  tf_oxts.child_frame_id = "oxts_link";
+  tf_oxts.transform.translation.x = odometry.pose.pose.position.x;
+  tf_oxts.transform.translation.y = odometry.pose.pose.position.y;
+  tf_oxts.transform.translation.z = odometry.pose.pose.position.z;
+  tf_oxts.transform.rotation.x = odometry.pose.pose.orientation.x;
+  tf_oxts.transform.rotation.y = odometry.pose.pose.orientation.y;
+  tf_oxts.transform.rotation.z = odometry.pose.pose.orientation.z;
+  tf_oxts.transform.rotation.w = odometry.pose.pose.orientation.w;
   tf_broadcaster_->sendTransform(tf_oxts);
 
   auto vat    = RosNComWrapper::getVat(this->nrx);
@@ -128,6 +133,36 @@ void OxtsIns::velocity()
   header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
   auto msg    = RosNComWrapper::velocity(this->nrx, header);
   pubVelocity_->publish(msg);
+}
+
+void OxtsIns::odometry()
+{
+  std_msgs::msg::Header header;
+  header = RosNComWrapper::header(this->get_timestamp(), 
+                                  this->pub_odometry_frame_id);
+  // Set the LRF if - we haven't set it before, it is configured to come from 
+  // NCom LRF, and the NCom LRF is valid.
+  if(!this->lrf_valid && 
+      this->lrf_source == LRF_SOURCE::NCOM_LRF && 
+      nrx->mIsRefLatValid)
+  {
+    this->lrf = RosNComWrapper::getLrf(nrx); 
+    this->lrf_valid = true;
+  }
+  // Set the LRF if - we haven't set it before, and its configured to come from 
+  // the first NCom packet
+  else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST)
+  {
+    this->lrf.origin(nrx->mLat,nrx->mLon,nrx->mAlt);
+    this->lrf.heading(nrx->mHeading);
+    this->lrf_valid = true;
+  }  
+
+  if (this->lrf_valid)
+  {
+    auto msg    = RosNComWrapper::odometry(this->nrx, header, this->lrf);
+    pubOdometry_->publish(msg);
+  }
 }
 
 void OxtsIns::time_reference()

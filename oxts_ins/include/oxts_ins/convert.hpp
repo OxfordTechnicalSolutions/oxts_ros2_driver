@@ -35,6 +35,7 @@
 #include "oxts_ins/NComRxC.h"
 #include "oxts_ins/nav_const.hpp"
 #include "oxts_ins/wrapper.hpp"
+#include "oxts_ins/nav_conversions.hpp"
 
 using std::placeholders::_1;
 
@@ -50,6 +51,16 @@ enum PUB_TIMESTAMP_MODE
   ROS = 0,
   /** Use NCom time. */
   NCOM = 1
+};
+/**
+ * Enumeration of LRF sources
+ */
+enum LRF_SOURCE
+{
+  /** Use the LRF from NCom. */
+  NCOM_LRF = 0,
+  /** Use the position and heading of first NCom packet as LRF. */
+  NCOM_FIRST = 1
 };
 
 
@@ -69,6 +80,9 @@ private:
   /*! Timestamp type to be applied to published packets
     {0 : ROS time, 1 : NCom time} */
   int timestamp_mode;
+  /*! Local reference frame source
+    {0 : From NCom LRF, 1 : First NCom position} */
+  uint8_t lrf_source;
   /*! Frame ID of outgoing packets. @todo Having a general frame ID may not
     make sense. This isn't implemented. */
   std::string frame_id;
@@ -80,6 +94,8 @@ private:
   uint8_t pub_velocity_rate;
   /*! Publishing rate for Odometry message. */
   uint8_t pub_odometry_rate;
+  /*! Frame ID for Odometry message. */
+  std::string pub_odometry_frame_id;
   /*! Publishing rate for TimeReference message.*/
   uint8_t pub_time_reference_rate; 
   /*! Publishing rate for PointStamped message. */
@@ -180,10 +196,12 @@ public:
     pub_imu_flag            = this->declare_parameter("pub_imu_flag", true);
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 0);
     pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 0);
+    pub_odometry_frame_id   = this->declare_parameter("pub_odometry_frame_id", "map");
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 0);
     pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 0);
     pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 0);
     pub_tf_flag             = this->declare_parameter("pub_tf_flag", true);
+    lrf_source              = this->declare_parameter("lrf_source", 0);
 
     /** @todo Improve error handling */
     if (ncom_rate == 0)
@@ -236,16 +254,15 @@ public:
 
     nrx = NComCreateNComRxC();
 
+    lrf_valid = false;
   }
 
-  /**
-   * NCom decoder instance
-   */
+  /** NCom decoder instance */
   NComRxC *nrx;
-  /**
-   * Buffer for UDP data
-   */
-  unsigned char buff[1024];
+  /** Local reference frame validity flag */
+  bool lrf_valid;
+  /** Local reference frame */
+  Lrf lrf;
 
   rclcpp::Time get_timestamp();
 

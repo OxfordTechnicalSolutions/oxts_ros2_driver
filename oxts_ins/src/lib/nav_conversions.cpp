@@ -170,13 +170,6 @@ Point::Cart NavConversions::EcefToEnu(Point::Cart p, double lat0, double lon0, d
   return p_enu;
 }
 
-Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
-                                      double lat0, double lon0, double alt0
-                                      )
-{
-  Point::Cart p(x,y,z);
-  return NavConversions::EcefToEnu(p, lat0, lon0, alt0);
-}
 
 Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
                                       double lat0, double lon0, double alt0
@@ -204,12 +197,20 @@ Point::Cart NavConversions::EnuToEcef(double xEast, double yNorth, double zUp,
   return p_ecef;
 }
 
+Point::Cart NavConversions::EcefToEnu(double x, double y, double z,
+                                      double lat0, double lon0, double alt0
+                                      )
+{
+  Point::Cart p(x,y,z);
+  return NavConversions::EcefToEnu(p, lat0, lon0, alt0);
+}
+
 Point::Cart NavConversions::EnuToLrf(double xEast, double yNorth, double zUp, 
                                      double ref_heading)
 {
   Point::Cart p_lrf;
   // theta is the ref_heading angle in the enu frame
-  double theta = (90.0 - ref_heading) * NAV_CONST::DEG2RADS;
+  double theta = (-ref_heading) * NAV_CONST::DEG2RADS;
 
   p_lrf.x(xEast * std::cos(theta) - yNorth * std::sin(theta));
   p_lrf.y(xEast * std::sin(theta) + yNorth * std::cos(theta));

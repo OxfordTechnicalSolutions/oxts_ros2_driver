@@ -54,14 +54,14 @@ tf2::Quaternion getBodyRPY(const NComRxC *nrx)
 }
 
 
-RosNComWrapper::Lrf getLrf(const NComRxC *nrx)
+Lrf getLrf(const NComRxC *nrx)
 {
   // Origin to use for map frame
-  return RosNComWrapper::Lrf(
+  return Lrf(
     nrx->mRefLat,
     nrx->mRefLon,
     nrx->mRefAlt,
-    90 - nrx->mRefHeading // NED to ENU
+    -nrx->mRefHeading // NED to ENU
   );
 }
 
@@ -181,10 +181,10 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
   auto msg = oxts_msgs::msg::NavSatRef();
   auto lrf = getLrf(nrx);
   msg.header = head;
-  msg.latitude  = lrf.lat;
-  msg.longitude = lrf.lon;
-  msg.altitude  = lrf.alt;
-  msg.heading  = lrf.heading; // NED to ENU
+  msg.latitude  = lrf.lat();
+  msg.longitude = lrf.lon();
+  msg.altitude  = lrf.alt();
+  msg.heading   = lrf.heading();
   return msg;
 }
 
@@ -197,10 +197,10 @@ geometry_msgs::msg::PointStamped ecef_pos
   auto msg = geometry_msgs::msg::PointStamped();
   msg.header = head;
 
-  std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-  msg.point.x    = ecef[0]; 
-  msg.point.y    = ecef[1];
-  msg.point.z    = ecef[2];
+  Point::Cart ecef = NavConversions::GeodeticToEcef(nrx->mLat, nrx->mLon, nrx->mAlt);
+  msg.point.x    = ecef.x(); 
+  msg.point.y    = ecef.y();
+  msg.point.z    = ecef.z();
 
   return msg;
 }
@@ -335,43 +335,49 @@ tf2::Matrix3x3 getRotEnuToLrf(double theta)
 
 
 nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
-                                  std_msgs::msg::Header head)
+                                  std_msgs::msg::Header head,
+                                  Lrf lrf)
 {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = head;
-
+  msg.child_frame_id = "oxts_link";
   // pose with covariance ======================================================
-  auto lrf = RosNComWrapper::getLrf(nrx); // returns quaternion
 
   Point::Cart p_enu;
   p_enu = NavConversions::GeodeticToEnu(nrx->mLat, 
                                         nrx->mLon, 
                                         nrx->mAlt,
-                                        lrf.lat, 
-                                        lrf.lon, 
-                                        lrf.alt);
+                                        lrf.lat(), 
+                                        lrf.lon(), 
+                                        lrf.alt());
 
-  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading);
+  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading());
 
   msg.pose.pose.position.x = p_lrf.x();
   msg.pose.pose.position.y = p_lrf.y();
   msg.pose.pose.position.z = p_lrf.z();
 
   // Orientation must be taken from NCom (NED - pseudo polar) and rotated into ENU - tangent
+  auto rpyBodENU = RosNComWrapper::getBodyRPY(nrx);
+  auto rpyBodLRF = tf2::Quaternion();
+  auto enu2lrf = tf2::Quaternion();
+  // NED to ENU rotation
+  enu2lrf.setRPY(0,0,lrf.heading());
+  // transform from ENU to LRF
+  rpyBodLRF = enu2lrf * rpyBodENU;
 
-  msg.pose.pose.orientation.x = 0;
-  msg.pose.pose.orientation.y = 0;
-  msg.pose.pose.orientation.z = 0;
-  msg.pose.pose.orientation.w = 1;
-
+  msg.pose.pose.orientation.x = rpyBodLRF.x();
+  msg.pose.pose.orientation.y = rpyBodLRF.y();
+  msg.pose.pose.orientation.z = rpyBodLRF.z();
+  msg.pose.pose.orientation.w = rpyBodLRF.w();
 
   // Covariance from NCom is in the NED local coordinate frame. This must be 
   // rotated into the LRF
 
   // rotation from the ENU frame defined by the LRF origin to the full LRF frame 
-  tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading);
+  tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading());
   // rotation from ECEF frame to the ENU frame defined by the LRF origin
-  tf2::Matrix3x3 r_ecef_enu = getRotEnuToEcef(lrf.lat, lrf.lon).transpose();
+  tf2::Matrix3x3 r_ecef_enu = getRotEnuToEcef(lrf.lat(), lrf.lon()).transpose();
   // rotation from ECEF frame to the ENU frame defined by the current position
   tf2::Matrix3x3 r_pos_ecef = getRotEnuToEcef(nrx->mLat, nrx->mLon);
 
@@ -392,12 +398,15 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   // Copy the position covariance data into the output message
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)
-      msg.pose.covariance[(3*i)+j] = tmp[i][j];
+      msg.pose.covariance[(6*i)+j] = tmp[i][j];
 
 
-  // twist with covariance =====================================================
+  // twist =====================================================================
 
+  auto twist_stamped = RosNComWrapper::velocity(nrx,head);
+  msg.twist.twist = twist_stamped.twist;
 
+  /** \todo Twist covariance */
 
   return msg;
 }

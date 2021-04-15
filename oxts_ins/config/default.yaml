@@ -17,7 +17,7 @@ oxts_ins:
     ### Configure sample rate of NCom (do not exceed output rate of ncom)
     ncom_rate               : 100
     ### Publish string message
-    pub_string_rate         : 1
+    pub_string_rate         : 0
     ### Publish NavSatFix message
     pub_nav_sat_fix_rate    : 5
     ### Publish Velocity message
@@ -36,6 +36,10 @@ oxts_ins:
     pub_imu_flag            : true
     ### Broadcast Tf messages for rviz visualisation
     pub_tf_flag             : true
+    ### Source of the local reference frame
+    #### 0 - NCom LRF
+    #### 1 - Set automatically from first NCom packet
+    lrf_source              : 1
 
 #===============================================================================
     ## Timing - how to timestamp messages published by the ROS driver

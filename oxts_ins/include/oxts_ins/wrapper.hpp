@@ -40,21 +40,7 @@
  */
 namespace RosNComWrapper
 {
-  struct Lrf
-  {
-    double lat;
-    double lon;
-    double alt;
-    double heading;
 
-    Lrf(double lat, double lon, double alt, double heading)
-    {
-      this->lat = lat;
-      this->lon = lon;
-      this->alt = alt;
-      this->heading = heading;
-    }
-  };
 
   /**
    * Calculate the rotational component of the transform from frame1 to frame2
@@ -85,6 +71,8 @@ namespace RosNComWrapper
    * @return A quaterntion representing the rotation between the vehicle frame and NED
    */
   tf2::Quaternion getVehRPY(const NComRxC *nrx);
+
+  Lrf getLrf(const NComRxC *nrx);
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.
@@ -174,7 +162,8 @@ namespace RosNComWrapper
    * @returns 
    */
   nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
-                                    std_msgs::msg::Header head);
+                                    std_msgs::msg::Header head,
+                                    Lrf lrf);
   /**
    * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
    * 

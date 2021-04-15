@@ -70,7 +70,41 @@ public:
 
 } // namespace Point
 
+class Lrf
+{
+private:
+  Point::Geodetic origin_;
+  double heading_;
+public:
+  Lrf() : 
+      origin_(0.0,0.0,0.0),
+      heading_(0.0)
+  { }
+  Lrf(double lat, double lon, double alt, double heading) : 
+      origin_(lat,lon,alt),
+      heading_(heading)
+  { }
 
+  Lrf(Point::Geodetic origin, double heading) : 
+      origin_(origin),
+      heading_(heading)
+  { }
+  
+  void origin(Point::Geodetic origin){ this->origin_ = origin; }
+  void origin(double lat, double lon, double alt)
+  {
+    this->origin_.lat(lat);
+    this->origin_.lon(lon);
+    this->origin_.alt(alt);
+  }
+  void heading(double heading){ this->heading_ = heading; }
+
+  Point::Geodetic origin(){ return this->origin_; }
+  double lat(){ return this->origin_.lat(); }
+  double lon(){ return this->origin_.lon(); }
+  double alt(){ return this->origin_.alt(); }
+  double heading(){ return this->heading_; }
+};
 
 /**
  * @namespace NavConversions
@@ -110,14 +144,14 @@ namespace NavConversions
    * East-North-Up coordinates in a Local Tangent Plane that is centered at the 
    * (WGS-84) Geodetic point (lat0, lon0, alt).
    */
-  Point::Cart EcefToEnu(Point::Cart p, double lat0, double lon0, double alt0);
+  Point::Cart EcefToEnu(double x, double y, double z,
+                        double lat0, double lon0, double alt
+                        );
   /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to 
    * East-North-Up coordinates in a Local Tangent Plane that is centered at the 
    * (WGS-84) Geodetic point (lat0, lon0, alt).
    */
-  Point::Cart EcefToEnu(double x, double y, double z,
-                        double lat0, double lon0, double alt
-                        );
+  Point::Cart EcefToEnu(Point::Cart p, double lat0, double lon0, double alt0);
   /** Inverse of EcefToEnu. Converts East-North-Up coordinates 
    * (xEast, yNorth, zUp) in a Local Tangent Plane that is centered at the 
    * (WGS-84) Geodetic point (lat0, lon0, alt0) to the 
