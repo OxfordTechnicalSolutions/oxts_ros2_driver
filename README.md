@@ -94,7 +94,8 @@ The driver has been developed on Ubuntu 20.04 using the Visual Studio Code IDE o
 
 In lieu of getting the colcon tasks package working, the following VS Code tasks.json file was used:
 
-`{
+```
+{
     "version": "2.0.0",
     "command": "bash",
     "args": [
@@ -117,7 +118,8 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
             "args":["source /opt/ros/foxy/setup.bash  && cd ~/code/ros2_ws/ && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash"],
         },
     ]
-}`
+}
+```
 
 This creates VS Code tasks for building a ROS2 / colcon workspace. Note that since this is for building a workspace, it should be at the workspace level, not at the package level. It's a bit hacky but it makes building easy. If anyone figures out the colcon tasks package that's probably the better approach.
 
