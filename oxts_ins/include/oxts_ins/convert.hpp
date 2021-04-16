@@ -60,7 +60,9 @@ enum LRF_SOURCE
   /** Use the LRF from NCom. */
   NCOM_LRF = 0,
   /** Use the position and heading of first NCom packet as LRF. */
-  NCOM_FIRST = 1
+  NCOM_FIRST = 1,
+  /** Use the position of first NCom packet as origin of LRF. Align to ENU */
+  NCOM_FIRST_ENU = 2
 };
 
 

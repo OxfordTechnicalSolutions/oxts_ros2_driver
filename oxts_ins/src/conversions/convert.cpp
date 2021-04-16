@@ -176,7 +176,15 @@ void OxtsIns::odometry()
   else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST)
   {
     this->lrf.origin(nrx->mLat,nrx->mLon,nrx->mAlt);
-    this->lrf.heading((90.0-nrx->mHeading) * NAV_CONST::DEG2RADS); // NED - ENU heading
+    // mHeading is in NED. Get angle between LRF and ENU
+    this->lrf.heading((90.0+nrx->mHeading) * NAV_CONST::DEG2RADS); 
+    this->lrf_valid = true;
+
+  }  
+  else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST_ENU)
+  {
+    this->lrf.origin(nrx->mLat,nrx->mLon,nrx->mAlt);
+    this->lrf.heading((0.0) * NAV_CONST::DEG2RADS); // LRF aligned to ENU
     this->lrf_valid = true;
   }  
 

@@ -70,7 +70,8 @@ Lrf getLrf(const NComRxC *nrx)
     nrx->mRefLat,
     nrx->mRefLon,
     nrx->mRefAlt,
-    (90.0-nrx->mRefHeading) * NAV_CONST::DEG2RADS // NED to ENU
+    // mRefHeading is in NED. Get angle between ENU and LRF
+    (90.0+nrx->mRefHeading) * NAV_CONST::DEG2RADS 
   );
 }
 
@@ -331,8 +332,8 @@ tf2::Matrix3x3 getRotEnuToEcef(double lat0, double lon0)
 
 tf2::Matrix3x3 getRotEnuToLrf(double theta)
 {
-  double s_theta = std::sin(90.0 - theta);
-  double c_theta = std::cos(90.0 - theta);
+  double s_theta = std::sin(theta);
+  double c_theta = std::cos(theta);
 
   return tf2::Matrix3x3(
                         c_theta, -s_theta, 0,
@@ -370,8 +371,8 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   auto rpyBodENU = RosNComWrapper::getBodyRPY(nrx);
   auto rpyBodLRF = tf2::Quaternion();
   auto enu2lrf = tf2::Quaternion();
-  // NED to ENU rotation
-  enu2lrf.setRPY(0,0,lrf.heading());
+  // ENU to LRF rotation
+  enu2lrf.setRPY(0,0,-lrf.heading());
   // transform from ENU to LRF
   rpyBodLRF = enu2lrf * rpyBodENU;
 
