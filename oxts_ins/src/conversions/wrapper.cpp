@@ -372,7 +372,7 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   auto rpyBodLRF = tf2::Quaternion();
   auto enu2lrf = tf2::Quaternion();
   // ENU to LRF rotation
-  enu2lrf.setRPY(0,0,-lrf.heading());
+  enu2lrf.setRPY(0,0,lrf.heading());
   // transform from ENU to LRF
   rpyBodLRF = enu2lrf * rpyBodENU;
 
