@@ -209,11 +209,9 @@ Point::Cart NavConversions::EnuToLrf(double xEast, double yNorth, double zUp,
                                      double ref_heading)
 {
   Point::Cart p_lrf;
-  // theta is the ref_heading angle in the enu frame
-  double theta = (-ref_heading) * NAV_CONST::DEG2RADS;
-
-  p_lrf.x(xEast * std::cos(theta) - yNorth * std::sin(theta));
-  p_lrf.y(xEast * std::sin(theta) + yNorth * std::cos(theta));
+  // ref_heading is the angle from the enu frame to the LRF
+  p_lrf.x(xEast * std::cos(ref_heading) - yNorth * std::sin(ref_heading));
+  p_lrf.y(xEast * std::sin(ref_heading) + yNorth * std::cos(ref_heading));
   p_lrf.z(zUp);
 
   return p_lrf;

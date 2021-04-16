@@ -70,7 +70,7 @@ Lrf getLrf(const NComRxC *nrx)
     nrx->mRefLat,
     nrx->mRefLon,
     nrx->mRefAlt,
-    -nrx->mRefHeading // NED to ENU
+    (90.0-nrx->mRefHeading) * NAV_CONST::DEG2RADS // NED to ENU
   );
 }
 
@@ -331,8 +331,8 @@ tf2::Matrix3x3 getRotEnuToEcef(double lat0, double lon0)
 
 tf2::Matrix3x3 getRotEnuToLrf(double theta)
 {
-  double s_theta = std::sin(90 - theta);
-  double c_theta = std::cos(90 - theta);
+  double s_theta = std::sin(90.0 - theta);
+  double c_theta = std::cos(90.0 - theta);
 
   return tf2::Matrix3x3(
                         c_theta, -s_theta, 0,
