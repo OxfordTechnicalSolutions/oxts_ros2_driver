@@ -46,6 +46,7 @@ or, to replay from an ncom file:
     ros2 launch oxts launch.py ncom:=<absolute_path_to_ncom>
 ```
 
+To view the Odometry and Tf data from the INS, use the additional command line option `use_rviz:=true`. This requires RViz to be installed. 
 
 ## Output ROS messages
 
@@ -61,6 +62,12 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame.
+* **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Odometry.msg)
+    Odometry data from the INS. 
+    - Position: In a local reference frame defined either by the LRF in NCom, or created from the first NCom packet. 
+    - Orientation: Rotation of the INS relative to the alignment of the LRF
+    - Linear Velocity: _Future_
+    - Angular Velocity: _Future_ 
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
 
 \* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet
@@ -94,8 +101,7 @@ The driver has been developed on Ubuntu 20.04 using the Visual Studio Code IDE o
 
 In lieu of getting the colcon tasks package working, the following VS Code tasks.json file was used:
 
-```
-{
+`{
     "version": "2.0.0",
     "command": "bash",
     "args": [
@@ -118,8 +124,7 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
             "args":["source /opt/ros/foxy/setup.bash  && cd ~/code/ros2_ws/ && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash"],
         },
     ]
-}
-```
+}`
 
 This creates VS Code tasks for building a ROS2 / colcon workspace. Note that since this is for building a workspace, it should be at the workspace level, not at the package level. It's a bit hacky but it makes building easy. If anyone figures out the colcon tasks package that's probably the better approach.
 
