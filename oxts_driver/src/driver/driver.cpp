@@ -41,6 +41,10 @@ void OxtsDriver::publish_packet()
   auto msg = oxts_msgs::msg::Ncom();
   if (this->prevWeekSecond > 0 && this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
     RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
+  if (this->prevWeekSecond > 0 && this->nrx->mTimeWeekSecond == this->prevWeekSecond) {
+    RCLCPP_WARN(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
+    return;
+  }
   msg.header.stamp = this->get_clock()->now();
   msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
   for (int i=0; i < NCOM_PACKET_LENGTH ;++i)
