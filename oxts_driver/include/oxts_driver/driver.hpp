@@ -71,7 +71,7 @@ private:
   int timestamp_mode;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
-  double prevWeekSecond;
+  double prevRegularWeekSecond;
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
 
@@ -110,7 +110,7 @@ public:
     timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
 
     ncomInterval            = std::chrono::milliseconds(int(1000.0 / ncom_rate));
-    prevWeekSecond          = -1;
+    prevRegularWeekSecond          = -1;
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
@@ -202,6 +202,7 @@ public:
 
   std::fstream inFileNCom;
 
+  bool check_rate(double prevPktSec, double currPktSec);
   rclcpp::Time get_timestamp();
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
@@ -209,7 +210,7 @@ public:
    * 
    * @param nrx Pointer to the decoded NCom data
    */
-  rclcpp::Time ncomTime(const NComRxC *nrx);
+  rclcpp::Time get_ncom_time(const NComRxC *nrx);
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    * 

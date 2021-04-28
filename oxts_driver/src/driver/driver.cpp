@@ -38,29 +38,48 @@ void OxtsDriver::get_socket_packet()
 
 void OxtsDriver::publish_packet()
 {
-  auto msg = oxts_msgs::msg::Ncom();
+  // publish the NCOM packet
+  switch (this->nrx->mOutputPacketType)
+    {
+      case OUTPUT_PACKET_REGULAR:
+      {
+        if (this->check_rate(this->prevRegularWeekSecond, this->nrx->mTimeWeekSecond)) return;
+
+        auto msg = oxts_msgs::msg::Ncom();
+        msg.header.stamp = this->get_timestamp();
+        msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
+        for (int i=0; i < NCOM_PACKET_LENGTH ;++i)
+          msg.raw_packet[i] = this->nrx->mInternal->mCurPkt[i];
+        this->pubNCom_->publish(msg);
+        this->prevRegularWeekSecond = this->nrx->mTimeWeekSecond;
+        break;
+      }
+      case OUTPUT_PACKET_STATUS:
+      {
+        break;
+      }
+      default : break;
+    };
+}
+
+bool OxtsDriver::check_rate(double prevPktSec, double currPktSec)
+{
   // perform error checking on nrx timestamps
-  if (this->prevWeekSecond > 0) {
-    if (this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
+  if (prevPktSec > 0) {
+    if (currPktSec - prevPktSec > (1.5/this->ncom_rate))
       RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
-    if (this->nrx->mTimeWeekSecond < this->prevWeekSecond) {
+    if (currPktSec < prevPktSec) {
       RCLCPP_ERROR(this->get_logger(), "Current packet is older than previous packet, skipping packet.");
-      return;
+      return true;
     }
-    if (this->nrx->mTimeWeekSecond == this->prevWeekSecond) {
+    if (currPktSec == prevPktSec) {
       RCLCPP_ERROR(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
-      return;
+      return true;
     }
-    if (this->nrx->mTimeWeekSecond - this->prevWeekSecond < (0.5/this->ncom_rate))
+    if (currPktSec - prevPktSec < (0.5/this->ncom_rate))
       RCLCPP_WARN(this->get_logger(), "Early packet detected, ncom_rate may be misconfigured.");
   }
-  // publish the NCOM packet
-  msg.header.stamp = this->get_timestamp();
-  msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
-  for (int i=0; i < NCOM_PACKET_LENGTH ;++i)
-    msg.raw_packet[i] = this->nrx->mInternal->mCurPkt[i];
-  this->pubNCom_->publish(msg);
-  this->prevWeekSecond = this->nrx->mTimeWeekSecond;
+  return false;
 }
 
 rclcpp::Time OxtsDriver::get_timestamp()
@@ -68,10 +87,10 @@ rclcpp::Time OxtsDriver::get_timestamp()
   if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
     return this->get_clock()->now();
   else
-    return this->ncomTime(this->nrx);
+    return this->get_ncom_time(this->nrx);
 }
 
-rclcpp::Time OxtsDriver::ncomTime(const NComRxC *nrx)
+rclcpp::Time OxtsDriver::get_ncom_time(const NComRxC *nrx)
 {
   auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
                            (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 

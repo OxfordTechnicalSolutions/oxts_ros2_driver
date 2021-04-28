@@ -118,7 +118,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
   rclcpp::TimerBase::SharedPtr timer_nav_sat_ref_;
 
-  void NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg);
+  void NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg);
   /** Callback function for debug String message. Wraps message, publishes, and
    *  prints some information to the console.*/
   void string();
@@ -237,9 +237,9 @@ public:
                                                    ("ins/ecef_pos",         10);
     pubNavSatRef_     = this->create_publisher<oxts_msgs::msg::NavSatRef>
                                                    ("ins/nav_sat_ref",      10);
-    // Initialise subscriber for ncom message
+    // Initialise subscriber for regular ncom packet message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
-                      ("ncom",10,std::bind(&OxtsIns::NCom_callback,this,_1));
+                      ("ncom",10,std::bind(&OxtsIns::NCom_callback_regular,this,_1));
 
     nrx = NComCreateNComRxC();
 
