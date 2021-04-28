@@ -21,6 +21,7 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/point.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -39,6 +40,8 @@
  */
 namespace RosNComWrapper
 {
+
+
   /**
    * Calculate the rotational component of the transform from frame1 to frame2
    * based on Euler angles
@@ -55,29 +58,23 @@ namespace RosNComWrapper
    */
   tf2::Vector3 getNsp(const NComRxC *nrx);
   /**
+   * Get the NCOM orientation in body (IMU) frame
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @return A quaterntion representing the rotation between the vehicle frame and NED
+   */
+  tf2::Quaternion getBodyRPY(const NComRxC *nrx);
+  /**
    * Get the NCOM orientation in vehicle frame
    * 
    * @param nrx Pointer to the decoded NCom data
    * @return A quaterntion representing the rotation between the vehicle frame and NED
    */
-  tf2::Quaternion getRPY(const NComRxC *nrx);
+  tf2::Quaternion getVehRPY(const NComRxC *nrx);
   /**
-   * Convert NCom time to a ROS friendly time format. Does not convert to ROS
-   * time, only the format.
-   * 
-   * @param nrx Pointer to the decoded NCom data
+   * Get the LRF from the NCOM decoder
    */
-  rclcpp::Time       ncomTime(const NComRxC *nrx);
-  /**
-   * Wrap data into ROS header format.
-   * 
-   * Does not strictly belong here since it is not encoding NCom data. Move when
-   * appropriate alternative location makes itself known.
-   * 
-   * @param time Timestamp to be added to the packet
-   * @param frame frame_id of the message
-   */
-  std_msgs::msg::Header header(rclcpp::Time time, std::string frame);
+  Lrf getNcomLrf(const NComRxC *nrx);
   /** 
    * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
    * 
@@ -142,6 +139,16 @@ namespace RosNComWrapper
    */
   geometry_msgs::msg::TwistStamped   velocity (const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
+  /**
+   * Wrap navigation data from NCom decoder to nav_msgs/msg/Odometry
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
+   * @returns 
+   */
+  nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
+                                    std_msgs::msg::Header head,
+                                    Lrf lrf);
   /**
    * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
    * 

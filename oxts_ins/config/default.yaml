@@ -16,26 +16,28 @@ oxts_ins:
     ## Rates are in Hz. 0 Hz => Message will not be published
     ### Configure sample rate of NCom (do not exceed output rate of ncom)
     ncom_rate               : 100
-    ### Publish ROS string message
-    pub_string_rate         : 1
-    ### Publish ROS NavSatFix message
+    ### Publish string message
+    pub_string_rate         : 0
+    ### Publish NavSatFix message
     pub_nav_sat_fix_rate    : 5
-    ### Publish ROS Velocity message
+    ### Publish Velocity message
     pub_velocity_rate       : 10
-    ### Publish ROS TimeReference message
+    ### Publish Odometry message
+    pub_odometry_rate       : 10
+    ### Defaults to "map", can be set to "odom" when emulating navsat_transform_node
+    pub_odometry_frame_id   : "map"
+    ### Publish TimeReference message
     pub_time_reference_rate : 1
-    ### Publish ROS PoseWithCovarianceStamped message
+    ### Publish PoseWithCovarianceStamped message
     pub_ecef_pos_rate       : 10
     ### Publish OxTS NavSatRef message
     pub_nav_sat_ref_rate    : 10
-    ### Publish ROS Imu message
+    ### Publish Imu message
     pub_imu_flag            : true
     ### Broadcast Tf messages for rviz visualisation
     pub_tf_flag             : true
-
-#===============================================================================
-    ## Timing - how to timestamp messages published by the ROS driver
-
-    # 0 => Timestamped by the ROS node time (future default)
-    # 1 => Timestamped from NCom
-    timestamp_mode : 1
+    ### Source of the local reference frame
+    #### 0 - NCom LRF
+    #### 1 - Set automatically from first NCom packet
+    #### 2 - Set automatically from first position of NCom packet aligned to ENU
+    lrf_source              : 2

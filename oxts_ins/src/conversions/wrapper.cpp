@@ -24,44 +24,57 @@ tf2::Vector3 getNsp(const NComRxC *nrx)
     nrx->mNoSlipLeverArmZ);
 }
 
-tf2::Quaternion getRPY(const NComRxC *nrx)
+// tf2::Vector3 getNvsp(const NComRxC *nrx)
+// {
+//   // Translation of rear axle in imu frame
+//   return tf2::Vector3(
+//     nrx->mNoSlipLeverArmX,
+//     nrx->mNoSlipLeverArmY,
+//     nrx->mNoSlipLeverArmZ);
+// }
+
+tf2::Quaternion getVehRPY(const NComRxC *nrx)
 {
-  auto rpyNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
-  auto rpyENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
+  auto rpyVehNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
+  auto rpyVehENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
   auto ned2enu = tf2::Quaternion(); // NED to ENU rotation
 
-  rpyNED.setRPY(
+  rpyVehNED.setRPY(
     NAV_CONST::DEG2RADS * nrx->mRoll,
     NAV_CONST::DEG2RADS * nrx->mPitch,
     NAV_CONST::DEG2RADS * nrx->mHeading
   );
+  // NED to ENU rotation
   ned2enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,90.0*NAV_CONST::DEG2RADS);
-  rpyENU = ned2enu * rpyNED;
-  return rpyENU;
+  // transform from NED to ENU
+  rpyVehENU = ned2enu * rpyVehNED;
+  return rpyVehENU;
 }
 
-
-rclcpp::Time      ncomTime(const NComRxC *nrx)
+tf2::Quaternion getBodyRPY(const NComRxC *nrx)
 {
-  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
-                           (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 
-                           nrx->mTimeUtcOffset + NAV_CONST::GPS2UNIX_EPOCH,
-  static_cast<uint32_t>((nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
-    * NAV_CONST::SECS2NANOSECS ));
+  auto rpyVehENU = RosNComWrapper::getVehRPY(nrx); // Orientation of the vehicle (ENU frame)
+  auto rpyBodENU = tf2::Quaternion();              // Orientation of the body (ENU frame)
+  auto vat = RosNComWrapper::getVat(nrx);          // Body to vehicle frame rotation
 
-  return time;
+  // transform from vehicle to body
+  rpyBodENU = rpyVehENU * vat.inverse(); // vehicle to body
+  return rpyBodENU;
 }
 
-std_msgs::msg::Header       header(rclcpp::Time time,
-                                                        std::string frame)
+
+Lrf getNcomLrf(const NComRxC *nrx)
 {
-  auto header = std_msgs::msg::Header();
-
-  header.stamp = time;
-  header.frame_id = frame; 
-
-  return header;
+  // Origin to use for map frame
+  return Lrf(
+    nrx->mRefLat,
+    nrx->mRefLon,
+    nrx->mRefAlt,
+    // mRefHeading is in NED. Get angle between ENU and LRF
+    (90.0+nrx->mRefHeading) * NAV_CONST::DEG2RADS 
+  );
 }
+
 
 sensor_msgs::msg::NavSatStatus nav_sat_status(
                                                     const NComRxC *nrx)
@@ -154,11 +167,12 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
                             std_msgs::msg::Header head)
 {
   auto msg = oxts_msgs::msg::NavSatRef();
+  auto lrf = getNcomLrf(nrx);
   msg.header = head;
-  msg.latitude  = nrx->mRefLat;
-  msg.longitude = nrx->mRefLon;
-  msg.altitude  = nrx->mRefAlt;
-  msg.heading  = 90 - nrx->mRefHeading; // NED to ENU
+  msg.latitude  = lrf.lat();
+  msg.longitude = lrf.lon();
+  msg.altitude  = lrf.alt();
+  msg.heading   = lrf.heading();
   return msg;
 }
 
@@ -171,10 +185,10 @@ geometry_msgs::msg::PointStamped ecef_pos
   auto msg = geometry_msgs::msg::PointStamped();
   msg.header = head;
 
-  std::vector<double> ecef = NavConversions::lla_to_ecef(nrx->mLat, nrx->mLon, nrx->mAlt);
-  msg.point.x    = ecef[0]; 
-  msg.point.y    = ecef[1];
-  msg.point.z    = ecef[2];
+  Point::Cart ecef = NavConversions::GeodeticToEcef(nrx->mLat, nrx->mLon, nrx->mAlt);
+  msg.point.x    = ecef.x(); 
+  msg.point.y    = ecef.y();
+  msg.point.z    = ecef.z();
 
   return msg;
 }
@@ -200,7 +214,6 @@ sensor_msgs::msg::Imu imu (
   msg.header = head;
 
   auto q_vat = tf2::Quaternion(); // Quaternion representation of the vehicle-imu alignment
-  auto veh_o = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
   auto imu_o = tf2::Quaternion(); // Orientation of the IMU (ENU frame)
   auto veh_w = tf2::Vector3();    // Angular rate in vehicle frame (rads)
   auto imu_w = tf2::Vector3();    // Angular rate in imu frame (rads)
@@ -209,10 +222,9 @@ sensor_msgs::msg::Imu imu (
 
   // Construct vehicle-imu frame transformation --------------------------------
   q_vat = getVat(nrx);
-  // Get vehicle orientation from HPR ------------------------------------------
-  veh_o = getRPY(nrx); // ENU frame
-  // Find imu orientation
-  imu_o = veh_o * q_vat.inverse(); // vehicle to body
+
+  // Get imu orientation from NCOM packet -------------------------------------
+  imu_o = getBodyRPY(nrx); // ENU frame
   tf2::convert(imu_o, msg.orientation);
 
   // Covariance = 0 => unknown. -1 => invalid
@@ -273,6 +285,116 @@ geometry_msgs::msg::TwistStamped   velocity   (
   msg.twist.angular.x = imu_w.getX();
   msg.twist.angular.y = imu_w.getY();
   msg.twist.angular.z = imu_w.getZ();
+
+  return msg;
+}
+
+tf2::Matrix3x3 getRotEnuToEcef(double lat0, double lon0)
+{
+  double lambda = (lon0) * NAV_CONST::DEG2RADS;
+  double phi    = (lat0) * NAV_CONST::DEG2RADS;
+
+  double s_phi = std::sin(phi);
+  double c_phi = std::cos(phi);
+  double s_lambda = std::sin(lambda);
+  double c_lambda = std::cos(lambda);
+
+  auto r = tf2::Matrix3x3(
+                            -s_lambda, -c_lambda * s_phi, c_lambda * c_phi,
+                             c_lambda, -s_lambda * s_phi, s_lambda * c_phi,
+                                    0,             c_phi,            s_phi
+                            );
+
+  return r;
+}
+
+tf2::Matrix3x3 getRotEnuToLrf(double theta)
+{
+  double s_theta = std::sin(theta);
+  double c_theta = std::cos(theta);
+
+  return tf2::Matrix3x3(
+                        c_theta, -s_theta, 0,
+                        s_theta,  c_theta, 0,
+                              0,        0, 1
+                        );
+
+}
+
+
+nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
+                                  std_msgs::msg::Header head,
+                                  Lrf lrf)
+{
+  auto msg = nav_msgs::msg::Odometry();
+  msg.header = head;
+  msg.child_frame_id = "oxts_link";
+  // pose with covariance ======================================================
+
+  Point::Cart p_enu;
+  p_enu = NavConversions::GeodeticToEnu(nrx->mLat, 
+                                        nrx->mLon, 
+                                        nrx->mAlt,
+                                        lrf.lat(), 
+                                        lrf.lon(), 
+                                        lrf.alt());
+
+  Point::Cart p_lrf = NavConversions::EnuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading());
+
+  msg.pose.pose.position.x = p_lrf.x();
+  msg.pose.pose.position.y = p_lrf.y();
+  msg.pose.pose.position.z = p_lrf.z();
+
+  // Orientation must be taken from NCom (NED - pseudo polar) and rotated into ENU - tangent
+  auto rpyBodENU = RosNComWrapper::getBodyRPY(nrx);
+  auto rpyBodLRF = tf2::Quaternion();
+  auto enu2lrf = tf2::Quaternion();
+  // ENU to LRF rotation
+  enu2lrf.setRPY(0,0,lrf.heading());
+  // transform from ENU to LRF
+  rpyBodLRF = enu2lrf * rpyBodENU;
+
+  msg.pose.pose.orientation.x = rpyBodLRF.x();
+  msg.pose.pose.orientation.y = rpyBodLRF.y();
+  msg.pose.pose.orientation.z = rpyBodLRF.z();
+  msg.pose.pose.orientation.w = rpyBodLRF.w();
+
+  // Covariance from NCom is in the NED local coordinate frame. This must be 
+  // rotated into the LRF
+
+  // rotation from the ENU frame defined by the LRF origin to the full LRF frame 
+  tf2::Matrix3x3 r_enu_lrf  = getRotEnuToLrf(lrf.heading());
+  // rotation from ECEF frame to the ENU frame defined by the LRF origin
+  tf2::Matrix3x3 r_ecef_enu = getRotEnuToEcef(lrf.lat(), lrf.lon()).transpose();
+  // rotation from ECEF frame to the ENU frame defined by the current position
+  tf2::Matrix3x3 r_pos_ecef = getRotEnuToEcef(nrx->mLat, nrx->mLon);
+
+  auto diff = tf2::Matrix3x3(r_enu_lrf);
+  diff *= r_ecef_enu;
+  diff *= r_pos_ecef;
+
+  auto tmp = tf2::Matrix3x3(diff);
+  auto cov = tf2::Matrix3x3 (
+                              nrx->mEastAcc,             0.0,         0.0,
+                              0.0,            nrx->mNorthAcc,         0.0,
+                              0.0,                       0.0, nrx->mAltAcc
+                            );
+  // cov_b = R * cov_a * R^T
+  tmp *= cov;
+  tmp *= diff.transpose();
+
+  // Copy the position covariance data into the output message
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      msg.pose.covariance[(6*i)+j] = tmp[i][j];
+
+
+  // twist =====================================================================
+
+  auto twist_stamped = RosNComWrapper::velocity(nrx,head);
+  msg.twist.twist = twist_stamped.twist;
+
+  /** \todo Twist covariance */
 
   return msg;
 }

@@ -31,6 +31,16 @@ namespace oxts_driver
 {
 
 /**
+ * Enumeration of timestamp modes for published topics
+ */
+enum PUB_TIMESTAMP_MODE
+{
+  /** Use ROS time. */
+  ROS = 0,
+  /** Use NCom time. */
+  NCOM = 1
+};
+/**
  * This class creates a subclass of Node designed to take NCom data from the 
  * NCom decoder and publish it to pre-configured ROS topics.
  * 
@@ -52,12 +62,16 @@ private:
   std::string ncom_path;
   /*! Function pointer to the necesary NCom file/socket callback */
   void (oxts_driver::OxtsDriver::*timer_ncom_callback)();
+  /*! Function pointer to the necesary NCom updater */
+  void (oxts_driver::OxtsDriver::*update_ncom)();
   /*! Whether ot not to wait for NCom initialisation before publishing messages. */
   bool wait_for_init;
-  /*! Publishing rate for debug String message. */
+  /*! Timestamp type to be applied to published packets
+    {0 : ROS time, 1 : NCom time} */
+  int timestamp_mode;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
-  double prevWeekSecond;
+  double prevRegularWeekSecond;
 
   rclcpp::TimerBase::SharedPtr timer_ncom_;
 
@@ -69,6 +83,9 @@ private:
    */
   void timer_ncom_socket_callback();
   void timer_ncom_file_callback();
+  void get_file_packet();
+  void get_socket_packet();
+  void publish_packet();
 
   /**
    * Publisher for std_msgs/msg/string. Only used for debugging, currently 
@@ -90,9 +107,10 @@ public:
     unit_port               = this->declare_parameter("unit_port", 3000);
     ncom_path               = this->declare_parameter("ncom", std::string(""));
     wait_for_init           = this->declare_parameter("wait_for_init", true);
+    timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
 
     ncomInterval            = std::chrono::milliseconds(int(1000.0 / ncom_rate));
-    prevWeekSecond          = -1;
+    prevRegularWeekSecond          = -1;
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
@@ -126,19 +144,19 @@ public:
     if (!ncom_path.empty())
     {
       timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
+      update_ncom = &OxtsDriver::get_file_packet;
     }
     else 
     {
       timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
+      update_ncom = &OxtsDriver::get_socket_packet;
     }
-    timer_ncom_ = this->create_wall_timer(
-                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     // Wait for config to be populated in NCOM packets
     RCLCPP_INFO(this->get_logger(), "Waiting for INS config information...");
     while (nrx->mSerialNumber == 0 || nrx->mIsImu2VehHeadingValid == 0)
     {
-      (*this.*timer_ncom_callback)();
+      (*this.*update_ncom)();
     }
     RCLCPP_INFO(this->get_logger(), "INS config information received");
 
@@ -146,9 +164,18 @@ public:
     if (wait_for_init)
     {
       RCLCPP_INFO(this->get_logger(), "Waiting for initialisation...");
-      while (nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME)
+      // Only block things that are required for 100% of OxTS navigation
+      while (
+        nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME &&
+        nrx->mIsLatValid == 0 &&
+        nrx->mIsLonValid == 0 &&
+        nrx->mIsAltValid == 0 &&
+        nrx->mIsHeadingValid == 0 &&
+        nrx->mIsPitchValid == 0 &&
+        nrx->mIsRollValid == 0
+      )
       {
-        (*this.*timer_ncom_callback)();
+        (*this.*update_ncom)();
       }
       RCLCPP_INFO(this->get_logger(), "INS initialised");
     }
@@ -156,6 +183,9 @@ public:
     {
       RCLCPP_INFO(this->get_logger(), "Publishing before INS initialisation");
     }
+
+    timer_ncom_ = this->create_wall_timer(
+                  ncomInterval, std::bind(timer_ncom_callback, this));
 
     RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %iHz", ncom_rate);
 
@@ -172,7 +202,15 @@ public:
 
   std::fstream inFileNCom;
 
+  bool check_rate(double prevPktSec, double currPktSec);
   rclcpp::Time get_timestamp();
+  /**
+   * Convert NCom time to a ROS friendly time format. Does not convert to ROS
+   * time, only the format.
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   */
+  rclcpp::Time get_ncom_time(const NComRxC *nrx);
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    * 

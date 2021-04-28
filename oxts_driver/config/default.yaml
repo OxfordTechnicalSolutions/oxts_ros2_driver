@@ -11,3 +11,10 @@ oxts_driver:
     ## Rate is in Hz. 0 Hz => Message will not be published
     ### Configure sample rate of NCom (do not exceed output rate of ncom)
     ncom_rate               : 100
+
+#===============================================================================
+    ## Timing - how to timestamp messages published by the ROS driver
+
+    # 0 => Timestamped by the ROS node time (future default)
+    # 1 => Timestamped from NCom
+    timestamp_mode : 1
