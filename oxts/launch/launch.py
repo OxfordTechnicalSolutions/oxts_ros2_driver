@@ -17,16 +17,19 @@ def generate_launch_description():
     # get current path and go one level up
     driver_dir = get_package_share_directory('oxts_driver')
     ins_dir = get_package_share_directory('oxts_ins')
+    rviz_path = os.path.join(ins_dir, 'rviz', 'display.rviz')
 
     driver_param_path = os.path.join(driver_dir, 'config', parameters_file_name)
     with open(driver_param_path, 'r') as f:
         driver_params = yaml.safe_load(f)['oxts_driver']['ros__parameters']
 
     ins_param_path = os.path.join(ins_dir, 'config', parameters_file_name)
-    urdf_path = os.path.join(ins_dir, 'urdf', urdf_file_name)
-    rviz_path = os.path.join(ins_dir, 'rviz', 'display.rviz')
     with open(ins_param_path, 'r') as f:
         ins_params = yaml.safe_load(f)['oxts_ins']['ros__parameters']
+
+    urdf_path = os.path.join(ins_dir, 'urdf', urdf_file_name)
+    with open(urdf_path, 'r') as f:
+        robot_desc = f.read()
 
     use_sim_time = LaunchConfiguration('use_tim_time', default='false')
     use_rviz = LaunchConfiguration('use_rviz')
@@ -74,7 +77,10 @@ def generate_launch_description():
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'robot_description': robot_desc,
+            }],
         arguments=[urdf_path])
 
     rviz_cmd = Node(
