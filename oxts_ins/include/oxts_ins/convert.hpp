@@ -136,23 +136,23 @@ private:
    *  prints some information to the console.*/
   void string();
   /** Callback function for NavSatFix message. Wraps message and publishes. */
-  void nav_sat_fix();
+  void nav_sat_fix(std_msgs::msg::Header header);
   /** Callback function for Imu message. Wraps message and publishes. */
-  void imu();
+  void imu(std_msgs::msg::Header header);
   /** Callback function for Tf messages. Wraps messages and broadcasts. */
-  void tf();
+  void tf(std_msgs::msg::Header header);
   /** Callback function for TimeReference message. Wraps message and publishes. */
-  void time_reference();
+  void time_reference(std_msgs::msg::Header header);
   /** Callback function for Velocity message. Wraps message and publishes. */
-  void velocity();
+  void velocity(std_msgs::msg::Header header);
   /** Callback function for Odometry message. Wraps message and publishes. */
-  void odometry();
+  void odometry(std_msgs::msg::Header header);
   /** Callback function for PointStamped message. Wraps message and 
    *  publishes.*/
-  void ecef_pos();
+  void ecef_pos(std_msgs::msg::Header header);
   /** Callback function for OxTS NavSatRef message. Wraps message and 
    *  publishes.*/
-  void nav_sat_ref();
+  void nav_sat_ref(std_msgs::msg::Header header);
 
 
   /**  Subscriber for oxts_msgs/msg/NCom. */

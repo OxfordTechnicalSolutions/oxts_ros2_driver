@@ -16,25 +16,28 @@ void OxtsIns::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
     {
       case OUTPUT_PACKET_REGULAR:
       {
+        // create header once per NCOM packet
+        std_msgs::msg::Header header;
+        header = RosNComWrapper::header(this->get_timestamp(), "");
         // Publish IMU message if being subscribed to and enabled in config
         if (this->pub_imu_flag) 
-          this->imu();
+          this->imu(header);
         if (this->pub_tf_flag)
-          this->tf();
+          this->tf(header);
         if (this->pubStringInterval && (sec_idx % this->pubStringInterval == 0))
           this->string();
         if (this->pubNavSatRefInterval && (sec_idx % this->pubNavSatRefInterval == 0))
-          this->nav_sat_ref();
+          this->nav_sat_ref(header);
         if (this->pubEcefPosInterval && (sec_idx % this->pubEcefPosInterval == 0))
-          this->ecef_pos();
+          this->ecef_pos(header);
         if (this->pubNavSatFixInterval && (sec_idx % this->pubNavSatFixInterval == 0))
-          this->nav_sat_fix();
+          this->nav_sat_fix(header);
         if (this->pubVelocityInterval && (sec_idx % this->pubVelocityInterval == 0))
-          this->velocity();
+          this->velocity(header);
         if (this->pubOdometryInterval && (sec_idx % this->pubOdometryInterval == 0))
-          this->odometry();
+          this->odometry(header);
         if (this->pubTimeReferenceInterval && (sec_idx % this->pubTimeReferenceInterval == 0))
-          this->time_reference();
+          this->time_reference(header);
         break;
       }
       case OUTPUT_PACKET_STATUS:
@@ -56,42 +59,35 @@ void OxtsIns::string()
                                   msgString.data.c_str());
 }
 
-void OxtsIns::nav_sat_fix()
+void OxtsIns::nav_sat_fix(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+  header.frame_id = "navsat_link";
   auto msg    = RosNComWrapper::nav_sat_fix(this->nrx, header);
   pubNavSatFix_->publish(msg);
 }
 
-void OxtsIns::nav_sat_ref()
+void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "navsat_link");
+  header.frame_id = "navsat_link";
   auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
   pubNavSatRef_->publish(msg);
 }
-void OxtsIns::ecef_pos()
+void OxtsIns::ecef_pos(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+  header.frame_id = "oxts_link";
   auto msg    = RosNComWrapper::ecef_pos(this->nrx, header);
   pubEcefPos_->publish(msg);
 }
 
-void OxtsIns::imu()
+void OxtsIns::imu(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
+  header.frame_id = "imu_link";
   auto msg    = RosNComWrapper::imu(this->nrx, header);
   pubImu_->publish(msg);
 }
 
-void OxtsIns::tf()
+void OxtsIns::tf(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "imu_link");
-
   auto odometry = RosNComWrapper::odometry(this->nrx, header, this->lrf);
   geometry_msgs::msg::TransformStamped tf_oxts;
   tf_oxts.header = header;
@@ -149,19 +145,16 @@ void OxtsIns::tf()
   
 }
 
-void OxtsIns::velocity()
+void OxtsIns::velocity(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+  header.frame_id = "oxts_link";
   auto msg    = RosNComWrapper::velocity(this->nrx, header);
   pubVelocity_->publish(msg);
 }
 
-void OxtsIns::odometry()
+void OxtsIns::odometry(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), 
-                                  this->pub_odometry_frame_id);
+  header.frame_id = this->pub_odometry_frame_id;
   // Set the LRF if - we haven't set it before, it is configured to come from 
   // NCom LRF, and the NCom LRF is valid.
   if(!this->lrf_valid && 
@@ -195,10 +188,9 @@ void OxtsIns::odometry()
   }
 }
 
-void OxtsIns::time_reference()
+void OxtsIns::time_reference(std_msgs::msg::Header header)
 {
-  std_msgs::msg::Header header;
-  header = RosNComWrapper::header(this->get_timestamp(), "oxts_link");
+  header.frame_id = "oxts_link";
   auto msg    = RosNComWrapper::time_reference(this->nrx, header);
   pubTimeReference_->publish(msg);
 }
