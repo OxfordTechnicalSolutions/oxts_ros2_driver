@@ -71,8 +71,10 @@ namespace RosNComWrapper
    * @return A quaterntion representing the rotation between the vehicle frame and NED
    */
   tf2::Quaternion getVehRPY(const NComRxC *nrx);
-
-  Lrf getLrf(const NComRxC *nrx);
+  /**
+   * Get the LRF from the NCOM decoder
+   */
+  Lrf getNcomLrf(const NComRxC *nrx);
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.

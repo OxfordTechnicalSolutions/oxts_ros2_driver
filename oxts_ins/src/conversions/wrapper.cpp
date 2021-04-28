@@ -63,7 +63,7 @@ tf2::Quaternion getBodyRPY(const NComRxC *nrx)
 }
 
 
-Lrf getLrf(const NComRxC *nrx)
+Lrf getNcomLrf(const NComRxC *nrx)
 {
   // Origin to use for map frame
   return Lrf(
@@ -189,7 +189,7 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
                             std_msgs::msg::Header head)
 {
   auto msg = oxts_msgs::msg::NavSatRef();
-  auto lrf = getLrf(nrx);
+  auto lrf = getNcomLrf(nrx);
   msg.header = head;
   msg.latitude  = lrf.lat();
   msg.longitude = lrf.lon();

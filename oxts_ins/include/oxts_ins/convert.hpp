@@ -153,7 +153,8 @@ private:
   /** Callback function for OxTS NavSatRef message. Wraps message and 
    *  publishes.*/
   void nav_sat_ref(std_msgs::msg::Header header);
-
+  /** Get the LRF from configured source */
+  void getLrf();
 
   /**  Subscriber for oxts_msgs/msg/NCom. */
   rclcpp::Subscription<oxts_msgs::msg::Ncom>::SharedPtr     subNCom_;
