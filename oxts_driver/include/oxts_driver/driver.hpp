@@ -189,7 +189,6 @@ public:
 
   std::fstream inFileNCom;
 
-  rclcpp::Time get_timestamp();
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    * 

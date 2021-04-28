@@ -43,7 +43,7 @@ void OxtsDriver::publish_packet()
     if (this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
       RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
     if (this->nrx->mTimeWeekSecond < this->prevWeekSecond) {
-      RCLCPP_ERROR(this->get_logger(), "Current packet is older than previos packet, skipping packet.");
+      RCLCPP_ERROR(this->get_logger(), "Current packet is older than previous packet, skipping packet.");
       return;
     }
     if (this->nrx->mTimeWeekSecond == this->prevWeekSecond) {
