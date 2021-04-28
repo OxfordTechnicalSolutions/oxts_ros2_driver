@@ -21,7 +21,7 @@
       </geometry>
     </visual>
   </link>
-  <joint name="rear_axle_link_joint" type="floating">
+  <joint name="rear_axle_joint" type="floating">
     <parent link="oxts_link"/>
     <child link="rear_axle_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
@@ -35,7 +35,7 @@
       </geometry>
     </visual>
   </link>
-  <joint name="front_axle_link_joint" type="floating">
+  <joint name="front_axle_joint" type="floating">
     <parent link="oxts_link"/>
     <child link="front_axle_link" />
     <origin xyz="0 0 0" rpy="0 0 0" />
