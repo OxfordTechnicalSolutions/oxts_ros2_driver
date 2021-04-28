@@ -9,35 +9,32 @@ void OxtsIns::NCom_callback(const oxts_msgs::msg::Ncom::SharedPtr msg)
   // Add data to decoder
   if (NComNewChars(this->nrx, msg->raw_packet.data(), NCOM_PACKET_LENGTH) == COM_NEW_UPDATE)
   {
-    double current_time = this->get_timestamp().seconds();
+    double current_time = rclcpp::Time(msg->header.stamp).seconds();
     int sec_idx = round((current_time - floor(current_time)) * this->ncom_rate);
     
     switch (nrx->mOutputPacketType)
     {
       case OUTPUT_PACKET_REGULAR:
       {
-        // create header once per NCOM packet
-        std_msgs::msg::Header header;
-        header = RosNComWrapper::header(this->get_timestamp(), "");
         // Publish IMU message if being subscribed to and enabled in config
         if (this->pub_imu_flag) 
-          this->imu(header);
+          this->imu(msg->header);
         if (this->pub_tf_flag)
-          this->tf(header);
+          this->tf(msg->header);
         if (this->pubStringInterval && (sec_idx % this->pubStringInterval == 0))
           this->string();
         if (this->pubNavSatRefInterval && (sec_idx % this->pubNavSatRefInterval == 0))
-          this->nav_sat_ref(header);
+          this->nav_sat_ref(msg->header);
         if (this->pubEcefPosInterval && (sec_idx % this->pubEcefPosInterval == 0))
-          this->ecef_pos(header);
+          this->ecef_pos(msg->header);
         if (this->pubNavSatFixInterval && (sec_idx % this->pubNavSatFixInterval == 0))
-          this->nav_sat_fix(header);
+          this->nav_sat_fix(msg->header);
         if (this->pubVelocityInterval && (sec_idx % this->pubVelocityInterval == 0))
-          this->velocity(header);
+          this->velocity(msg->header);
         if (this->pubOdometryInterval && (sec_idx % this->pubOdometryInterval == 0))
-          this->odometry(header);
+          this->odometry(msg->header);
         if (this->pubTimeReferenceInterval && (sec_idx % this->pubTimeReferenceInterval == 0))
-          this->time_reference(header);
+          this->time_reference(msg->header);
         break;
       }
       case OUTPUT_PACKET_STATUS:
@@ -180,14 +177,6 @@ void OxtsIns::time_reference(std_msgs::msg::Header header)
   header.frame_id = "oxts_link";
   auto msg    = RosNComWrapper::time_reference(this->nrx, header);
   pubTimeReference_->publish(msg);
-}
-
-rclcpp::Time OxtsIns::get_timestamp()
-{
-  if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
-    return this->get_clock()->now();
-  else
-    return RosNComWrapper::ncomTime(nrx);
 }
 
 void OxtsIns::getLrf()

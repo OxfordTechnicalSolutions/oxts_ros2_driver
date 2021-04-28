@@ -31,6 +31,16 @@ namespace oxts_driver
 {
 
 /**
+ * Enumeration of timestamp modes for published topics
+ */
+enum PUB_TIMESTAMP_MODE
+{
+  /** Use ROS time. */
+  ROS = 0,
+  /** Use NCom time. */
+  NCOM = 1
+};
+/**
  * This class creates a subclass of Node designed to take NCom data from the 
  * NCom decoder and publish it to pre-configured ROS topics.
  * 
@@ -56,7 +66,9 @@ private:
   void (oxts_driver::OxtsDriver::*update_ncom)();
   /*! Whether ot not to wait for NCom initialisation before publishing messages. */
   bool wait_for_init;
-  /*! Publishing rate for debug String message. */
+  /*! Timestamp type to be applied to published packets
+    {0 : ROS time, 1 : NCom time} */
+  int timestamp_mode;
 
   std::chrono::duration<uint64_t,std::milli> ncomInterval;
   double prevWeekSecond;
@@ -95,6 +107,7 @@ public:
     unit_port               = this->declare_parameter("unit_port", 3000);
     ncom_path               = this->declare_parameter("ncom", std::string(""));
     wait_for_init           = this->declare_parameter("wait_for_init", true);
+    timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
 
     ncomInterval            = std::chrono::milliseconds(int(1000.0 / ncom_rate));
     prevWeekSecond          = -1;
@@ -189,6 +202,14 @@ public:
 
   std::fstream inFileNCom;
 
+  rclcpp::Time get_timestamp();
+  /**
+   * Convert NCom time to a ROS friendly time format. Does not convert to ROS
+   * time, only the format.
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   */
+  rclcpp::Time ncomTime(const NComRxC *nrx);
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    * 

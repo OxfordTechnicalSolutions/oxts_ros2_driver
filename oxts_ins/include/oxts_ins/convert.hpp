@@ -43,16 +43,6 @@ namespace oxts_ins
 {
 
 /**
- * Enumeration of timestamp modes for published topics
- */
-enum PUB_TIMESTAMP_MODE
-{
-  /** Use ROS time. */
-  ROS = 0,
-  /** Use NCom time. */
-  NCOM = 1
-};
-/**
  * Enumeration of LRF sources
  */
 enum LRF_SOURCE
@@ -79,9 +69,6 @@ private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
   uint8_t ncom_rate;
-  /*! Timestamp type to be applied to published packets
-    {0 : ROS time, 1 : NCom time} */
-  int timestamp_mode;
   /*! Local reference frame source
     {0 : From NCom LRF, 1 : First NCom position} */
   uint8_t lrf_source;
@@ -192,7 +179,6 @@ public:
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate               = this->declare_parameter("ncom_rate", 100);
-    timestamp_mode          = this->declare_parameter("timestamp_mode", 0); 
     frame_id                = this->declare_parameter("frame_id", "oxts_link");
     pub_string_rate         = this->declare_parameter("pub_string_rate", 0);
     pub_nav_sat_fix_rate    = this->declare_parameter("pub_nav_sat_fix_rate", 0);
@@ -266,8 +252,6 @@ public:
   bool lrf_valid;
   /** Local reference frame */
   Lrf lrf;
-
-  rclcpp::Time get_timestamp();
 
 };
 

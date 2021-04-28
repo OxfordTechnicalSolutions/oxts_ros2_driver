@@ -76,28 +76,6 @@ Lrf getNcomLrf(const NComRxC *nrx)
 }
 
 
-rclcpp::Time      ncomTime(const NComRxC *nrx)
-{
-  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
-                           (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 
-                           nrx->mTimeUtcOffset + NAV_CONST::GPS2UNIX_EPOCH,
-  static_cast<uint32_t>((nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
-    * NAV_CONST::SECS2NANOSECS ));
-
-  return time;
-}
-
-std_msgs::msg::Header       header(rclcpp::Time time,
-                                                        std::string frame)
-{
-  auto header = std_msgs::msg::Header();
-
-  header.stamp = time;
-  header.frame_id = frame; 
-
-  return header;
-}
-
 sensor_msgs::msg::NavSatStatus nav_sat_status(
                                                     const NComRxC *nrx)
 {

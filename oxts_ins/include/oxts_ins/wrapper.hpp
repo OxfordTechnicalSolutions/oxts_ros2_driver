@@ -75,23 +75,6 @@ namespace RosNComWrapper
    * Get the LRF from the NCOM decoder
    */
   Lrf getNcomLrf(const NComRxC *nrx);
-  /**
-   * Convert NCom time to a ROS friendly time format. Does not convert to ROS
-   * time, only the format.
-   * 
-   * @param nrx Pointer to the decoded NCom data
-   */
-  rclcpp::Time       ncomTime(const NComRxC *nrx);
-  /**
-   * Wrap data into ROS header format.
-   * 
-   * Does not strictly belong here since it is not encoding NCom data. Move when
-   * appropriate alternative location makes itself known.
-   * 
-   * @param time Timestamp to be added to the packet
-   * @param frame frame_id of the message
-   */
-  std_msgs::msg::Header header(rclcpp::Time time, std::string frame);
   /** 
    * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
    * 

@@ -41,10 +41,3 @@ oxts_ins:
     #### 1 - Set automatically from first NCom packet
     #### 2 - Set automatically from first position of NCom packet aligned to ENU
     lrf_source              : 2
-
-#===============================================================================
-    ## Timing - how to timestamp messages published by the ROS driver
-
-    # 0 => Timestamped by the ROS node time (future default)
-    # 1 => Timestamped from NCom
-    timestamp_mode : 1

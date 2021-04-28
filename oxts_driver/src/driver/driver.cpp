@@ -39,6 +39,7 @@ void OxtsDriver::get_socket_packet()
 void OxtsDriver::publish_packet()
 {
   auto msg = oxts_msgs::msg::Ncom();
+  // perform error checking on nrx timestamps
   if (this->prevWeekSecond > 0) {
     if (this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
       RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
@@ -51,14 +52,34 @@ void OxtsDriver::publish_packet()
       return;
     }
     if (this->nrx->mTimeWeekSecond - this->prevWeekSecond < (0.5/this->ncom_rate))
-      RCLCPP_WARN(this->get_logger(), "Early packet detected.");
+      RCLCPP_WARN(this->get_logger(), "Early packet detected, ncom_rate may be misconfigured.");
   }
-  msg.header.stamp = this->get_clock()->now();
+  // publish the NCOM packet
+  msg.header.stamp = this->get_timestamp();
   msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
   for (int i=0; i < NCOM_PACKET_LENGTH ;++i)
     msg.raw_packet[i] = this->nrx->mInternal->mCurPkt[i];
   this->pubNCom_->publish(msg);
   this->prevWeekSecond = this->nrx->mTimeWeekSecond;
+}
+
+rclcpp::Time OxtsDriver::get_timestamp()
+{
+  if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
+    return this->get_clock()->now();
+  else
+    return this->ncomTime(this->nrx);
+}
+
+rclcpp::Time OxtsDriver::ncomTime(const NComRxC *nrx)
+{
+  auto time = rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) + 
+                           (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) + 
+                           nrx->mTimeUtcOffset + NAV_CONST::GPS2UNIX_EPOCH,
+  static_cast<uint32_t>((nrx->mTimeWeekSecond - std::floor(nrx->mTimeWeekSecond))
+    * NAV_CONST::SECS2NANOSECS ));
+
+  return time;
 }
 
 std::string OxtsDriver::get_unit_ip()
