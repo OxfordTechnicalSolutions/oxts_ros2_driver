@@ -39,11 +39,19 @@ void OxtsDriver::get_socket_packet()
 void OxtsDriver::publish_packet()
 {
   auto msg = oxts_msgs::msg::Ncom();
-  if (this->prevWeekSecond > 0 && this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
-    RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
-  if (this->prevWeekSecond > 0 && this->nrx->mTimeWeekSecond == this->prevWeekSecond) {
-    RCLCPP_WARN(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
-    return;
+  if (this->prevWeekSecond > 0) {
+    if (this->nrx->mTimeWeekSecond - this->prevWeekSecond > (1.5/this->ncom_rate))
+      RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
+    if (this->nrx->mTimeWeekSecond < this->prevWeekSecond) {
+      RCLCPP_ERROR(this->get_logger(), "Current packet is older than previos packet, skipping packet.");
+      return;
+    }
+    if (this->nrx->mTimeWeekSecond == this->prevWeekSecond) {
+      RCLCPP_ERROR(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
+      return;
+    }
+    if (this->nrx->mTimeWeekSecond - this->prevWeekSecond < (0.5/this->ncom_rate))
+      RCLCPP_WARN(this->get_logger(), "Early packet detected.");
   }
   msg.header.stamp = this->get_clock()->now();
   msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
