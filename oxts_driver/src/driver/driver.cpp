@@ -64,22 +64,24 @@ void OxtsDriver::publish_packet()
 
 bool OxtsDriver::check_rate(double prevPktSec, double currPktSec)
 {
+  bool skip_packet = false;
   // perform error checking on nrx timestamps
-  if (prevPktSec > 0) {
-    if (currPktSec - prevPktSec > (1.5/this->ncom_rate))
-      RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
-    if (currPktSec < prevPktSec) {
-      RCLCPP_ERROR(this->get_logger(), "Current packet is older than previous packet, skipping packet.");
-      return true;
-    }
-    if (currPktSec == prevPktSec) {
-      RCLCPP_ERROR(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
-      return true;
-    }
-    if (currPktSec - prevPktSec < (0.5/this->ncom_rate))
-      RCLCPP_WARN(this->get_logger(), "Early packet detected, ncom_rate may be misconfigured.");
+  if (!(prevPktSec > 0));
+  else if (currPktSec - prevPktSec > (1.5/this->ncom_rate)) {
+    RCLCPP_WARN(this->get_logger(), "Packet drop detected.");
   }
-  return false;
+  else if (currPktSec < prevPktSec) {
+    RCLCPP_ERROR(this->get_logger(), "Current packet is older than previous packet, skipping packet.");
+    skip_packet = true;
+  }
+  else if (currPktSec == prevPktSec) {
+    RCLCPP_ERROR(this->get_logger(), "Duplicate NCOM packet detected, skipping packet.");
+    skip_packet = true;
+  }
+  else if (currPktSec - prevPktSec < (0.5/this->ncom_rate)) {
+    RCLCPP_WARN(this->get_logger(), "Early packet detected, ncom_rate may be misconfigured.");
+  }
+  return skip_packet;
 }
 
 rclcpp::Time OxtsDriver::get_timestamp()
