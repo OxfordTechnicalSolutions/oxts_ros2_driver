@@ -375,9 +375,9 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
 
   auto tmp = tf2::Matrix3x3(diff);
   auto cov = tf2::Matrix3x3 (
-                              nrx->mEastAcc,             0.0,         0.0,
-                              0.0,            nrx->mNorthAcc,         0.0,
-                              0.0,                       0.0, nrx->mAltAcc
+                              std::pow(nrx->mEastAcc,2),             0.0,         0.0,
+                              0.0,            std::pow(nrx->mNorthAcc,2),         0.0,
+                              0.0,                       0.0, std::pow(nrx->mAltAcc,2)
                             );
   // cov_b = R * cov_a * R^T
   tmp *= cov;
