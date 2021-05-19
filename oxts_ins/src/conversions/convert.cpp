@@ -52,9 +52,17 @@ void OxtsIns::nav_sat_fix(std_msgs::msg::Header header)
 
 void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
 {
-  header.frame_id = "navsat_link";
-  auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
-  pubNavSatRef_->publish(msg);
+  // Set the LRF if - we haven't set it before
+  if (!this->lrf_valid)
+  {
+    this->getLrf();
+  } 
+  if (this->lrf_valid)
+  {
+    header.frame_id = "navsat_link";
+    auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header, this->lrf);
+    pubNavSatRef_->publish(msg);
+  }
 }
 
 void OxtsIns::ecef_pos(std_msgs::msg::Header header)
@@ -135,7 +143,6 @@ void OxtsIns::tf(std_msgs::msg::Header header)
       }
     }
   }
-  
 }
 
 void OxtsIns::velocity(std_msgs::msg::Header header)

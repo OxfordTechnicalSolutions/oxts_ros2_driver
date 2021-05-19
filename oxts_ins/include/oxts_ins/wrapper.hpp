@@ -96,7 +96,8 @@ namespace RosNComWrapper
    * @param head Header to be added to the published message
    */
   oxts_msgs::msg::NavSatRef        nav_sat_ref(const NComRxC *nrx,
-                                                    std_msgs::msg::Header head);
+                                                    std_msgs::msg::Header head,
+                                                    Lrf lrf);
 
   /**
    * Wrap data from the NCom decoder to 

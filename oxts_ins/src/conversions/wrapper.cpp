@@ -164,10 +164,10 @@ sensor_msgs::msg::NavSatFix nav_sat_fix(
 
 oxts_msgs::msg::NavSatRef nav_sat_ref(
                             const NComRxC *nrx,
-                            std_msgs::msg::Header head)
+                            std_msgs::msg::Header head,
+                            Lrf lrf)
 {
   auto msg = oxts_msgs::msg::NavSatRef();
-  auto lrf = getNcomLrf(nrx);
   msg.header = head;
   msg.latitude  = lrf.lat();
   msg.longitude = lrf.lon();
