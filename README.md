@@ -46,7 +46,12 @@ or, to replay from an ncom file:
     ros2 launch oxts launch.py ncom:=<absolute_path_to_ncom>
 ```
 
-To view the Odometry and Tf data from the INS, use the additional command line option `use_rviz:=true`. This requires RViz to be installed. 
+To view the Odometry and Tf data from the INS, use the additional command line option `use_rviz:=true`. This requires RViz to be installed. There is also the option to start publishig before the NCOM has initialised (not recommended) `wait_for_init:=false`.
+
+The currently available launch files are as follows:
+
+* `launch.py` - Launches the driver, as well as `robot_state_publisher` and, optionally, RViz
+* `minimal.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
 ## Output ROS messages
 
@@ -58,6 +63,11 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Contains a timestamped position of the INS in the ECEF reference frame.
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
+* **ins/nav_sat_ref** [oxts_msgs/msg/NavSatRef](./oxts_msgs/msg/NavSatRef.msg)
+    Contains the WGS84 reference position currently being used to calculate the local coordinates for **ins/odometry**. This can either be the: 
+    * LRF in NCOM
+    * Position & heading of the first NCOM packet received
+    * Position of the first NCOM packet received, aligned to ENU.
 * **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Imu.html)
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
