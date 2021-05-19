@@ -212,73 +212,59 @@ public:
 
     if (pubStringInterval)
     {
+      // Throw an error if ncom_rate / String_rate is not an integer
       if (ncom_rate % pubStringInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;
-      } else
-      {
-        pubString_ = this->create_publisher<std_msgs::msg::String>("ins/debug_string_pos", 10); 
-      }
+        {RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;}
+      // Create publisher
+      pubString_ = this->create_publisher<std_msgs::msg::String>("ins/debug_string_pos", 10); 
     }
     if (pubNavSatFixInterval)
     {
+      // Throw an error if ncom_rate / NavSatFix_rate is not an integer
       if (ncom_rate % pubNavSatFixInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;
-      } else
-      {
-        pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix", 10); 
-      }
+        {RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;}
+      // Create publisher
+      pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix", 10); 
     }
     if (pubVelocityInterval)
     {
+      // Throw an error if ncom_rate / Velocity_rate is not an integer
       if (ncom_rate % pubVelocityInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;
-      } else
-      {
-        pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity", 10); 
-      }
+        {RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;}
+      // Create publisher
+      pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity", 10); 
     }
     if (pubOdometryInterval)
     {
+      // Throw an error if ncom_rate / Odometry_rate is not an integer
       if (ncom_rate % pubOdometryInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;
-      } else
-      {
-        pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>("ins/odometry", 10); 
-      }
+        {RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;}
+      // Create publisher
+      pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>("ins/odometry", 10); 
     }
     if (pubTimeReferenceInterval)
     {
+      // Throw an error if ncom_rate / TimeReference_rate is not an integer
       if (ncom_rate % pubTimeReferenceInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;
-      } else
-      {
-        pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>("ins/time_reference", 10);
-      }
+        {RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;}
+      // Create publisher
+      pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>("ins/time_reference", 10);
     }
     if (pubEcefPosInterval)
     {
+      // Throw an error if ncom_rate / EcefPos_rate is not an integer
       if (ncom_rate % pubEcefPosInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;
-      } else
-      {
-        pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>("ins/ecef_pos", 10);
-      }
+        {RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;}
+      // Create publisher
+      pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>("ins/ecef_pos", 10);
     }
     if (pubNavSatRefInterval)
     {
+      // Throw an error if ncom_rate / NavSatRef_rate is not an integer
       if (ncom_rate % pubNavSatRefInterval != 0)
-      {
-        RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;
-      } else
-      {
-        pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>("ins/nav_sat_ref", 10);
-      }
+        {RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;}
+      // Create publisher
+      pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>("ins/nav_sat_ref", 10);
     }
 
     // Initialise subscriber for regular ncom packet message
