@@ -174,8 +174,6 @@ public:
    */
   explicit OxtsIns(const rclcpp::NodeOptions & options) : Node("oxts_ins", options)
   {
-    // Initilize tf broadcaster
-    tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate               = this->declare_parameter("ncom_rate", 100);
@@ -204,39 +202,85 @@ public:
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
 
-    if (pubStringInterval && ncom_rate % pubStringInterval != 0)
-      {RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;}
-    if (pubNavSatFixInterval && (ncom_rate % pubNavSatFixInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;}
-    if (pubVelocityInterval && (ncom_rate % pubVelocityInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;}
-    if (pubOdometryInterval && (ncom_rate % pubOdometryInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;}
-    if (pubTimeReferenceInterval && (ncom_rate % pubTimeReferenceInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;}
-    if (pubEcefPosInterval && (ncom_rate % pubEcefPosInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;}
-    if (pubNavSatRefInterval && (ncom_rate % pubNavSatRefInterval != 0))
-      {RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;}
+    // Initilize tf broadcaster if configured to broadcast
+    if (pub_tf_flag) {
+      tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    }
+    // Initialise publishers for each message if configured to publish
+    if (pub_imu_flag)
+      pubImu_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data", 10); 
 
-    // Initialise publishers for each message - all are initialised, even if not
-    // configured
-    pubString_        = this->create_publisher<std_msgs::msg::String>                      
-                                                   ("ins/debug_string_pos", 10); 
-    pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>                
-                                                   ("ins/nav_sat_fix",      10); 
-    pubImu_           = this->create_publisher<sensor_msgs::msg::Imu>                      
-                                                   ("imu/data",             10); 
-    pubVelocity_      = this->create_publisher<geometry_msgs::msg::TwistStamped>           
-                                                   ("ins/velocity",         10); 
-    pubOdometry_      = this->create_publisher<nav_msgs::msg::Odometry>           
-                                                   ("ins/odometry",         10); 
-    pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>            
-                                                   ("ins/time_reference",   10);
-    pubEcefPos_       = this->create_publisher<geometry_msgs::msg::PointStamped>
-                                                   ("ins/ecef_pos",         10);
-    pubNavSatRef_     = this->create_publisher<oxts_msgs::msg::NavSatRef>
-                                                   ("ins/nav_sat_ref",      10);
+    if (pubStringInterval)
+    {
+      if (ncom_rate % pubStringInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;
+      } else
+      {
+        pubString_ = this->create_publisher<std_msgs::msg::String>("ins/debug_string_pos", 10); 
+      }
+    }
+    if (pubNavSatFixInterval)
+    {
+      if (ncom_rate % pubNavSatFixInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;
+      } else
+      {
+        pubNavSatFix_     = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix", 10); 
+      }
+    }
+    if (pubVelocityInterval)
+    {
+      if (ncom_rate % pubVelocityInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;
+      } else
+      {
+        pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity", 10); 
+      }
+    }
+    if (pubOdometryInterval)
+    {
+      if (ncom_rate % pubOdometryInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;
+      } else
+      {
+        pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>("ins/odometry", 10); 
+      }
+    }
+    if (pubTimeReferenceInterval)
+    {
+      if (ncom_rate % pubTimeReferenceInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;
+      } else
+      {
+        pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>("ins/time_reference", 10);
+      }
+    }
+    if (pubEcefPosInterval)
+    {
+      if (ncom_rate % pubEcefPosInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;
+      } else
+      {
+        pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>("ins/ecef_pos", 10);
+      }
+    }
+    if (pubNavSatRefInterval)
+    {
+      if (ncom_rate % pubNavSatRefInterval != 0)
+      {
+        RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;
+      } else
+      {
+        pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>("ins/nav_sat_ref", 10);
+      }
+    }
+
     // Initialise subscriber for regular ncom packet message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
                       ("ncom",10,std::bind(&OxtsIns::NCom_callback_regular,this,_1));

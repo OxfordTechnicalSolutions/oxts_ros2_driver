@@ -56,6 +56,7 @@ void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
   auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header);
   pubNavSatRef_->publish(msg);
 }
+
 void OxtsIns::ecef_pos(std_msgs::msg::Header header)
 {
   header.frame_id = "oxts_link";
