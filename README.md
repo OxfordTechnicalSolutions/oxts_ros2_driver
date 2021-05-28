@@ -47,10 +47,11 @@ or, to replay from an ncom file:
     ros2 launch oxts run.py ncom:=<path_to_ncom> # absolute or relative
 ```
 
-To view the Odometry and Tf data from the INS, use the additional command line option `use_rviz:=true`. This requires RViz to be installed. There is also the option to start publishig before the NCOM has initialised (not recommended) `wait_for_init:=false`.
+To view the Odometry and Tf data from the INS, use the `visualise.py` launch file. This requires RViz to be installed. There is also the option to start publishig before the NCOM has initialised (not recommended) `wait_for_init:=false`.
 
 The currently available launch files are as follows:
 
+* `visualise.py` - Launches the driver, as well as `robot_state_publisher` and `rviz2` (the latter can be disabled with `use_rviz:=False`)
 * `run.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
 ## Output ROS messages
@@ -59,25 +60,33 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 
 * **ins/debug_string_pos** [std_msgs/msg/String](http://docs.ros.org/en/noetic/api/std_msgs/html/msg/String.html)
     This message is not useful for general use. It is currently included for debug purposes. It contains a timestamp from NCom and WGS84 coordinates in string form, which is output to the console.
+
 * **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PointStamped.html)
     Contains a timestamped position of the INS in the ECEF reference frame.
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
+
 * **ins/nav_sat_ref** [oxts_msgs/msg/NavSatRef](./oxts_msgs/msg/NavSatRef.msg)
     Contains the WGS84 reference position currently being used to calculate the local coordinates for **ins/odometry**. This can either be the: 
     * LRF in NCOM
     * Position & heading of the first NCOM packet received
     * Position of the first NCOM packet received, aligned to ENU.
+
+    (Depending on the parameters set in the `.yaml`)
+
 * **imu/data** [sensor_msgs/msg/Imu](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Imu.html)
     Contains IMU data from the INS, including orientation, angular rates, and linear accelerations. Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
+
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame.
+
 * **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Odometry.msg)
     Odometry data from the INS. 
     - Position: In a local reference frame defined either by the LRF in NCom, or created from the first NCom packet. 
     - Orientation: Rotation of the INS relative to the alignment of the LRF
     - Linear Velocity: _Future_
     - Angular Velocity: _Future_ 
+
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
 
 \* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet

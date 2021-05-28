@@ -26,8 +26,8 @@ def generate_launch_description():
         robot_desc = f.read()
 
     use_sim_time = LaunchConfiguration("use_tim_time", default="False")
-    use_rviz = LaunchConfiguration("use_rviz", default="False")
-    wait_for_init = LaunchConfiguration("wait_for_init", default="False")
+    use_rviz = LaunchConfiguration("use_rviz", default="True")
+    wait_for_init = LaunchConfiguration("wait_for_init", default="True")
     ncom = LaunchConfiguration("ncom", default="")
 
     # declare launch arguments (this exposes the arcument
