@@ -18,17 +18,18 @@ pip3 install sphinx breathe sphinx_rtd_theme
 ```
 
 Build instructions will look something like this:
-
-1. . /opt/ros/foxy/setup.bash
-2. cd <colcon_ws>/src
-3. git clone https://gitlab.com/oxts/navigation/ros/oxts.git
-4. cd oxts
-5. rosdep update
-6. rosdep install --from-path .
-7. cd ../..
-8. colcon build
-9. source install/setup.bash
-
+```bash
+. /opt/ros/foxy/setup.bash # "." and "source" are interchangeable (unix)
+mkdir -p ros_ws/src
+cd ros_ws/src
+git clone https://gitlab.com/oxts/navigation/ros/oxts.git
+cd oxts
+rosdep update
+rosdep install --from-path .
+cd ../..
+colcon build
+. install/setup.bash
+```
 
 ## Configuring and Launching the Driver
 
@@ -37,21 +38,20 @@ The driver is configured using .yaml files, as is the norm for ROS2 nodes. The d
 Launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine. They can be use like so:
 
 ```bash
-    ros2 launch oxts launch.py
+    ros2 launch oxts run.py
 ```
 
 or, to replay from an ncom file:
 
 ```bash
-    ros2 launch oxts launch.py ncom:=<absolute_path_to_ncom>
+    ros2 launch oxts run.py ncom:=<path_to_ncom> # absolute or relative
 ```
 
 To view the Odometry and Tf data from the INS, use the additional command line option `use_rviz:=true`. This requires RViz to be installed. There is also the option to start publishig before the NCOM has initialised (not recommended) `wait_for_init:=false`.
 
 The currently available launch files are as follows:
 
-* `launch.py` - Launches the driver, as well as `robot_state_publisher` and, optionally, RViz
-* `minimal.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
+* `run.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
 ## Output ROS messages
 

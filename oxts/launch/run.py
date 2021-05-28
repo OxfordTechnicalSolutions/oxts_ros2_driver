@@ -3,11 +3,12 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 
+from launch_ros.actions import Node
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
-from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
+
+from launch.conditions import IfCondition, LaunchConfigurationNotEquals
 
 parameters_file_name = 'default.yaml'
 
@@ -28,11 +29,14 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_tim_time', default='false')
     wait_for_init = LaunchConfiguration('wait_for_init')
     ncom = LaunchConfiguration('ncom', default='')
-    driver_params['ncom'] = ncom
+    # if ncom is default value, don't overwite the config
+    if LaunchConfigurationNotEquals(ncom, ''):
+        driver_params['ncom'] = ncom
     driver_params['wait_for_init'] = wait_for_init
 
-    # declare launch arguments
-    launch_argument = DeclareLaunchArgument(
+    # declare launch arguments (this exposes the arcument
+    # to IncludeLaunchDescriptionand to the command line)
+    declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false')
     declare_wait_for_init = DeclareLaunchArgument(
@@ -62,7 +66,8 @@ def generate_launch_description():
     # create launch descroption and populate
     ld = LaunchDescription()
     # launch options
-    ld.add_action(launch_argument)
+    ld.add_action(declare_ncom)
+    ld.add_action(declare_use_sim_time)
     ld.add_action(declare_wait_for_init)
     # launch nodes
     ld.add_action(oxts_driver_node)
