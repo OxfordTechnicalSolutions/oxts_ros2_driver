@@ -3,48 +3,41 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
 from launch_ros.actions import Node
+from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, LaunchConfigurationNotEquals
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-parameters_file_name = 'default.yaml'
 urdf_file_name = 'medium.urdf.xml'
 
 
 def generate_launch_description():
     # get current path and go one level up
-    driver_dir = get_package_share_directory('oxts_driver')
+    oxts_dir = get_package_share_directory('oxts')
     ins_dir = get_package_share_directory('oxts_ins')
+
+
     rviz_path = os.path.join(ins_dir, 'rviz', 'display.rviz')
-
-    driver_param_path = os.path.join(driver_dir, 'config', parameters_file_name)
-    with open(driver_param_path, 'r') as f:
-        driver_params = yaml.safe_load(f)['oxts_driver']['ros__parameters']
-
-    ins_param_path = os.path.join(ins_dir, 'config', parameters_file_name)
-    with open(ins_param_path, 'r') as f:
-        ins_params = yaml.safe_load(f)['oxts_ins']['ros__parameters']
 
     urdf_path = os.path.join(ins_dir, 'urdf', urdf_file_name)
     with open(urdf_path, 'r') as f:
         robot_desc = f.read()
 
-    use_sim_time = LaunchConfiguration('use_tim_time', default='false')
-    use_rviz = LaunchConfiguration('use_rviz')
-    wait_for_init = LaunchConfiguration('wait_for_init')
-    ncom = LaunchConfiguration('ncom', default='')
-    driver_params['ncom'] = ncom
-    driver_params['wait_for_init'] = wait_for_init
+    use_sim_time = LaunchConfiguration("use_tim_time", default="False")
+    use_rviz = LaunchConfiguration("use_rviz", default="False")
+    wait_for_init = LaunchConfiguration("wait_for_init", default="False")
+    ncom = LaunchConfiguration("ncom", default="")
 
-    # declare launch arguments
-    launch_argument = DeclareLaunchArgument(
+    # declare launch arguments (this exposes the arcument
+    # to IncludeLaunchDescriptionand to the command line)
+    declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='false')
+        default_value='False')
     declare_use_rviz = DeclareLaunchArgument(
         'use_rviz',
-        default_value='False',
+        default_value='True',
         description='Whether to start RVIZ')
     declare_wait_for_init = DeclareLaunchArgument(
         'wait_for_init',
@@ -55,24 +48,18 @@ def generate_launch_description():
         default_value='',
         description='NCOM file to replay (optional)')
 
+    # driver launch file
+    launch_description = PythonLaunchDescriptionSource(f"{oxts_dir}/launch/minimal.py")
+    oxts_launch = IncludeLaunchDescription(
+        launch_description_source=launch_description,
+        launch_arguments={
+            "ncom": ncom,
+            "use_sim_time": use_sim_time,
+            "wait_for_init": wait_for_init
+        }.items()
+    )
 
-    oxts_driver_node = Node(
-        package='oxts_driver',
-        #namespace='unit1',
-        executable='oxts_driver',
-        name='oxts_driver',
-        output='screen',
-        parameters=[driver_params, {'use_sim_time': use_sim_time}])
-
-    oxts_ins_node = Node(
-        package='oxts_ins',
-        #namespace='unit1',
-        executable='oxts_ins',
-        name='oxts_ins',
-        output='screen',
-        parameters=[ins_params, {'use_sim_time': use_sim_time}])
-
-    robot_state_publisher = Node(
+    robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
@@ -83,7 +70,7 @@ def generate_launch_description():
             }],
         arguments=[urdf_path])
 
-    rviz_cmd = Node(
+    rviz_node = Node(
         condition=IfCondition(use_rviz),
         package='rviz2',
         executable='rviz2',
@@ -95,13 +82,13 @@ def generate_launch_description():
     # create launch descroption and populate
     ld = LaunchDescription()
     # launch options
-    ld.add_action(launch_argument)
+    ld.add_action(declare_ncom)
     ld.add_action(declare_use_rviz)
+    ld.add_action(declare_use_sim_time)
     ld.add_action(declare_wait_for_init)
     # launch nodes
-    ld.add_action(oxts_driver_node)
-    ld.add_action(oxts_ins_node)
-    ld.add_action(robot_state_publisher)
-    ld.add_action(rviz_cmd)
+    ld.add_action(oxts_launch)
+    ld.add_action(robot_state_publisher_node)
+    ld.add_action(rviz_node)
 
     return ld
