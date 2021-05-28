@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 #include <fstream>
+#include <filesystem>
 
 // ROS includes
 #include "rclcpp/rclcpp.hpp"
@@ -121,6 +122,7 @@ public:
 
     if (!ncom_path.empty())
     {
+      ncom_path = std::filesystem::canonical(ncom_path);
       inFileNCom.open(ncom_path);
       if(!inFileNCom.is_open())
       {
