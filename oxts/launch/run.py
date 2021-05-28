@@ -21,29 +21,26 @@ def generate_launch_description():
     driver_param_path = os.path.join(driver_dir, "config", parameters_file_name)
     with open(driver_param_path, "r") as f:
         driver_params = yaml.safe_load(f)["oxts_driver"]["ros__parameters"]
+    yaml_ncom = driver_params.pop("ncom", "")
 
     ins_param_path = os.path.join(ins_dir, "config", parameters_file_name)
     with open(ins_param_path, "r") as f:
         ins_params = yaml.safe_load(f)["oxts_ins"]["ros__parameters"]
 
-    use_sim_time = LaunchConfiguration("use_tim_time", default="false")
-    wait_for_init = LaunchConfiguration("wait_for_init")
-    ncom = LaunchConfiguration("ncom", default="")
-    # if ncom is default value, don't overwite the config
-    if LaunchConfigurationNotEquals(ncom, ""):
-        driver_params["ncom"] = ncom
-    driver_params["wait_for_init"] = wait_for_init
+    use_sim_time = LaunchConfiguration("use_tim_time", default="False")
+    wait_for_init = LaunchConfiguration("wait_for_init", default="False")
+    ncom = LaunchConfiguration("ncom", default=yaml_ncom)
 
     # declare launch arguments (this exposes the arcument
     # to IncludeLaunchDescriptionand to the command line)
-    declare_use_sim_time = DeclareLaunchArgument("use_sim_time", default_value="false")
+    declare_use_sim_time = DeclareLaunchArgument("use_sim_time", default_value="False")
     declare_wait_for_init = DeclareLaunchArgument(
         "wait_for_init",
         default_value="True",
         description="Whether to publish before NCOM initialisation",
     )
     declare_ncom = DeclareLaunchArgument(
-        "ncom", default_value="", description="NCOM file to replay (optional)"
+        "ncom", default_value=yaml_ncom, description="NCOM file to replay (optional)"
     )
 
     oxts_driver_node = Node(
@@ -51,7 +48,12 @@ def generate_launch_description():
         executable="oxts_driver",
         name="oxts_driver",
         output="screen",
-        parameters=[driver_params, {"use_sim_time": use_sim_time}],
+        parameters=[
+            driver_params,
+            {"use_sim_time": use_sim_time},
+            {"wait_for_init": wait_for_init},
+            {"ncom": ncom},
+        ],
     )
 
     oxts_ins_node = Node(

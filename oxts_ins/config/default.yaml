@@ -1,15 +1,6 @@
 oxts_ins:
   ros__parameters:
 #===============================================================================
-    # INS configuration (set up to match the unit)
-    ## Unit IP address
-    unit_ip: 192.168.25.44
-    ## Unit Port (3000 unless intentionally configured otherwise on the INS)
-    unit_port: 3000
-    ## Path of NCOM to replay (optional, must be absolute path)
-    # ncom: /default/ncom/path.ncom 
-
-#===============================================================================
     # Configure ROS messages to be published by the node.
     ## Frames
     frame_id            : "oxts_link"
