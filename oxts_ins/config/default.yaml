@@ -12,23 +12,25 @@ oxts_ins:
     ### Publish string message
     pub_string_rate         : 0
     ### Publish NavSatFix message
-    pub_nav_sat_fix_rate    : 5
+    pub_nav_sat_fix_rate    : 4
     ### Publish Velocity message
-    pub_velocity_rate       : 10
+    pub_velocity_rate       : 0
     ### Publish Odometry message
-    pub_odometry_rate       : 10
+    pub_odometry_rate       : 100
     ### Defaults to "map", can be set to "odom" when emulating navsat_transform_node
     pub_odometry_frame_id   : "map"
     ### Publish TimeReference message
-    pub_time_reference_rate : 1
+    pub_time_reference_rate : 0
     ### Publish PoseWithCovarianceStamped message
-    pub_ecef_pos_rate       : 10
+    pub_ecef_pos_rate       : 0
     ### Publish OxTS NavSatRef message
     pub_nav_sat_ref_rate    : 10
+    ### Publish OxTS Lever Arm message
+    pub_lever_arm_rate      : 5
     ### Publish Imu message
     pub_imu_flag            : true
     ### Broadcast Tf messages for rviz visualisation
-    pub_tf_flag             : true
+    pub_tf_flag             : false
     ### Source of the local reference frame
     #### 0 - NCom LRF
     #### 1 - Set automatically from first NCom packet

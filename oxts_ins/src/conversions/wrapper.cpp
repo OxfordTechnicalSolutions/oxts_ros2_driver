@@ -176,6 +176,18 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(
   return msg;
 }
 
+oxts_msgs::msg::LeverArm       lever_arm_gap(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head)
+{
+  auto msg = oxts_msgs::msg::LeverArm();
+  msg.header = head;
+  msg.lever_arm_id = "gap";
+  msg.offset_x = nrx->mGAPx;
+  msg.offset_y = nrx->mGAPy;
+  msg.offset_z = nrx->mGAPz;
+  return msg;
+}
+
 geometry_msgs::msg::PointStamped ecef_pos
                                               (
                                               const NComRxC *nrx,

@@ -31,6 +31,8 @@ void OxtsIns::NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg)
       this->odometry(msg->header);
     if (this->pubTimeReferenceInterval && (sec_idx % this->pubTimeReferenceInterval == 0))
       this->time_reference(msg->header);
+    if (this->pubLeverArmInterval && (sec_idx % this->pubLeverArmInterval == 0))
+      this->lever_arm_gap(msg->header);
   }
 }
 
@@ -63,6 +65,13 @@ void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
     auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header, this->lrf);
     pubNavSatRef_->publish(msg);
   }
+}
+
+void OxtsIns::lever_arm_gap(std_msgs::msg::Header header)
+{
+  header.frame_id = "oxts_link";
+  auto msg = RosNComWrapper::lever_arm_gap(this->nrx, header);
+  pubLeverArm_->publish(msg);
 }
 
 void OxtsIns::ecef_pos(std_msgs::msg::Header header)

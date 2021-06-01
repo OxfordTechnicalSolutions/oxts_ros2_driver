@@ -26,6 +26,7 @@
 #include <geometry_msgs/msg/point.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <oxts_msgs/msg/nav_sat_ref.hpp>
+#include <oxts_msgs/msg/lever_arm.hpp>
 
 #include "tf2_kdl/tf2_kdl.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
@@ -98,6 +99,16 @@ namespace RosNComWrapper
   oxts_msgs::msg::NavSatRef        nav_sat_ref(const NComRxC *nrx,
                                                     std_msgs::msg::Header head,
                                                     Lrf lrf);
+
+  /**
+   * @brief Wrap data for GAP (primary GPS to IMU offset) using oxts_msgs/msg/LeverArm
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
+   * @return oxts_msgs::msgs::LeverArm 
+   */
+  oxts_msgs::msg::LeverArm       lever_arm_gap(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
 
   /**
    * Wrap data from the NCom decoder to 
