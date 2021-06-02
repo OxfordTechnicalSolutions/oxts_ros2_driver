@@ -27,6 +27,8 @@ oxts_ins:
     pub_nav_sat_ref_rate    : 10
     ### Publish OxTS Lever Arm message
     pub_lever_arm_rate      : 5
+    ### Publish OxTS IMU Bias message
+    pub_imu_bias_rate       : 5
     ### Publish Imu message
     pub_imu_flag            : true
     ### Broadcast Tf messages for rviz visualisation

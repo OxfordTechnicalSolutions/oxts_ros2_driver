@@ -27,6 +27,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <oxts_msgs/msg/nav_sat_ref.hpp>
 #include <oxts_msgs/msg/lever_arm.hpp>
+#include <oxts_msgs/msg/imu_bias.hpp>
 
 #include "tf2_kdl/tf2_kdl.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
@@ -108,6 +109,16 @@ namespace RosNComWrapper
    * @return oxts_msgs::msgs::LeverArm 
    */
   oxts_msgs::msg::LeverArm       lever_arm_gap(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head);
+
+  /**
+   * @brief Wrap data for IMU biases (accelerometer and gyro)
+   * 
+   * @param nrx Pointer to the decoded NCom data
+   * @param head Header to be added to the published message
+   * @return oxts_msgs::msg::ImuBias 
+   */
+  oxts_msgs::msg::ImuBias       imu_bias(const NComRxC *nrx,
                                                     std_msgs::msg::Header head);
 
   /**
