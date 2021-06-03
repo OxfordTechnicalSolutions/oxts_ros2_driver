@@ -163,9 +163,8 @@ sensor_msgs::msg::NavSatFix nav_sat_fix(
 }
 
 oxts_msgs::msg::NavSatRef nav_sat_ref(
-                            const NComRxC *nrx,
-                            std_msgs::msg::Header head,
-                            Lrf lrf)
+                            Lrf lrf,
+                            std_msgs::msg::Header head)
 {
   auto msg = oxts_msgs::msg::NavSatRef();
   msg.header = head;
@@ -423,6 +422,16 @@ nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
   msg.twist.twist = twist_stamped.twist;
 
   /** \todo Twist covariance */
+
+  return msg;
+}
+
+nav_msgs::msg::Path path (const std::vector<geometry_msgs::msg::PoseStamped> &poses,
+                                  std_msgs::msg::Header head)
+{
+  auto msg = nav_msgs::msg::Path();
+  msg.header = head;
+  msg.poses = poses;
 
   return msg;
 }

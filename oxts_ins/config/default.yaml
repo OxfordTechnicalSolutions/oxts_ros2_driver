@@ -17,6 +17,8 @@ oxts_ins:
     pub_velocity_rate       : 0
     ### Publish Odometry message
     pub_odometry_rate       : 100
+    ### Publish Path message
+    pub_path_rate           : 100
     ### Defaults to "map", can be set to "odom" when emulating navsat_transform_node
     pub_odometry_frame_id   : "map"
     ### Publish TimeReference message

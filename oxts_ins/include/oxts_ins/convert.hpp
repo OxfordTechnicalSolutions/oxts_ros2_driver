@@ -21,6 +21,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include <geometry_msgs/msg/pose_with_covariance.h>
@@ -85,6 +86,10 @@ private:
   uint8_t pub_odometry_rate;
   /*! Frame ID for Odometry message. */
   std::string pub_odometry_frame_id;
+  /*! Publishing rate for Path message. */
+  uint8_t pub_path_rate;
+  /*! Historical data for Path message. */
+  std::vector<geometry_msgs::msg::PoseStamped> past_poses;
   /*! Publishing rate for TimeReference message.*/
   uint8_t pub_time_reference_rate; 
   /*! Publishing rate for PointStamped message. */
@@ -106,6 +111,7 @@ private:
   uint8_t pubTfInterval;
   uint8_t pubVelocityInterval;
   uint8_t pubOdometryInterval;
+  uint8_t pubPathInterval;
   uint8_t pubTimeReferenceInterval;
   uint8_t pubEcefPosInterval;
   uint8_t pubNavSatRefInterval;
@@ -113,16 +119,6 @@ private:
   uint8_t pubIMUBiasInterval;
   // ...
 
-  rclcpp::TimerBase::SharedPtr timer_ncom_;
-  rclcpp::TimerBase::SharedPtr timer_string_;
-  rclcpp::TimerBase::SharedPtr timer_nav_sat_fix_;
-  rclcpp::TimerBase::SharedPtr timer_imu_;
-  rclcpp::TimerBase::SharedPtr timer_tf_;
-  rclcpp::TimerBase::SharedPtr timer_velocity_;
-  rclcpp::TimerBase::SharedPtr timer_odometry_;
-  rclcpp::TimerBase::SharedPtr timer_time_reference_;
-  rclcpp::TimerBase::SharedPtr timer_ecef_pos_;
-  rclcpp::TimerBase::SharedPtr timer_nav_sat_ref_;
 
   void NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg);
   /** Callback function for debug String message. Wraps message, publishes, and
@@ -140,6 +136,8 @@ private:
   void velocity(std_msgs::msg::Header header);
   /** Callback function for Odometry message. Wraps message and publishes. */
   void odometry(std_msgs::msg::Header header);
+  /** Callback function for Path message. Wraps message and publishes. */
+  void path(std_msgs::msg::Header header);
   /** Callback function for PointStamped message. Wraps message and 
    *  publishes.*/
   void ecef_pos(std_msgs::msg::Header header);
@@ -167,6 +165,8 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr  pubVelocity_;
   /** Publisher for /nav_msgs/msg/Odometry */
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr  pubOdometry_;
+  /** Publisher for /nav_msgs/msg/Path */
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr  pubPath_;
   /** Publisher for /sensor_msgs/msg/TimeReference */
   rclcpp::Publisher<sensor_msgs::msg::TimeReference>::SharedPtr  pubTimeReference_;
   /** Publisher for /geometry_msgs/msg/PointStamped */
@@ -199,6 +199,7 @@ public:
     pub_velocity_rate       = this->declare_parameter("pub_velocity_rate", 0);
     pub_odometry_rate       = this->declare_parameter("pub_odometry_rate", 0);
     pub_odometry_frame_id   = this->declare_parameter("pub_odometry_frame_id", "map");
+    pub_path_rate           = this->declare_parameter("pub_path_rate", 0);
     pub_time_reference_rate = this->declare_parameter("pub_time_reference_rate", 0);
     pub_ecef_pos_rate       = this->declare_parameter("pub_ecef_pos_rate", 0);
     pub_nav_sat_ref_rate    = this->declare_parameter("pub_nav_sat_ref_rate", 0);
@@ -215,6 +216,7 @@ public:
     pubNavSatFixInterval     = (pub_nav_sat_fix_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
     pubVelocityInterval      = (pub_velocity_rate       == 0) ? 0 : ncom_rate / pub_velocity_rate;
     pubOdometryInterval      = (pub_odometry_rate       == 0) ? 0 : ncom_rate / pub_odometry_rate;
+    pubPathInterval          = (pub_path_rate           == 0) ? 0 : ncom_rate / pub_path_rate;
     pubTimeReferenceInterval = (pub_time_reference_rate == 0) ? 0 : ncom_rate / pub_time_reference_rate;
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
@@ -260,6 +262,14 @@ public:
         {RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;}
       // Create publisher
       pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>("ins/odometry", 10); 
+    }
+    if (pubPathInterval)
+    {
+      // Throw an error if ncom_rate / Path_rate is not an integer
+      if (ncom_rate % pubPathInterval != 0)
+        {RCLCPP_ERROR(this->get_logger(), "Path" + notFactorError, pub_path_rate); return;}
+      // Create publisher
+      pubPath_ = this->create_publisher<nav_msgs::msg::Path>("ins/path", 10); 
     }
     if (pubTimeReferenceInterval)
     {

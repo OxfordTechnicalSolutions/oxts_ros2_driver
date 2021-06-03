@@ -177,6 +177,9 @@ public:
       // Only block things that are required for 100% of OxTS navigation
       while (
         nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME &&
+        nrx->mIsLatValid == 0 &&
+        nrx->mIsLonValid == 0 &&
+        nrx->mIsAltValid == 0 &&
         nrx->mIsHeadingValid == 0 &&
         nrx->mIsPitchValid == 0 &&
         nrx->mIsRollValid == 0

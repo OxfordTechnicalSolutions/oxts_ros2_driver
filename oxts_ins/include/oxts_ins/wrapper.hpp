@@ -16,14 +16,15 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/nav_sat_status.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/time_reference.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
-#include "nav_msgs/msg/odometry.hpp"
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/point.h>
+#include <geometry_msgs/msg/pose_stamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <oxts_msgs/msg/nav_sat_ref.hpp>
 #include <oxts_msgs/msg/lever_arm.hpp>
@@ -97,9 +98,8 @@ namespace RosNComWrapper
    * @param nrx Pointer to the decoded NCom data
    * @param head Header to be added to the published message
    */
-  oxts_msgs::msg::NavSatRef        nav_sat_ref(const NComRxC *nrx,
-                                                    std_msgs::msg::Header head,
-                                                    Lrf lrf);
+  oxts_msgs::msg::NavSatRef        nav_sat_ref(const Lrf lrf,
+                                                    std_msgs::msg::Header head);
 
   /**
    * @brief Wrap data for GAP (primary GPS to IMU offset) using oxts_msgs/msg/LeverArm
@@ -172,6 +172,15 @@ namespace RosNComWrapper
   nav_msgs::msg::Odometry odometry (const NComRxC *nrx,
                                     std_msgs::msg::Header head,
                                     Lrf lrf);
+  /**
+   * Wrap navigation data from NCom decoder to nav_msgs/msg/Path
+   * 
+   * @param poses Reference to the vector of poses
+   * @param head Header to be added to the published message
+   * @returns 
+   */
+  nav_msgs::msg::Path path (const std::vector<geometry_msgs::msg::PoseStamped> &poses,
+                                    std_msgs::msg::Header head);
   /**
    * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
    * 
