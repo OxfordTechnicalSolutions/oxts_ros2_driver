@@ -162,6 +162,14 @@ public:
     }
     RCLCPP_INFO(this->get_logger(), "INS config information received");
 
+    // Wait for a valid lat/long/alt
+    while ((nrx->mIsLatValid == 0 && nrx->mIsLatApprox == 0) &&
+        (nrx->mIsLonValid ==0 && nrx->mIsLonApprox == 0) &&
+        (nrx->mIsAltValid == 0 && nrx->mIsAltApprox == 0))
+    {
+      (*this.*update_ncom)();
+    }
+
     // Wait for INS initialisation if option enabled
     if (wait_for_init)
     {
@@ -169,9 +177,6 @@ public:
       // Only block things that are required for 100% of OxTS navigation
       while (
         nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME &&
-        nrx->mIsLatValid == 0 &&
-        nrx->mIsLonValid == 0 &&
-        nrx->mIsAltValid == 0 &&
         nrx->mIsHeadingValid == 0 &&
         nrx->mIsPitchValid == 0 &&
         nrx->mIsRollValid == 0
