@@ -87,6 +87,9 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     - Linear Velocity: _Future_
     - Angular Velocity: _Future_ 
 
+* **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Path.msg)
+    Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic. 
+
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
 
 \* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet

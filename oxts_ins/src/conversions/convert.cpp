@@ -29,6 +29,8 @@ void OxtsIns::NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg)
       this->velocity(msg->header);
     if (this->pubOdometryInterval && (sec_idx % this->pubOdometryInterval == 0))
       this->odometry(msg->header);
+    if (this->pubPathInterval && (sec_idx % this->pubPathInterval == 0))
+      this->path(msg->header);
     if (this->pubTimeReferenceInterval && (sec_idx % this->pubTimeReferenceInterval == 0))
       this->time_reference(msg->header);
     if (this->pubLeverArmInterval && (sec_idx % this->pubLeverArmInterval == 0))
@@ -62,7 +64,7 @@ void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
   if (this->lrf_valid)
   {
     header.frame_id = "navsat_link";
-    auto msg    = RosNComWrapper::nav_sat_ref(this->nrx, header, this->lrf);
+    auto msg    = RosNComWrapper::nav_sat_ref(this->lrf, header);
     pubNavSatRef_->publish(msg);
   }
 }
@@ -105,10 +107,7 @@ void OxtsIns::tf(std_msgs::msg::Header header)
     tf_oxts.transform.translation.x = odometry.pose.pose.position.x;
     tf_oxts.transform.translation.y = odometry.pose.pose.position.y;
     tf_oxts.transform.translation.z = odometry.pose.pose.position.z;
-    tf_oxts.transform.rotation.x = odometry.pose.pose.orientation.x;
-    tf_oxts.transform.rotation.y = odometry.pose.pose.orientation.y;
-    tf_oxts.transform.rotation.z = odometry.pose.pose.orientation.z;
-    tf_oxts.transform.rotation.w = odometry.pose.pose.orientation.w;
+    tf_oxts.transform.rotation = odometry.pose.pose.orientation;
     tf_broadcaster_->sendTransform(tf_oxts);
 
     auto vat    = RosNComWrapper::getVat(this->nrx);
@@ -172,8 +171,22 @@ void OxtsIns::odometry(std_msgs::msg::Header header)
   if (this->lrf_valid)
   {
     auto msg    = RosNComWrapper::odometry(this->nrx, header, this->lrf);
+    if (this->pubPathInterval)
+    {
+      auto new_pose_stamped = geometry_msgs::msg::PoseStamped();
+      new_pose_stamped.header = msg.header;
+      new_pose_stamped.pose = msg.pose.pose;
+      this->past_poses.push_back(new_pose_stamped);
+    }
     pubOdometry_->publish(msg);
   }
+}
+
+void OxtsIns::path(std_msgs::msg::Header header)
+{
+  header.frame_id = this->pub_odometry_frame_id;
+  auto msg = RosNComWrapper::path(this->past_poses, header);
+  pubPath_->publish(msg);
 }
 
 void OxtsIns::time_reference(std_msgs::msg::Header header)
