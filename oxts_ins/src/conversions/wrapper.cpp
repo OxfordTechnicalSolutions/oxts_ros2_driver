@@ -187,6 +187,22 @@ oxts_msgs::msg::LeverArm       lever_arm_gap(const NComRxC *nrx,
   return msg;
 }
 
+oxts_msgs::msg::ImuBias       imu_bias(const NComRxC *nrx,
+                                                    std_msgs::msg::Header head)
+{
+  auto msg = oxts_msgs::msg::ImuBias();
+  msg.header = head;
+  // Accelerometer biases
+  msg.accel.x = nrx->mAxBias;
+  msg.accel.y = nrx->mAyBias;
+  msg.accel.z = nrx->mAzBias;
+  // Gyroscope biases
+  msg.gyro.x = nrx->mWxBias;
+  msg.gyro.y = nrx->mWyBias;
+  msg.gyro.z = nrx->mWzBias;
+  return msg;
+}
+
 geometry_msgs::msg::PointStamped ecef_pos
                                               (
                                               const NComRxC *nrx,

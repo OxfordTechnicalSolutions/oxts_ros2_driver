@@ -102,6 +102,8 @@ private:
   bool pub_tf_flag;
   /*! Publishing rate for lever arm message. */
   uint8_t pub_lever_arm_rate;
+  /*! Publishing rate for IMU Bias message. */
+  uint8_t pub_imu_bias_rate;
 
   uint8_t ncomInterval;
   uint8_t pubStringInterval;
@@ -114,6 +116,8 @@ private:
   uint8_t pubEcefPosInterval;
   uint8_t pubNavSatRefInterval;
   uint8_t pubLeverArmInterval;
+  uint8_t pubIMUBiasInterval;
+  // ...
 
 
   void NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg);
@@ -143,6 +147,8 @@ private:
   /** Callback function for OxTS GAP lever arm message. Wraps message and
    *  publishes.*/
   void lever_arm_gap(std_msgs::msg::Header header);
+  /** Callback function for OxTS IMU Bias message. Wraps message and publishes. */
+  void imu_bias(std_msgs::msg::Header header);
   /** Get the LRF from configured source */
   void getLrf();
 
@@ -169,6 +175,8 @@ private:
   rclcpp::Publisher<oxts_msgs::msg::NavSatRef>::SharedPtr  pubNavSatRef_;
   /** Publsuher for /oxts_msgs/msg/LeverArm */
   rclcpp::Publisher<oxts_msgs::msg::LeverArm>::SharedPtr   pubLeverArm_;
+  /** Publisher for /oxts_msgs/msg/ImuBias */
+  rclcpp::Publisher<oxts_msgs::msg::ImuBias>::SharedPtr    pubIMUBias_;
   /** TF broadcaster */
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   /** Error strings */
@@ -198,6 +206,7 @@ public:
     pub_tf_flag             = this->declare_parameter("pub_tf_flag", true);
     lrf_source              = this->declare_parameter("lrf_source", 0);
     pub_lever_arm_rate      = this->declare_parameter("pub_lever_arm_rate", 0);
+    pub_imu_bias_rate       = this->declare_parameter("pub_imu_bias_rate", 0);
 
     /** @todo Improve error handling */
     if (ncom_rate == 0)
@@ -211,7 +220,8 @@ public:
     pubTimeReferenceInterval = (pub_time_reference_rate == 0) ? 0 : ncom_rate / pub_time_reference_rate;
     pubEcefPosInterval       = (pub_ecef_pos_rate       == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval     = (pub_nav_sat_ref_rate    == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
-    pubLeverArmInterval      = (pub_lever_arm_rate  == 0) ? 0 : ncom_rate / pub_lever_arm_rate;
+    pubLeverArmInterval      = (pub_lever_arm_rate      == 0) ? 0 : ncom_rate / pub_lever_arm_rate;
+    pubIMUBiasInterval       = (pub_imu_bias_rate       == 0) ? 0 : ncom_rate / pub_imu_bias_rate;
 
     // Initilize tf broadcaster if configured to broadcast
     if (pub_tf_flag) {
@@ -292,6 +302,14 @@ public:
         {RCLCPP_ERROR(this->get_logger(), "LeverArm" + notFactorError, pub_lever_arm_rate); return;}
       // Create publisher
       pubLeverArm_ = this->create_publisher<oxts_msgs::msg::LeverArm>("ins/lever_arm", 10);
+    }
+    if (pubIMUBiasInterval)
+    {
+      // Throw an error if ncom_rate / LeverArm_rate is not an integer
+       if (ncom_rate % pubIMUBiasInterval != 0)
+        {RCLCPP_ERROR(this->get_logger(), "IMUBias" + notFactorError, pub_imu_bias_rate); return;}
+      // Create publisher
+      pubIMUBias_ = this->create_publisher<oxts_msgs::msg::ImuBias>("ins/imu_bias", 10);
     }
 
     // Initialise subscriber for regular ncom packet message
