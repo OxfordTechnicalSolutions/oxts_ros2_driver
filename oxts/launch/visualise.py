@@ -28,6 +28,8 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration("use_rviz", default="True")
     wait_for_init = LaunchConfiguration("wait_for_init", default="True")
     ncom = LaunchConfiguration("ncom", default="")
+    topic_prefix = LaunchConfiguration("topic_prefix", default="ins")
+
 
     # declare launch arguments (this exposes the arcument
     # to IncludeLaunchDescriptionand to the command line)
@@ -43,6 +45,9 @@ def generate_launch_description():
     declare_ncom = DeclareLaunchArgument(
         "ncom", default_value="", description="NCOM file to replay (optional)"
     )
+    declare_prefix = DeclareLaunchArgument(
+        "topic_prefix", default_value="ins", description="Prefix to apply to all topics"
+    )
 
     # driver launch file
     launch_description = PythonLaunchDescriptionSource(f"{oxts_dir}/launch/minimal.py")
@@ -50,6 +55,7 @@ def generate_launch_description():
         launch_description_source=launch_description,
         launch_arguments={
             "ncom": ncom,
+            "topic_prefix": topic_prefix,
             "use_sim_time": use_sim_time,
             "wait_for_init": wait_for_init,
         }.items(),

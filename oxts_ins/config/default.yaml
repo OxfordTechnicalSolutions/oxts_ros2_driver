@@ -4,47 +4,49 @@ oxts_ins:
     # Configure ROS messages to be published by the node.
     ## Frames
     frame_id            : "oxts_link"
-    ## Configure output rates of individual topics
+    ## Configure individual topics
     ## Rates must be factors of the ncom_rate, configured above.
     ## Rates are in Hz. 0 Hz => Message will not be published
+    ### Overall topic names take the form "{topic_prefix}/{x_topic}"
+    ### where topic prefix is defined in the oxts_driver yaml
     ### Configure NCom (do not exceed output rate of ncom)
     ncom_rate               : 100
     ncom_topic              : "ncom"
     ### Publish string message
     pub_string_rate         : 0
-    string_topic            : "ins/debug_string_pos"
+    string_topic            : "debug_string_pos"
     ### Publish NavSatFix message
     pub_nav_sat_fix_rate    : 4
-    nav_sat_fix_topic       : "ins/nav_sat_fix"
+    nav_sat_fix_topic       : "nav_sat_fix"
     ### Publish Velocity message
     pub_velocity_rate       : 0
-    velocity_topic          : "ins/velocity"
+    velocity_topic          : "velocity"
     ### Publish Odometry message
     pub_odometry_rate       : 100
-    odometry_topic          : "ins/odometry"
+    odometry_topic          : "odometry"
     ### Publish Path message
     pub_path_rate           : 100
-    path_topic              : "ins/path"
+    path_topic              : "path"
     ### Defaults to "map", can be set to "odom" when emulating navsat_transform_node
     pub_odometry_frame_id   : "map"
     ### Publish TimeReference message
     pub_time_reference_rate : 0
-    time_reference_topic    : "ins/time_reference"
+    time_reference_topic    : "time_reference"
     ### Publish PoseWithCovarianceStamped message
     pub_ecef_pos_rate       : 0
-    ecef_pos_topic          : "ins/ecef_pos"
+    ecef_pos_topic          : "ecef_pos"
     ### Publish OxTS NavSatRef message
     pub_nav_sat_ref_rate    : 10
-    nav_sat_ref_topic       : "ins/nav_sat_ref"
+    nav_sat_ref_topic       : "nav_sat_ref"
     ### Publish OxTS Lever Arm message
     pub_lever_arm_rate      : 5
-    lever_arm_topic         : "ins/lever_arm"
+    lever_arm_topic         : "lever_arm"
     ### Publish OxTS IMU Bias message
     pub_imu_bias_rate       : 5
-    imu_bias_topic          : "ins/imu_bias"
+    imu_bias_topic          : "imu_bias"
     ### Publish Imu message
     pub_imu_flag            : true
-    imu_topic               : "imu/data"
+    imu_topic               : "imu"
     ### Broadcast TF messages for rviz visualisation
     pub_tf_flag             : true
     ### Source of the local reference frame

@@ -9,7 +9,8 @@ oxts_driver:
     ## Path of NCOM to replay (optional, must be absolute path)
     # ncom: /default/ncom/path.ncom 
     ## Topic to publish NCOM messages to
-    ncom_topic: ncom
+    ncom_topic: "ncom"
+    topic_prefix: "ins"
 
 #===============================================================================
     ## Rate is in Hz. 0 Hz => Message will not be published

@@ -22,6 +22,7 @@ def generate_launch_description():
     with open(driver_param_path, "r") as f:
         driver_params = yaml.safe_load(f)["oxts_driver"]["ros__parameters"]
     yaml_ncom = driver_params.pop("ncom", "")
+    yaml_prefix = driver_params.pop("topic_prefix", "ins")
 
     ins_param_path = os.path.join(ins_dir, "config", parameters_file_name)
     with open(ins_param_path, "r") as f:
@@ -30,8 +31,9 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_tim_time", default="False")
     wait_for_init = LaunchConfiguration("wait_for_init", default="True")
     ncom = LaunchConfiguration("ncom", default=yaml_ncom)
+    topic_prefix = LaunchConfiguration("topic_prefix", default=yaml_prefix)
 
-    # declare launch arguments (this exposes the arcument
+    # declare launch arguments (this exposes the argument
     # to IncludeLaunchDescriptionand to the command line)
     declare_use_sim_time = DeclareLaunchArgument("use_sim_time", default_value="False")
     declare_wait_for_init = DeclareLaunchArgument(
@@ -41,6 +43,9 @@ def generate_launch_description():
     )
     declare_ncom = DeclareLaunchArgument(
         "ncom", default_value=yaml_ncom, description="NCOM file to replay (optional)"
+    )
+    declare_prefix = DeclareLaunchArgument(
+        "topic_prefix", default_value=yaml_prefix, description="Prefix to apply to all topics"
     )
 
     oxts_driver_node = Node(
@@ -52,6 +57,7 @@ def generate_launch_description():
             driver_params,
             {"use_sim_time": use_sim_time},
             {"wait_for_init": wait_for_init},
+            {"topic_prefix": topic_prefix},
             {"ncom": ncom},
         ],
     )
@@ -61,13 +67,18 @@ def generate_launch_description():
         executable="oxts_ins",
         name="oxts_ins",
         output="screen",
-        parameters=[ins_params, {"use_sim_time": use_sim_time}],
+        parameters=[
+            ins_params,
+            {"use_sim_time": use_sim_time},
+            {"topic_prefix": topic_prefix},
+        ],
     )
 
     # create launch descroption and populate
     ld = LaunchDescription()
     # launch options
     ld.add_action(declare_ncom)
+    ld.add_action(declare_prefix)
     ld.add_action(declare_use_sim_time)
     ld.add_action(declare_wait_for_init)
     # launch nodes
