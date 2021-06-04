@@ -117,6 +117,19 @@ private:
   uint8_t pubNavSatRefInterval;
   uint8_t pubLeverArmInterval;
   uint8_t pubIMUBiasInterval;
+
+  std::string ncom_topic;
+  std::string string_topic;
+  std::string nav_sat_fix_topic;
+  std::string velocity_topic;
+  std::string odometry_topic;
+  std::string path_topic;
+  std::string time_reference_topic;
+  std::string ecef_pos_topic;
+  std::string nav_sat_ref_topic;
+  std::string lever_arm_topic;
+  std::string imu_bias_topic;
+  std::string imu_topic;
   // ...
 
 
@@ -207,6 +220,18 @@ public:
     lrf_source              = this->declare_parameter("lrf_source", 0);
     pub_lever_arm_rate      = this->declare_parameter("pub_lever_arm_rate", 0);
     pub_imu_bias_rate       = this->declare_parameter("pub_imu_bias_rate", 0);
+    ncom_topic              = this->declare_parameter("ncom_topic", "ncom");
+    string_topic            = this->declare_parameter("string_topic", "ins/debug_string_pos");
+    nav_sat_fix_topic       = this->declare_parameter("nav_sat_fix_topic", "ins/nav_sat_fix");
+    velocity_topic          = this->declare_parameter("velocity_topic", "ins/velocity");
+    odometry_topic          = this->declare_parameter("odometry_topic", "ins/odometry");
+    path_topic              = this->declare_parameter("path_topic", "ins/path");
+    time_reference_topic    = this->declare_parameter("time_reference_topic", "ins/time_reference");
+    ecef_pos_topic          = this->declare_parameter("ecef_pos_topic", "ins/ecef_pos");
+    nav_sat_ref_topic       = this->declare_parameter("nav_sat_ref_topic", "ins/nav_sat_ref");
+    lever_arm_topic         = this->declare_parameter("lever_arm_topic", "ins/lever_arm");
+    imu_bias_topic          = this->declare_parameter("imu_bias_topic", "ins/imu_bias");
+    imu_topic               = this->declare_parameter("imu_topic", "imu/data");
 
     /** @todo Improve error handling */
     if (ncom_rate == 0)
@@ -229,7 +254,7 @@ public:
     }
     // Initialise publishers for each message if configured to publish
     if (pub_imu_flag)
-      pubImu_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data", 10); 
+      pubImu_ = this->create_publisher<sensor_msgs::msg::Imu>(imu_topic, 10); 
 
     if (pubStringInterval)
     {
@@ -237,7 +262,7 @@ public:
       if (ncom_rate % pubStringInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "String" + notFactorError, pub_string_rate); return;}
       // Create publisher
-      pubString_ = this->create_publisher<std_msgs::msg::String>("ins/debug_string_pos", 10); 
+      pubString_ = this->create_publisher<std_msgs::msg::String>(string_topic, 10); 
     }
     if (pubNavSatFixInterval)
     {
@@ -245,7 +270,7 @@ public:
       if (ncom_rate % pubNavSatFixInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError, pub_nav_sat_fix_rate); return;}
       // Create publisher
-      pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>("ins/nav_sat_fix", 10); 
+      pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>(nav_sat_fix_topic, 10); 
     }
     if (pubVelocityInterval)
     {
@@ -253,7 +278,7 @@ public:
       if (ncom_rate % pubVelocityInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError, pub_velocity_rate); return;}
       // Create publisher
-      pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("ins/velocity", 10); 
+      pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(velocity_topic, 10); 
     }
     if (pubOdometryInterval)
     {
@@ -261,7 +286,7 @@ public:
       if (ncom_rate % pubOdometryInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError, pub_odometry_rate); return;}
       // Create publisher
-      pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>("ins/odometry", 10); 
+      pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>(odometry_topic, 10); 
     }
     if (pubPathInterval)
     {
@@ -269,7 +294,7 @@ public:
       if (ncom_rate % pubPathInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "Path" + notFactorError, pub_path_rate); return;}
       // Create publisher
-      pubPath_ = this->create_publisher<nav_msgs::msg::Path>("ins/path", 10); 
+      pubPath_ = this->create_publisher<nav_msgs::msg::Path>(path_topic, 10); 
     }
     if (pubTimeReferenceInterval)
     {
@@ -277,7 +302,7 @@ public:
       if (ncom_rate % pubTimeReferenceInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError, pub_time_reference_rate); return;}
       // Create publisher
-      pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>("ins/time_reference", 10);
+      pubTimeReference_ = this->create_publisher<sensor_msgs::msg::TimeReference>(time_reference_topic, 10);
     }
     if (pubEcefPosInterval)
     {
@@ -285,7 +310,7 @@ public:
       if (ncom_rate % pubEcefPosInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError, pub_ecef_pos_rate); return;}
       // Create publisher
-      pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>("ins/ecef_pos", 10);
+      pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>(ecef_pos_topic, 10);
     }
     if (pubNavSatRefInterval)
     {
@@ -293,7 +318,7 @@ public:
       if (ncom_rate % pubNavSatRefInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError, pub_nav_sat_ref_rate); return;}
       // Create publisher
-      pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>("ins/nav_sat_ref", 10);
+      pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>(nav_sat_ref_topic, 10);
     }
     if (pubLeverArmInterval)
     {
@@ -301,7 +326,7 @@ public:
        if (ncom_rate % pubLeverArmInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "LeverArm" + notFactorError, pub_lever_arm_rate); return;}
       // Create publisher
-      pubLeverArm_ = this->create_publisher<oxts_msgs::msg::LeverArm>("ins/lever_arm", 10);
+      pubLeverArm_ = this->create_publisher<oxts_msgs::msg::LeverArm>(lever_arm_topic, 10);
     }
     if (pubIMUBiasInterval)
     {
@@ -309,12 +334,12 @@ public:
        if (ncom_rate % pubIMUBiasInterval != 0)
         {RCLCPP_ERROR(this->get_logger(), "IMUBias" + notFactorError, pub_imu_bias_rate); return;}
       // Create publisher
-      pubIMUBias_ = this->create_publisher<oxts_msgs::msg::ImuBias>("ins/imu_bias", 10);
+      pubIMUBias_ = this->create_publisher<oxts_msgs::msg::ImuBias>(imu_bias_topic, 10);
     }
 
     // Initialise subscriber for regular ncom packet message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>
-                      ("ncom",10,std::bind(&OxtsIns::NCom_callback_regular,this,_1));
+                      (ncom_topic,10,std::bind(&OxtsIns::NCom_callback_regular,this,_1));
 
     nrx = NComCreateNComRxC();
 

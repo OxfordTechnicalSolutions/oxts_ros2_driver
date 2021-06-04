@@ -54,6 +54,8 @@ private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
   uint32_t ncom_rate;
+  /*! The topic to publish the raw NCOM messages to */
+  std::string ncom_topic;
   /*! IP address of the INS to connect to */
   std::string unit_ip;
   /*! Endpoint Port of the INS to be connected to. Default 3000 for NCom. */
@@ -104,6 +106,7 @@ public:
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate               = this->declare_parameter("ncom_rate", 100);
+    ncom_topic              = this->declare_parameter("ncom_topic", "ncom");
     unit_ip                 = this->declare_parameter("unit_ip", "0.0.0.0");
     unit_port               = this->declare_parameter("unit_port", 3000);
     ncom_path               = this->declare_parameter("ncom", std::string(""));
@@ -115,7 +118,7 @@ public:
 
     // Initialise publishers for each message - all are initialised, even if not
     // configured
-    pubNCom_ = this->create_publisher<oxts_msgs::msg::Ncom> ("ncom", 10); 
+    pubNCom_ = this->create_publisher<oxts_msgs::msg::Ncom> (ncom_topic, 10); 
 
 
     nrx = NComCreateNComRxC();

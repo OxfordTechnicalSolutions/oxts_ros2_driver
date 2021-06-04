@@ -7,33 +7,45 @@ oxts_ins:
     ## Configure output rates of individual topics
     ## Rates must be factors of the ncom_rate, configured above.
     ## Rates are in Hz. 0 Hz => Message will not be published
-    ### Configure sample rate of NCom (do not exceed output rate of ncom)
+    ### Configure NCom (do not exceed output rate of ncom)
     ncom_rate               : 100
+    ncom_topic              : "ncom"
     ### Publish string message
     pub_string_rate         : 0
+    string_topic            : "ins/debug_string_pos"
     ### Publish NavSatFix message
     pub_nav_sat_fix_rate    : 4
+    nav_sat_fix_topic       : "ins/nav_sat_fix"
     ### Publish Velocity message
     pub_velocity_rate       : 0
+    velocity_topic          : "ins/velocity"
     ### Publish Odometry message
     pub_odometry_rate       : 100
+    odometry_topic          : "ins/odometry"
     ### Publish Path message
     pub_path_rate           : 100
+    path_topic              : "ins/path"
     ### Defaults to "map", can be set to "odom" when emulating navsat_transform_node
     pub_odometry_frame_id   : "map"
     ### Publish TimeReference message
     pub_time_reference_rate : 0
+    time_reference_topic    : "ins/time_reference"
     ### Publish PoseWithCovarianceStamped message
     pub_ecef_pos_rate       : 0
+    ecef_pos_topic          : "ins/ecef_pos"
     ### Publish OxTS NavSatRef message
     pub_nav_sat_ref_rate    : 10
+    nav_sat_ref_topic       : "ins/nav_sat_ref"
     ### Publish OxTS Lever Arm message
     pub_lever_arm_rate      : 5
+    lever_arm_topic         : "ins/lever_arm"
     ### Publish OxTS IMU Bias message
     pub_imu_bias_rate       : 5
+    imu_bias_topic          : "ins/imu_bias"
     ### Publish Imu message
     pub_imu_flag            : true
-    ### Broadcast Tf messages for rviz visualisation
+    imu_topic               : "imu/data"
+    ### Broadcast TF messages for rviz visualisation
     pub_tf_flag             : true
     ### Source of the local reference frame
     #### 0 - NCom LRF
