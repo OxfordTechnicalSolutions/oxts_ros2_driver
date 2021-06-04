@@ -92,6 +92,12 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
 
+* **ins/lever_arm** [oxts_msgs/msg/LeverArm](./oxts_msgs/msg/LeverArm.msg)
+    Lever arm offsets, in (x, y, z) coordinates. The lever arm type is specified by `lever_arm_id` in the message. The reference frame will depend on the lever arm type. Currently, only `gap` (IMU to Primary GPS Antenna offset) is broacast.
+
+* **ins/imu_bias** [oxts_msgs/msg/ImuBias](./oxts_msgs/msg/ImuBias.msg)
+    Accelerometer and gyroscope biases.   
+
 \* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet
 
 Useful sources of information around frames used for these messages can be found in:
