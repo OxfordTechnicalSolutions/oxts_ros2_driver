@@ -162,14 +162,6 @@ public:
     }
     RCLCPP_INFO(this->get_logger(), "INS config information received");
 
-    // Wait for a valid lat/long/alt
-    while ((nrx->mIsLatValid == 0 && nrx->mIsLatApprox == 0) &&
-        (nrx->mIsLonValid ==0 && nrx->mIsLonApprox == 0) &&
-        (nrx->mIsAltValid == 0 && nrx->mIsAltApprox == 0))
-    {
-      (*this.*update_ncom)();
-    }
-
     // Wait for INS initialisation if option enabled
     if (wait_for_init)
     {
@@ -191,7 +183,20 @@ public:
     }
     else
     {
-      RCLCPP_INFO(this->get_logger(), "Publishing before INS initialisation");
+      RCLCPP_INFO(this->get_logger(), "Waiting for approximate position...");
+      // Wait for a approximate position (while uninitialised, orientation is never approx/valid)
+      while (
+        nrx->mIsLatApprox == 0 &&
+        nrx->mIsLonApprox == 0 &&
+        nrx->mIsAltApprox == 0 &&
+        nrx->mIsLatValid == 0 &&
+        nrx->mIsLonValid == 0 &&
+        nrx->mIsAltValid == 0
+      )
+      {
+        (*this.*update_ncom)();
+      }
+      RCLCPP_INFO(this->get_logger(), "Publishing before/without INS initialisation");
     }
 
     timer_ncom_ = this->create_wall_timer(
