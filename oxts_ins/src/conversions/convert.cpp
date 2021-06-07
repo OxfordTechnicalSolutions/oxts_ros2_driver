@@ -58,11 +58,8 @@ void OxtsIns::nav_sat_fix(std_msgs::msg::Header header)
 
 void OxtsIns::nav_sat_ref(std_msgs::msg::Header header)
 {
-  // Set the LRF if - we haven't set it before
-  if (!this->lrf_valid)
-  {
-    this->getLrf();
-  } 
+  // Set the LRF if - we haven't set it before (unless using NCOM LRF)
+  this->getLrf();
   if (this->lrf_valid)
   {
     header.frame_id = "navsat_link";
@@ -101,11 +98,8 @@ void OxtsIns::imu(std_msgs::msg::Header header)
 
 void OxtsIns::tf(std_msgs::msg::Header header)
 {
-  // Set the LRF if - we haven't set it before
-  if (!this->lrf_valid)
-  {
-    this->getLrf();
-  } 
+  // Set the LRF if - we haven't set it before (unless using NCOM LRF)
+  this->getLrf();
   if (this->lrf_valid)
   {
     auto odometry = RosNComWrapper::odometry(this->nrx, header, this->lrf);
@@ -172,11 +166,8 @@ void OxtsIns::velocity(std_msgs::msg::Header header)
 void OxtsIns::odometry(std_msgs::msg::Header header)
 {
   header.frame_id = this->pub_odometry_frame_id;
-  // Set the LRF if - we haven't set it before
-  if (!this->lrf_valid)
-  {
-    this->getLrf();
-  } 
+  // Set the LRF if - we haven't set it before (unless using NCOM LRF)
+  this->getLrf();
   if (this->lrf_valid)
   {
     auto msg    = RosNComWrapper::odometry(this->nrx, header, this->lrf);
@@ -210,18 +201,18 @@ void OxtsIns::getLrf()
   // Configured to come from NCom LRF, and the NCom LRF is valid.
   if (this->lrf_source == LRF_SOURCE::NCOM_LRF && nrx->mIsRefLatValid)
     {
-      this->lrf = RosNComWrapper::getNcomLrf(nrx); 
+      this->lrf = RosNComWrapper::getNcomLrf(nrx);
       this->lrf_valid = true;
     }
   // Configured to come from the first NCom packet
-  else if (this->lrf_source == LRF_SOURCE::NCOM_FIRST)
+  else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST)
   {
     this->lrf.origin(nrx->mLat,nrx->mLon,nrx->mAlt);
     // mHeading is in NED. Get angle between LRF and ENU
     this->lrf.heading((90.0+nrx->mHeading) * NAV_CONST::DEG2RADS); 
     this->lrf_valid = true;
   }  
-  else if (this->lrf_source == LRF_SOURCE::NCOM_FIRST_ENU)
+  else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST_ENU)
   {
     this->lrf.origin(nrx->mLat,nrx->mLon,nrx->mAlt);
     this->lrf.heading((0.0) * NAV_CONST::DEG2RADS); // LRF aligned to ENU
