@@ -10,7 +10,7 @@ from launch.conditions import IfCondition, LaunchConfigurationNotEquals
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-urdf_file_name = "medium.urdf.xml"
+urdf_file_name = "small_core.urdf.xml"
 
 
 def generate_launch_description():
@@ -50,7 +50,7 @@ def generate_launch_description():
     )
 
     # driver launch file
-    launch_description = PythonLaunchDescriptionSource(f"{oxts_dir}/launch/minimal.py")
+    launch_description = PythonLaunchDescriptionSource(f"{oxts_dir}/launch/run.py")
     oxts_launch = IncludeLaunchDescription(
         launch_description_source=launch_description,
         launch_arguments={
