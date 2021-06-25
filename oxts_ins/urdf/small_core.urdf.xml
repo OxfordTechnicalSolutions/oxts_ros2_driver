@@ -3,9 +3,9 @@
 
   <link name="oxts_link">
     <visual>
-      <origin rpy="0 0 -1.57079632679" xyz="-0.102 0.053 -0.015"/>
+      <origin rpy="0 0 0" xyz="-0.102 -0.024067 -0.015"/>
       <geometry>
-        <mesh filename="package://oxts_ins/urdf/medium.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://oxts_ins/urdf/small_core.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="oxts_red">
         <color rgba="0.792 0.094 0.11 1.0"/>
