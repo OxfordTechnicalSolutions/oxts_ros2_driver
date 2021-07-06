@@ -4,7 +4,7 @@
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Includes NCOM decoding and GAD encoding functionality. Where ROS is mentioned in this document this is in reference to ROS2. References to ROS1 will be explicit.
 
-The ROS driver has been built with ROS release Foxy Fitzroy as a pre-built binary. The need has not arisen to build from source just yet. 
+The ROS driver has been built with ROS release Foxy Fitzroy as a pre-built binary. The need has not arisen to build from source just yet.
 
 ## Build from source
 
@@ -47,7 +47,7 @@ or, to replay from an ncom file:
     ros2 launch oxts run.py ncom:=<path_to_ncom> # absolute or relative
 ```
 
-To view the Odometry and Tf data from the INS, use the `visualise.py` launch file. This requires RViz to be installed. There is also the option to start publishig before the NCOM has initialised (not recommended) `wait_for_init:=false`.
+To view the Odometry and Tf data from the INS, use the `visualise.py` launch file. This requires RViz to be installed. There is also the option to start publishing before the NCOM has initialised (not recommended) `wait_for_init:=false`.
 
 The currently available launch files are as follows:
 
@@ -67,7 +67,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output and as a result, this message can be output at a higher rate than is typical with GNSS receivers.
 
 * **ins/nav_sat_ref** [oxts_msgs/msg/NavSatRef](./oxts_msgs/msg/NavSatRef.msg)
-    Contains the WGS84 reference position currently being used to calculate the local coordinates for **ins/odometry**. This can either be the: 
+    Contains the WGS84 reference position currently being used to calculate the local coordinates for **ins/odometry**. This can either be the:
     * LRF in NCOM
     * Position & heading of the first NCOM packet received
     * Position of the first NCOM packet received, aligned to ENU.
@@ -81,24 +81,24 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Velocity of the INS, in the INS frame.
 
 * **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Odometry.msg)
-    Odometry data from the INS. 
-    - Position: In a local reference frame defined either by the LRF in NCom, or created from the first NCom packet. 
+    Odometry data from the INS.
+    - Position: In a local reference frame defined either by the LRF in NCom, or created from the first NCom packet.
     - Orientation: Rotation of the INS relative to the alignment of the LRF
     - Linear Velocity: _Future_
-    - Angular Velocity: _Future_ 
+    - Angular Velocity: _Future_
 
 * **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Path.msg)
-    Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic. 
+    Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic.
 
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
 
 * **ins/lever_arm** [oxts_msgs/msg/LeverArm](./oxts_msgs/msg/LeverArm.msg)
-    Lever arm offsets, in (x, y, z) coordinates. The lever arm type is specified by `lever_arm_id` in the message. The reference frame will depend on the lever arm type. Currently, only `gap` (IMU to Primary GPS Antenna offset) is broacast.
+    Lever arm offsets, in (x, y, z) coordinates. The lever arm type is specified by `lever_arm_id` in the message. The reference frame will depend on the lever arm type. Currently, only `gap` (IMU to Primary GPS Antenna offset) is broadcast.
 
 * **ins/imu_bias** [oxts_msgs/msg/ImuBias](./oxts_msgs/msg/ImuBias.msg)
-    Accelerometer and gyroscope biases.   
+    Accelerometer and gyroscope biases.
 
-\* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doens't exist yet
+\* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doesn't exist yet
 
 Useful sources of information around frames used for these messages can be found in:
 
@@ -129,7 +129,8 @@ The driver has been developed on Ubuntu 20.04 using the Visual Studio Code IDE o
 
 In lieu of getting the colcon tasks package working, the following VS Code tasks.json file was used:
 
-`{
+```json
+{
     "version": "2.0.0",
     "command": "bash",
     "args": [
@@ -152,13 +153,14 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
             "args":["source /opt/ros/foxy/setup.bash  && cd ~/code/ros2_ws/ && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash"],
         },
     ]
-}`
+}
+```
 
 This creates VS Code tasks for building a ROS2 / colcon workspace. Note that since this is for building a workspace, it should be at the workspace level, not at the package level. It's a bit hacky but it makes building easy. If anyone figures out the colcon tasks package that's probably the better approach.
 
 ## Intro to ROS2
 
-ROS2 has some really nice intro documentation, and it should only improve over time. 
+ROS2 has some really nice intro documentation, and it should only improve over time.
 
 - Installation: https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
 - Create a workspace: https://index.ros.org/doc/ros2/Tutorials/Workspace/Creating-A-Workspace/
