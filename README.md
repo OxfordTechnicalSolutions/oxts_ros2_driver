@@ -75,7 +75,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     (Depending on the parameters set in the `.yaml`)
 
 * **ins/imu** [sensor_msgs/msg/Imu](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Imu.html)
-    Contains IMU data from the INS, including orientation (`Roll`, `Pitch` and `Heading` from NCOM), angular rates (`Wx`, `Wy` and `Wz`), and linear accelerations (`Ax`, `Ay` and `Az`). Orientation is typically taken from magnetometers in this message. Here it is taken from INS output.
+    Contains IMU data from the INS. Orientation is typically taken from magnetometers in this message; here it is taken from INS output. This comprises orientation in ENU frame (`Roll`, `Pitch` and `Heading` from NCOM), angular rates in the IMU frame (`Wx`, `Wy` and `Wz`), and linear accelerations in the IMU frame (`Ax`, `Ay` and `Az`).
 
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame. (Linear velocity corresponds to measurements `IsoVoX`, `IsoVoY` and `IsoVoZ`, while angular velocity is `Wx`, `Wy` and `Wz`.)
