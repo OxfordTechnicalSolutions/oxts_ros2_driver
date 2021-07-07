@@ -17,7 +17,8 @@ sudo apt install doxygen
 pip3 install sphinx breathe sphinx_rtd_theme
 ```
 
-Build instructions will look something like this:
+To build the driver:
+
 ```bash
 . /opt/ros/foxy/setup.bash # "." and "source" are interchangeable (unix)
 mkdir -p ros_ws/src
