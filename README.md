@@ -63,7 +63,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     This message is not useful for general use. It is currently included for debug purposes. It contains a timestamp from NCom (`TimeWeekSecond`) and WGS84 coordinates (`Lat`, `Lon`, `Alt`) in string form, which is output to the console.
 
 * **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PointStamped.html)
-    Contains a timestamped position of the INS in the ECEF reference frame (`Lat`, `Lon` and `Alt` from NCOM).
+    Contains a timestamped position of the INS in the ECEF reference frame (derived from `Lat`, `Lon` and `Alt` from NCOM).
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output (`Lat`, `Lon` and `Alt`) and as a result, this message can be output at a higher rate than is typical with GNSS receivers. Covariance is derived from `EastAcc`, `NorthAcc` and `AltAcc`.
 
@@ -83,7 +83,10 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 
 * **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Odometry.msg)
     Odometry data from the INS.
-    - Position: In a local reference frame defined either by the LRF in NCom (`RefLat`, `RefLon`, `RefAlt` and `RefHeading`), or created from the first NCom packet (`Lat`, `Lon`, `Alt` and `Heading`).
+    - Position: In a local reference frame which, depending on your configuration, is defined either by:
+        - The LRF in NCom (`RefLat`, `RefLon`, `RefAlt` and `RefHeading`).
+        - The first NCom packet (`Lat`, `Lon`, `Alt` and `Heading`).
+        - The first NCom packet, aligned to ENU.
     - Orientation: Rotation of the INS relative to the alignment of the LRF (computed from `Roll`, `Pitch` and `Heading`)
     - Linear Velocity: _Future_
     - Angular Velocity: _Future_
@@ -101,7 +104,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     Biases for the accelerometer (`AxBias`, `AyBias`, `AzBias`) and gyroscope (`WxBias`, `WyBias`, `WzBias`).
 
 * **ins/ncom** [oxts_msgs/msg/Ncom](./oxts_msgs/msg/Ncom.msg)
-    Raw NCOM data, output by the `/oxts_driver` node. (To be subsequently split by the `/oxts_ins` node into the messages listed here.)
+    Raw NCOM data, output by the `/oxts_driver` node, to be subsequently split by the `/oxts_ins` node into all the messages listed here (besides this one).
 
 \* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doesn't exist yet
 
