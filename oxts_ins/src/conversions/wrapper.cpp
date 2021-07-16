@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "oxts_ins/wrapper.hpp"
 
 namespace RosNComWrapper {
@@ -121,7 +123,7 @@ sensor_msgs::msg::NavSatStatus nav_sat_status(const NComRxC *nrx) {
 sensor_msgs::msg::NavSatFix nav_sat_fix(const NComRxC *nrx,
                                         std_msgs::msg::Header head) {
   auto msg = sensor_msgs::msg::NavSatFix();
-  msg.header = head;
+  msg.header = std::move(head);
 
   msg.status = nav_sat_status(nrx);
 
@@ -141,7 +143,7 @@ sensor_msgs::msg::NavSatFix nav_sat_fix(const NComRxC *nrx,
 
 oxts_msgs::msg::NavSatRef nav_sat_ref(Lrf lrf, std_msgs::msg::Header head) {
   auto msg = oxts_msgs::msg::NavSatRef();
-  msg.header = head;
+  msg.header = std::move(head);
   msg.latitude = lrf.lat();
   msg.longitude = lrf.lon();
   msg.altitude = lrf.alt();
@@ -152,7 +154,7 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(Lrf lrf, std_msgs::msg::Header head) {
 oxts_msgs::msg::LeverArm lever_arm_gap(const NComRxC *nrx,
                                        std_msgs::msg::Header head) {
   auto msg = oxts_msgs::msg::LeverArm();
-  msg.header = head;
+  msg.header = std::move(head);
   msg.lever_arm_id = "gap";
   msg.offset_x = nrx->mGAPx;
   msg.offset_y = nrx->mGAPy;
@@ -163,7 +165,7 @@ oxts_msgs::msg::LeverArm lever_arm_gap(const NComRxC *nrx,
 oxts_msgs::msg::ImuBias imu_bias(const NComRxC *nrx,
                                  std_msgs::msg::Header head) {
   auto msg = oxts_msgs::msg::ImuBias();
-  msg.header = head;
+  msg.header = std::move(head);
   // Accelerometer biases
   msg.accel.x = nrx->mAxBias;
   msg.accel.y = nrx->mAyBias;
@@ -178,7 +180,7 @@ oxts_msgs::msg::ImuBias imu_bias(const NComRxC *nrx,
 geometry_msgs::msg::PointStamped ecef_pos(const NComRxC *nrx,
                                           std_msgs::msg::Header head) {
   auto msg = geometry_msgs::msg::PointStamped();
-  msg.header = head;
+  msg.header = std::move(head);
 
   Point::Cart ecef =
       NavConversions::GeodeticToEcef(nrx->mLat, nrx->mLon, nrx->mAlt);
@@ -200,7 +202,7 @@ std_msgs::msg::String string(const NComRxC *nrx) {
 
 sensor_msgs::msg::Imu imu(const NComRxC *nrx, std_msgs::msg::Header head) {
   auto msg = sensor_msgs::msg::Imu();
-  msg.header = head;
+  msg.header = std::move(head);
 
   auto q_vat = tf2::Quaternion(); // Quaternion representation of the
                                   // vehicle-imu alignment
@@ -251,7 +253,7 @@ sensor_msgs::msg::Imu imu(const NComRxC *nrx, std_msgs::msg::Header head) {
 geometry_msgs::msg::TwistStamped velocity(const NComRxC *nrx,
                                           std_msgs::msg::Header head) {
   auto msg = geometry_msgs::msg::TwistStamped();
-  msg.header = head;
+  msg.header = std::move(head);
 
   // Construct vehicle-imu frame transformation --------------------------------
   auto q_vat = getVat(nrx);
@@ -301,8 +303,8 @@ tf2::Matrix3x3 getRotEnuToLrf(double theta) {
   return tf2::Matrix3x3(c_theta, -s_theta, 0, s_theta, c_theta, 0, 0, 0, 1);
 }
 
-nav_msgs::msg::Odometry odometry(const NComRxC *nrx, std_msgs::msg::Header head,
-                                 Lrf lrf) {
+nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
+                                 const std_msgs::msg::Header &head, Lrf lrf) {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = head;
   msg.child_frame_id = "oxts_link";
@@ -375,7 +377,7 @@ nav_msgs::msg::Path
 path(const std::vector<geometry_msgs::msg::PoseStamped> &poses,
      std_msgs::msg::Header head) {
   auto msg = nav_msgs::msg::Path();
-  msg.header = head;
+  msg.header = std::move(head);
   msg.poses = poses;
 
   return msg;
@@ -385,7 +387,7 @@ sensor_msgs::msg::TimeReference time_reference(const NComRxC *nrx,
                                                std_msgs::msg::Header head) {
   auto msg = sensor_msgs::msg::TimeReference();
 
-  msg.header = head;
+  msg.header = std::move(head);
 
   msg.time_ref.sec = static_cast<int32_t>(nrx->mTimeWeekSecond);
   msg.time_ref.nanosec = static_cast<uint32_t>(

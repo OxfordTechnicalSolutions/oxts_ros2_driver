@@ -48,7 +48,7 @@ public:
       * port - the port on the local machine the socket will be opened on when
      receiving data
   */
-  client(short local_port)
+  explicit client(short local_port)
       : socket(io_service),
         local_endpoint(boost::asio::ip::udp::v4(), local_port) {}
 
@@ -79,7 +79,7 @@ public:
       number of bytes received, if it fails prints error code and returns 0.
   */
   std::size_t receive_from(byte *recv_buffer, std::size_t size_of_buffer,
-                           udp::endpoint required_sender_endpoint) {
+                           const udp::endpoint &required_sender_endpoint) {
     boost::system::error_code error_code;
     std::size_t bytes_received = 0;
     udp::endpoint sender_endpoint;
@@ -163,7 +163,7 @@ public:
      * dest_ip - the ip of the destination endpoint
      * dest_port - port of the destination endpoint
   */
-  void set_remote_endpoint(std::string dest_ip, short dest_port) {
+  void set_remote_endpoint(const std::string &dest_ip, short dest_port) {
     remote_endpoint = udp::endpoint(address::from_string(dest_ip), dest_port);
   }
 
@@ -208,7 +208,7 @@ public:
      * the number of bytes sent to the endpoint
   */
   std::size_t send_to(byte *buffer, std::size_t buffer_size,
-                      udp::endpoint remote_endpoint) {
+                      const udp::endpoint &remote_endpoint) {
     boost::system::error_code error_code;
     std::size_t sent = 0;
     try {

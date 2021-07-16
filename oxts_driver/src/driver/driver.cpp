@@ -20,7 +20,7 @@ void OxtsDriver::get_file_packet() {
       RCLCPP_INFO(this->get_logger(), "End of NCom file reached.");
       rclcpp::shutdown();
       return;
-    };
+    }
 }
 
 void OxtsDriver::get_socket_packet() {
@@ -29,7 +29,7 @@ void OxtsDriver::get_socket_packet() {
       this->buff, NCOM_PACKET_LENGTH, this->unitEndpointNCom);
   // Add data to decoder
   while (NComNewChars(this->nrx, this->buff, size) != COM_NEW_UPDATE) {
-  };
+  }
 }
 
 void OxtsDriver::publish_packet() {
@@ -54,13 +54,13 @@ void OxtsDriver::publish_packet() {
   }
   default:
     break;
-  };
+  }
 }
 
 bool OxtsDriver::check_rate(double prevPktSec, double currPktSec) {
   bool skip_packet = false;
   // perform error checking on nrx timestamps
-  if (!(prevPktSec > 0))
+  if (prevPktSec <= 0)
     ;
   else if (currPktSec - prevPktSec > (1.5 / this->ncom_rate)) {
     RCLCPP_WARN(this->get_logger(), "Packet drop detected.");

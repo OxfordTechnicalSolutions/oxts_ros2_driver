@@ -87,7 +87,7 @@ void OxtsIns::imu(std_msgs::msg::Header header) {
   pubImu_->publish(msg);
 }
 
-void OxtsIns::tf(std_msgs::msg::Header header) {
+void OxtsIns::tf(const std_msgs::msg::Header &header) {
   // Set the LRF if - we haven't set it before (unless using NCOM LRF)
   this->getLrf();
   if (this->lrf_valid) {

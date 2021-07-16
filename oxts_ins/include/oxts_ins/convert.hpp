@@ -99,10 +99,8 @@ private:
   /*! Publishing rate for IMU Bias message. */
   uint8_t pub_imu_bias_rate;
 
-  uint8_t ncomInterval;
   uint8_t pubStringInterval;
   uint8_t pubNavSatFixInterval;
-  uint8_t pubTfInterval;
   uint8_t pubVelocityInterval;
   uint8_t pubOdometryInterval;
   uint8_t pubPathInterval;
@@ -136,7 +134,7 @@ private:
   /** Callback function for Imu message. Wraps message and publishes. */
   void imu(std_msgs::msg::Header header);
   /** Callback function for Tf messages. Wraps messages and broadcasts. */
-  void tf(std_msgs::msg::Header header);
+  void tf(const std_msgs::msg::Header &header);
   /** Callback function for TimeReference message. Wraps message and publishes.
    */
   void time_reference(std_msgs::msg::Header header);

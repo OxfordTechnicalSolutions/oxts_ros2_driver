@@ -3,8 +3,8 @@
  * @brief General purpose conversion functions between coordinate frames.
  */
 
-#ifndef CONVERT_HPP
-#define CONVERT_HPP
+#ifndef NAV_CONVERSIONS_HPP
+#define NAV_CONVERSIONS_HPP
 
 #include <math.h>
 #include <vector>
@@ -20,9 +20,9 @@ private:
   double x2_ = 0;
 
 public:
-  double x0() const;
-  double x1() const;
-  double x2() const;
+  [[nodiscard]] double x0() const;
+  [[nodiscard]] double x1() const;
+  [[nodiscard]] double x2() const;
   void x0(double x0_);
   void x1(double x1_);
   void x2(double x2_);
@@ -30,17 +30,17 @@ public:
   Point() : x0_(0), x1_(0), x2_(0) {}
   Point(double x_0, double x_1, double x_2) : x0_(x_0), x1_(x_1), x2_(x_2) {}
 
-  Point operator+(const Point &p);
-  Point operator-(const Point &p);
+  Point operator+(const Point &p) const;
+  Point operator-(const Point &p) const;
 };
 
 class Cart : protected Point {
 public:
   Cart() : Point() {}
   Cart(double x, double y, double z) : Point(x, y, z) {}
-  double x() const;
-  double y() const;
-  double z() const;
+  [[nodiscard]] double x() const;
+  [[nodiscard]] double y() const;
+  [[nodiscard]] double z() const;
   void x(double x);
   void y(double y);
   void z(double z);
@@ -53,9 +53,9 @@ class Geodetic : protected Point {
 public:
   Geodetic() : Point() {}
   Geodetic(double lat, double lon, double alt) : Point(lat, lon, alt) {}
-  double lat() const;
-  double lon() const;
-  double alt() const;
+  [[nodiscard]] double lat() const;
+  [[nodiscard]] double lon() const;
+  [[nodiscard]] double alt() const;
   void lat(double x);
   void lon(double y);
   void alt(double z);
@@ -91,7 +91,7 @@ public:
   double lat() { return this->origin_.lat(); }
   double lon() { return this->origin_.lon(); }
   double alt() { return this->origin_.alt(); }
-  double heading() { return this->heading_; }
+  double heading() const { return this->heading_; }
 };
 
 /**
@@ -160,4 +160,4 @@ Point::Cart GeodeticToEnu(double lat, double lon, double h, double lat0,
                           double lon0, double alt0);
 } // namespace NavConversions
 
-#endif // CONVERSIONS_HPP
+#endif // NAV_CONVERSIONS_HPP

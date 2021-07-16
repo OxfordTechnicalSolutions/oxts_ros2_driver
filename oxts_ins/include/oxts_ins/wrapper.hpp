@@ -169,8 +169,8 @@ geometry_msgs::msg::TwistStamped velocity(const NComRxC *nrx,
  * @param head Header to be added to the published message
  * @returns
  */
-nav_msgs::msg::Odometry odometry(const NComRxC *nrx, std_msgs::msg::Header head,
-                                 Lrf lrf);
+nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
+                                 const std_msgs::msg::Header &head, Lrf lrf);
 /**
  * Wrap navigation data from NCom decoder to nav_msgs/msg/Path
  *
