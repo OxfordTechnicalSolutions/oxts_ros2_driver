@@ -125,7 +125,7 @@ private:
   std::string imu_topic;
   // ...
 
-  void NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg);
+  void ncomCallbackRegular(const oxts_msgs::msg::Ncom::SharedPtr msg);
   /** Callback function for debug String message. Wraps message, publishes, and
    *  prints some information to the console.*/
   void string();
@@ -388,7 +388,7 @@ public:
     // Initialise subscriber for regular ncom packet message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>(
         topic_prefix + "/" + ncom_topic, 10,
-        std::bind(&OxtsIns::NCom_callback_regular, this, _1));
+        std::bind(&OxtsIns::ncomCallbackRegular, this, _1));
 
     nrx = NComCreateNComRxC();
 

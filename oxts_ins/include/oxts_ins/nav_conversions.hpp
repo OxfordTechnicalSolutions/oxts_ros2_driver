@@ -100,7 +100,7 @@ public:
  */
 namespace NavConversions {
 /**
- * @fn hpr_to_quaternion
+ * @fn hprToQuaternion
  * @brief Convert Euler angles (Heading, Pitch, Roll) to Quaternions.
  *
  * @param  h Heading (deg)
@@ -108,9 +108,9 @@ namespace NavConversions {
  * @param  r Roll    (deg)
  * @return Quaternion (x, y, z, w)
  */
-std::vector<double> hpr_to_quaternion(double h, double p, double r);
+std::vector<double> hprToQuaternion(double h, double p, double r);
 /**
- * @fn lla_to_ecef
+ * @fn llaToEcef
  * @brief Convert Lat, Long, Alt to ECEF x,y,z
  *
  * @param  lat Latitude in WGS84
@@ -118,45 +118,45 @@ std::vector<double> hpr_to_quaternion(double h, double p, double r);
  * @param  alt Altitude in WGS84
  * @return ECEF (x, y, z)
  */
-std::vector<double> lla_to_ecef(double lat, double lon, double alt);
+std::vector<double> llaToEcef(double lat, double lon, double alt);
 /** Converts WGS-84 Geodetic point (lat, lon, alt) to the
  * Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z)
  */
-Point::Cart GeodeticToEcef(double lat, double lon, double alt);
+Point::Cart geodeticToEcef(double lat, double lon, double alt);
 /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to
  * (WGS-84) Geodetic point (lat, lon, h).
  */
-Point::Geodetic EcefToGeodetic(double x, double y, double z);
+Point::Geodetic ecefToGeodetic(double x, double y, double z);
 /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to
  * East-North-Up coordinates in a Local Tangent Plane that is centered at the
  * (WGS-84) Geodetic point (lat0, lon0, alt).
  */
-Point::Cart EcefToEnu(double x, double y, double z, double lat0, double lon0,
+Point::Cart ecefToEnu(double x, double y, double z, double lat0, double lon0,
                       double alt);
 /** Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to
  * East-North-Up coordinates in a Local Tangent Plane that is centered at the
  * (WGS-84) Geodetic point (lat0, lon0, alt).
  */
-Point::Cart EcefToEnu(Point::Cart p, double lat0, double lon0, double alt0);
-/** Inverse of EcefToEnu. Converts East-North-Up coordinates
+Point::Cart ecefToEnu(Point::Cart p, double lat0, double lon0, double alt0);
+/** Inverse of ecefToEnu. Converts East-North-Up coordinates
  * (xEast, yNorth, zUp) in a Local Tangent Plane that is centered at the
  * (WGS-84) Geodetic point (lat0, lon0, alt0) to the
  * Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z).
  */
-Point::Cart EnuToEcef(double xEast, double yNorth, double zUp, double lat0,
+Point::Cart enuToEcef(double xEast, double yNorth, double zUp, double lat0,
                       double lon0, double alt0);
 /** Converts the East-North-Up coordinates into a local coordinate frame
  *  defined at the same origin, but rotated around the negative z-axis by
  *  ref_heading degrees. Designed for use with the LRF from NCom.
  */
-Point::Cart EnuToLrf(double xEast, double yNorth, double zUp,
+Point::Cart enuToLrf(double xEast, double yNorth, double zUp,
                      double ref_heading);
 
 /** Converts the geodetic WGS-84 coordinated (lat, lon, h) to
  * East-North-Up coordinates in a Local Tangent Plane that is centered at the
  * (WGS-84) Geodetic point (lat0, lon0, alt0).
  */
-Point::Cart GeodeticToEnu(double lat, double lon, double h, double lat0,
+Point::Cart geodeticToEnu(double lat, double lon, double h, double lat0,
                           double lon0, double alt0);
 } // namespace NavConversions
 

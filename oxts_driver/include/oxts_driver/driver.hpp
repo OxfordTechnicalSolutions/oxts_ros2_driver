@@ -84,11 +84,11 @@ private:
    *
    * @todo Refactor into input class
    */
-  void timer_ncom_socket_callback();
-  void timer_ncom_file_callback();
-  void get_file_packet();
-  void get_socket_packet();
-  void publish_packet();
+  void timerNcomSocketCallback();
+  void timerNcomFileCallback();
+  void getFilePacket();
+  void getSocketPacket();
+  void publishPacket();
 
   /**
    * Publisher for std_msgs/msg/string. Only used for debugging, currently
@@ -147,11 +147,11 @@ public:
     // Assign callback functions to timers (callbacks are called at a rate
     // dictated by the associated timer)
     if (!ncom_path.empty()) {
-      timer_ncom_callback = &OxtsDriver::timer_ncom_file_callback;
-      update_ncom = &OxtsDriver::get_file_packet;
+      timer_ncom_callback = &OxtsDriver::timerNcomFileCallback;
+      update_ncom = &OxtsDriver::getFilePacket;
     } else {
-      timer_ncom_callback = &OxtsDriver::timer_ncom_socket_callback;
-      update_ncom = &OxtsDriver::get_socket_packet;
+      timer_ncom_callback = &OxtsDriver::timerNcomSocketCallback;
+      update_ncom = &OxtsDriver::getSocketPacket;
     }
 
     // Wait for config to be populated in NCOM packets
@@ -203,27 +203,27 @@ public:
 
   std::fstream inFileNCom;
 
-  bool check_rate(double prevPktSec, double currPktSec);
-  rclcpp::Time get_timestamp();
+  bool checkRate(double prevPktSec, double currPktSec);
+  rclcpp::Time getTimestamp();
   /**
    * Convert NCom time to a ROS friendly time format. Does not convert to ROS
    * time, only the format.
    *
    * @param nrx Pointer to the decoded NCom data
    */
-  rclcpp::Time get_ncom_time(const NComRxC *nrx);
+  rclcpp::Time getNcomTime(const NComRxC *nrx);
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    *
    * @returns IP address as a string
    */
-  std::string get_unit_ip();
+  std::string getUnitIp();
   /**
    * Get the endpoint port of the OxTS unit, as set in the .yaml params file
    *
    * @returns Port as a short
    */
-  short get_unit_port();
+  short getUnitPort();
 };
 
 } // namespace oxts_driver

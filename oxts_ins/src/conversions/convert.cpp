@@ -2,7 +2,7 @@
 
 namespace oxts_ins {
 
-void OxtsIns::NCom_callback_regular(const oxts_msgs::msg::Ncom::SharedPtr msg) {
+void OxtsIns::ncomCallbackRegular(const oxts_msgs::msg::Ncom::SharedPtr msg) {
   // Add data to decoder
   if (NComNewChars(this->nrx, msg->raw_packet.data(), NCOM_PACKET_LENGTH) ==
       COM_NEW_UPDATE) {

@@ -2,17 +2,17 @@
 
 namespace oxts_driver {
 
-void OxtsDriver::timer_ncom_socket_callback() {
-  OxtsDriver::get_socket_packet();
-  OxtsDriver::publish_packet();
+void OxtsDriver::timerNcomSocketCallback() {
+  OxtsDriver::getSocketPacket();
+  OxtsDriver::publishPacket();
 }
 
-void OxtsDriver::timer_ncom_file_callback() {
-  OxtsDriver::get_file_packet();
-  OxtsDriver::publish_packet();
+void OxtsDriver::timerNcomFileCallback() {
+  OxtsDriver::getFilePacket();
+  OxtsDriver::publishPacket();
 }
 
-void OxtsDriver::get_file_packet() {
+void OxtsDriver::getFilePacket() {
   char c;
 
   while (NComNewChar(this->nrx, (unsigned char)c) != COM_NEW_UPDATE)
@@ -23,7 +23,7 @@ void OxtsDriver::get_file_packet() {
     }
 }
 
-void OxtsDriver::get_socket_packet() {
+void OxtsDriver::getSocketPacket() {
   // Read from open socket
   std::size_t size = this->udpClient.receive_from(
       this->buff, NCOM_PACKET_LENGTH, this->unitEndpointNCom);
@@ -32,16 +32,16 @@ void OxtsDriver::get_socket_packet() {
   }
 }
 
-void OxtsDriver::publish_packet() {
+void OxtsDriver::publishPacket() {
   // publish the NCOM packet
   switch (this->nrx->mOutputPacketType) {
   case OUTPUT_PACKET_REGULAR: {
-    if (this->check_rate(this->prevRegularWeekSecond,
-                         this->nrx->mTimeWeekSecond))
+    if (this->checkRate(this->prevRegularWeekSecond,
+                        this->nrx->mTimeWeekSecond))
       return;
 
     auto msg = oxts_msgs::msg::Ncom();
-    msg.header.stamp = this->get_timestamp();
+    msg.header.stamp = this->getTimestamp();
     msg.header.frame_id = "oxts_sn" + std::to_string(this->nrx->mSerialNumber);
     for (int i = 0; i < NCOM_PACKET_LENGTH; ++i)
       msg.raw_packet[i] = this->nrx->mInternal->mCurPkt[i];
@@ -57,7 +57,7 @@ void OxtsDriver::publish_packet() {
   }
 }
 
-bool OxtsDriver::check_rate(double prevPktSec, double currPktSec) {
+bool OxtsDriver::checkRate(double prevPktSec, double currPktSec) {
   bool skip_packet = false;
   // perform error checking on nrx timestamps
   if (prevPktSec <= 0)
@@ -80,14 +80,14 @@ bool OxtsDriver::check_rate(double prevPktSec, double currPktSec) {
   return skip_packet;
 }
 
-rclcpp::Time OxtsDriver::get_timestamp() {
+rclcpp::Time OxtsDriver::getTimestamp() {
   if (this->timestamp_mode == PUB_TIMESTAMP_MODE::ROS)
     return this->get_clock()->now();
   else
-    return this->get_ncom_time(this->nrx);
+    return this->getNcomTime(this->nrx);
 }
 
-rclcpp::Time OxtsDriver::get_ncom_time(const NComRxC *nrx) {
+rclcpp::Time OxtsDriver::getNcomTime(const NComRxC *nrx) {
   auto time =
       rclcpp::Time(static_cast<int32_t>(nrx->mTimeWeekSecond) +
                        (nrx->mTimeWeekCount * NAV_CONST::WEEK_SECS) +
@@ -99,8 +99,8 @@ rclcpp::Time OxtsDriver::get_ncom_time(const NComRxC *nrx) {
   return time;
 }
 
-std::string OxtsDriver::get_unit_ip() { return this->unit_ip; }
+std::string OxtsDriver::getUnitIp() { return this->unit_ip; }
 
-short OxtsDriver::get_unit_port() { return this->unit_port; }
+short OxtsDriver::getUnitPort() { return this->unit_port; }
 
 } // namespace oxts_driver

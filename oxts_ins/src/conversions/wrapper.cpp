@@ -183,7 +183,7 @@ geometry_msgs::msg::PointStamped ecef_pos(const NComRxC *nrx,
   msg.header = std::move(head);
 
   Point::Cart ecef =
-      NavConversions::GeodeticToEcef(nrx->mLat, nrx->mLon, nrx->mAlt);
+      NavConversions::geodeticToEcef(nrx->mLat, nrx->mLon, nrx->mAlt);
   msg.point.x = ecef.x();
   msg.point.y = ecef.y();
   msg.point.z = ecef.z();
@@ -311,11 +311,11 @@ nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
   // pose with covariance ======================================================
 
   Point::Cart p_enu;
-  p_enu = NavConversions::GeodeticToEnu(nrx->mLat, nrx->mLon, nrx->mAlt,
+  p_enu = NavConversions::geodeticToEnu(nrx->mLat, nrx->mLon, nrx->mAlt,
                                         lrf.lat(), lrf.lon(), lrf.alt());
 
   Point::Cart p_lrf =
-      NavConversions::EnuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading());
+      NavConversions::enuToLrf(p_enu.x(), p_enu.y(), p_enu.z(), lrf.heading());
 
   msg.pose.pose.position.x = p_lrf.x();
   msg.pose.pose.position.y = p_lrf.y();
