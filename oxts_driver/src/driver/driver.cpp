@@ -15,12 +15,13 @@ void OxtsDriver::timerNcomFileCallback() {
 void OxtsDriver::getFilePacket() {
   char c;
 
-  while (NComNewChar(this->nrx, (unsigned char)c) != COM_NEW_UPDATE)
-    if (!this->inFileNCom.get(c)) {
-      RCLCPP_INFO(this->get_logger(), "End of NCom file reached.");
-      rclcpp::shutdown();
-      return;
-    }
+  do {
+      if (!this->inFileNCom.get(c)) {
+          RCLCPP_INFO(this->get_logger(), "End of NCom file reached.");
+          rclcpp::shutdown();
+          return;
+      }
+  } while (NComNewChar(this->nrx, (unsigned char)c) != COM_NEW_UPDATE);
 }
 
 void OxtsDriver::getSocketPacket() {
