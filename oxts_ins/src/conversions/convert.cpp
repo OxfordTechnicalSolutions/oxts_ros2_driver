@@ -119,11 +119,11 @@ void OxtsIns::tf(const std_msgs::msg::Header &header) {
       tf_vat.transform.rotation.w = vat.w();
       tf_broadcaster_->sendTransform(tf_vat);
 
-      /** \todo Make this real */
       if (true) // if vertical slip lever arm is valid
       {
         // auto nvsp    = RosNComWrapper::getNvsp(this->nrx);
-        // evil spoof pls fix
+        /** \todo Make this real */
+        // The transform to create the front axle pose is spoofed with a hardcoded offset, for now.
         auto nvsp = nsp;
         nvsp += tf2::quatRotate(vat, tf2::Vector3(2.6, 0, 0));
 
