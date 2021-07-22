@@ -289,9 +289,9 @@ tf2::Matrix3x3 getRotEnuToEcef(double lat0, double lon0) {
   double s_lambda = std::sin(lambda);
   double c_lambda = std::cos(lambda);
 
-  auto r =
-      tf2::Matrix3x3(-s_lambda, -c_lambda * s_phi, c_lambda * c_phi, c_lambda,
-                     -s_lambda * s_phi, s_lambda * c_phi, 0, c_phi, s_phi);
+  auto r = tf2::Matrix3x3(-s_lambda, -c_lambda * s_phi, c_lambda * c_phi,
+                           c_lambda, -s_lambda * s_phi, s_lambda * c_phi,
+                                  0,             c_phi,            s_phi);
 
   return r;
 }
@@ -300,7 +300,9 @@ tf2::Matrix3x3 getRotEnuToLrf(double theta) {
   double s_theta = std::sin(theta);
   double c_theta = std::cos(theta);
 
-  return tf2::Matrix3x3(c_theta, -s_theta, 0, s_theta, c_theta, 0, 0, 0, 1);
+  return tf2::Matrix3x3(c_theta, -s_theta, 0,
+                        s_theta,  c_theta, 0,
+                              0,        0, 1);
 }
 
 nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
@@ -351,9 +353,9 @@ nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
   diff *= r_pos_ecef;
 
   auto tmp = tf2::Matrix3x3(diff);
-  auto cov = tf2::Matrix3x3(std::pow(nrx->mEastAcc, 2), 0.0, 0.0, 0.0,
-                            std::pow(nrx->mNorthAcc, 2), 0.0, 0.0, 0.0,
-                            std::pow(nrx->mAltAcc, 2));
+  auto cov = tf2::Matrix3x3(std::pow(nrx->mEastAcc, 2), 0.0, 0.0,
+                            0.0, std::pow(nrx->mNorthAcc, 2), 0.0,
+                            0.0, 0.0, std::pow(nrx->mAltAcc, 2));
   // cov_b = R * cov_a * R^T
   tmp *= cov;
   tmp *= diff.transpose();
