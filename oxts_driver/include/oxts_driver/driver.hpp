@@ -188,7 +188,7 @@ public:
     timer_ncom_ = this->create_wall_timer(ncomInterval,
                                           std::bind(timer_ncom_callback, this));
 
-    RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %iHz",
+    RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %uHz",
                 ncom_rate);
   }
 
