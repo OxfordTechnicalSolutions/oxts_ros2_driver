@@ -166,6 +166,28 @@ In lieu of getting the colcon tasks package working, the following VS Code tasks
 
 This creates VS Code tasks for building a ROS2 / colcon workspace. Note that since this is for building a workspace, it should be at the workspace level, not at the package level. It's a bit hacky but it makes building easy. If anyone figures out the colcon tasks package that's probably the better approach.
 
+## Formatting the code
+
+To format the code automatically according to the [ROS style guide](http://wiki.ros.org/CppStyleGuide), you can use `clang-format` with the `.clang-format` file in the root of this repo (from  [here](https://github.com/PickNikRobotics/roscpp_code_format)).
+
+To format some file:
+
+```bash
+clang-format -i -style=file file/to/format.cpp
+```
+
+`-style=file` walks up to `/` looking for a `.clang-format` configuration file, reading style options from the first file it finds. (Hence the `.clang-format` in the root of this repo).
+
+To format all the files recursively under `/path/to/project/`:
+
+```bash
+find /path/to/project/ -iname '*.h' -or -iname '*.hpp' -or -iname '*.cpp' | xargs clang-format -i -style=file $1
+```
+
+**BEWARE** when doing this that some parts of your code, which you've formatted in a particular way on purpose, will get mangled. (See [this commit](https://gitlab.com/oxts/navigation/ros/oxts/-/commit/48b62a91bab3b6dc5fba81f93a748a1377050d35) for a good example of this problem being undone.) *So be careful to only format files which you've changed*, and check that the changes are sane before you commit.
+
+You may want to configure your editor to format changes when you save. The [Clang-Format extension to Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) is a good example; see its about page for how to configure it to do this (in particular adding `"editor.formatOnSave": true` to your `settings.json`).
+
 ## Intro to ROS2
 
 ROS2 has some really nice intro documentation, and it should only improve over time.
