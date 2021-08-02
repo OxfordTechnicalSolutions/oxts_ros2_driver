@@ -25,7 +25,9 @@ find_package(tf2_kdl REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
 add_executable(tests
+               tests.cpp
                oxts_driver.cpp
+               udp_server_client.cpp
                ../oxts_driver/src/driver/driver.cpp
                ../oxts_driver/src/lib/NComRxC.c
                ../oxts_driver/src/driver/driver.cpp)
