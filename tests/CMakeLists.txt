@@ -28,12 +28,15 @@ add_executable(tests
                tests.cpp
                oxts_driver.cpp
                udp_server_client.cpp
+               convert.cpp
                ../oxts_driver/src/driver/driver.cpp
                ../oxts_driver/src/lib/NComRxC.c
-               ../oxts_driver/src/driver/driver.cpp)
+               ../oxts_ins/src/conversions/convert.cpp
+               ../oxts_ins/src/conversions/wrapper.cpp
+               ../oxts_ins/src/lib/nav_conversions.cpp)
 
 ament_target_dependencies(tests
-rclcpp
+        rclcpp
         std_msgs
         sensor_msgs
         geometry_msgs
@@ -44,6 +47,7 @@ rclcpp
 
 target_include_directories(tests PUBLIC
         ../oxts_driver/include
+        ../oxts_ins/include
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         PRIVATE ${Boost_INCLUDE_DIRS}
         $<INSTALL_INTERFACE:include>)

@@ -1,28 +1,31 @@
 #include <boost/test/unit_test.hpp>
 
 #include <thread>
+#include <utility>
 
+#include "tests.h"
 #include "oxts_driver/driver.hpp"
 
 using namespace oxts_driver;
 
-OxtsDriver *driver = nullptr;
+namespace tests::oxts_driver {
 
-struct OxtsDriverFixture {
-    OxtsDriverFixture() {
+std::shared_ptr<OxtsDriver> driver;
+
+struct Fixture {
+    Fixture() {
         rclcpp::init(0, nullptr);
-        rclcpp::NodeOptions options;
-        options.append_parameter_override("ncom", std::filesystem::path{__FILE__}.replace_filename("test.ncom"));
-        driver = new oxts_driver::OxtsDriver{options};
+        driver = tests::newDriver();
+        std::thread{[]() { rclcpp::spin(driver); }}.detach();
     }
 
-    ~OxtsDriverFixture() {
-        delete driver;
+    ~Fixture() {
+        driver.reset();
         rclcpp::shutdown();
     }
 };
 
-BOOST_AUTO_TEST_SUITE(oxts_driver, * boost::unit_test::fixture<OxtsDriverFixture>())
+BOOST_AUTO_TEST_SUITE(oxts_driver, * boost::unit_test::fixture<Fixture>())
 
 BOOST_AUTO_TEST_CASE(checkRate) {
     BOOST_CHECK(driver->checkRate(-1, 0) == false);
@@ -58,3 +61,5 @@ BOOST_AUTO_TEST_CASE(getUnitPort) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+}
