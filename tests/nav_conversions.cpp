@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include "tests.h"
 #include "oxts_ins/nav_conversions.hpp"
 
 using namespace NavConversions;
@@ -7,50 +8,6 @@ using namespace NavConversions;
 namespace tests::nav_conversions {
 
 BOOST_AUTO_TEST_SUITE(nav_conversions)
-
-// ≅ functions because of floating point imprecision (and to make the checks more readable when
-// they're printed via ./tests -l all).
-
-constexpr double DEFAULT_DELTA = 0.001;
-
-template<typename T> bool approxEqual(T l, T r, double delta) {
-    return std::abs(l - r) <= delta;
-}
-
-template<typename T> bool approxEqual(
-    const std::vector<T>& l,
-    const std::vector<T>& r,
-    double delta = DEFAULT_DELTA
-) {
-    if (l.size() != r.size())
-        return false;
-
-    for (decltype(l.size()) i = 0; i < l.size(); ++i)
-        if (!approxEqual(l[i], r[i], delta))
-            return false;
-
-    return true;
-}
-
-bool approxEqual(
-    const Point::Cart& l,
-    const Point::Cart& r,
-    double delta = DEFAULT_DELTA
-) {
-    return approxEqual(l.x(), r.x(), delta)
-        && approxEqual(l.y(), r.y(), delta)
-        && approxEqual(l.z(), r.z(), delta);
-}
-
-bool approxEqual(
-    const Point::Geodetic& l,
-    const Point::Geodetic& r,
-    double delta = DEFAULT_DELTA
-) {
-    return approxEqual(l.lat(), r.lat(), delta)
-       && approxEqual(l.lon(), r.lon(), delta)
-       && approxEqual(l.alt(), r.alt(), delta);
-}
 
 BOOST_AUTO_TEST_CASE(hprToQuaternion) {
     BOOST_CHECK(approxEqual(

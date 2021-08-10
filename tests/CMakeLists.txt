@@ -30,6 +30,7 @@ add_executable(tests
                udp_server_client.cpp
                convert.cpp
                nav_conversions.cpp
+               wrapper.cpp
                ../oxts_driver/src/driver/driver.cpp
                ../oxts_driver/src/lib/NComRxC.c
                ../oxts_ins/src/conversions/convert.cpp
