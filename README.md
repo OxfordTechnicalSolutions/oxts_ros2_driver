@@ -125,7 +125,11 @@ ROS1 and ROS2 are not directly compatible, as a result of breaking changes betwe
 
 LINK - https://github.com/ros2/ros1_bridge
 
+## Licences
 
+The code is this project is licenced under the Apache 2.0 licence, a copy of which can be found in the [LICENCE](./LICENCE) file.
+
+This project uses multiple third-party libraries, the use of each of which being subject to its own terms and conditions. Licences for third-party software are present in the [licences directory](./licences), along with the software they apply to.
 
 # Developer notes (INTERNAL)
 
