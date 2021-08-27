@@ -93,8 +93,8 @@ The publisher node included in this driver opens a socket to receive NCOM messag
         - The first NCom packet (`Lat`, `Lon`, `Alt` and `Heading`).
         - The first NCom packet, aligned to ENU.
     - Orientation: Rotation of the INS relative to the alignment of the LRF (computed from `Roll`, `Pitch` and `Heading`)
-    - Linear Velocity: _Future_
-    - Angular Velocity: _Future_
+    - Linear Velocity: In the above reference frame, computed from `IsoVoX`, `IsoVoY` and `IsoVoZ`. (Does not yet have variances.)
+    - Angular Velocity: In the above reference frame, computed from `Wx`, `Wy` and `Wz`. (Does not yet have variances.)
 
 * **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Path.msg)
     Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic.

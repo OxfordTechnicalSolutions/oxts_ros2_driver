@@ -4,7 +4,7 @@
 Please see [the README](./README.md) for compilation instructions.
 
 ## Environment set-up
-The driver has been developed on Ubuntu 20.04 using the Visual Studio Code IDE on a Windows 10 machine. This has been done using some useful VS Code packages:
+This driver is IDE-agnostic, so you can set up your development environment however you please. So far however, it has been developed on Ubuntu 20.04 using the Visual Studio Code IDE on a Windows 10 machine. This has been done using some useful VS Code packages:
 
 - [**C/C++**](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) Standard for developing C++.
 - [**Remote - SSH**](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) Allows remote development via SSH. Developing in this way keeps the code local to the remote machine, not locally.
@@ -113,7 +113,7 @@ Building the test program requires something like:
 ```bash
 # In the root directory of the compiled package, e.g. ~/ros_ws/
 . /opt/ros/foxy/setup.bash
-. ./install/setup.sh
+. install/setup.sh
 colcon build
 ```
 
