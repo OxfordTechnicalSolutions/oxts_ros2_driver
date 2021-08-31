@@ -44,9 +44,8 @@ BOOST_AUTO_TEST_CASE(getBodyRPY) {
   nrx.mImu2VehRoll = 200;
   nrx.mImu2VehRoll = 150;
   nrx.mImu2VehRoll = 100;
-  BOOST_CHECK(
-      approxEqual(::getBodyRPY(&nrx),
-                  (tf2::Quaternion{-0.0616, -0.0616, -0.7044, 0.7044})));
+  BOOST_CHECK(approxEqual(::getBodyRPY(&nrx),
+                          (tf2::Quaternion{0.7044, 0.7044, -0.0616, 0.0616})));
 }
 
 BOOST_AUTO_TEST_CASE(getNcomLrf) {
@@ -228,20 +227,20 @@ BOOST_AUTO_TEST_CASE(odometry) {
   expectedPosition.z = -194852.9041;
 
   geometry_msgs::msg::Quaternion expectedOrientation{};
-  expectedOrientation.x = 0.0563;
-  expectedOrientation.y = -0.9908;
-  expectedOrientation.z = -0.1144;
-  expectedOrientation.w = -0.0446;
+  expectedOrientation.x = -0.0206;
+  expectedOrientation.y = 0.0847;
+  expectedOrientation.z = -0.9679;
+  expectedOrientation.w = 0.2358;
 
   geometry_msgs::msg::Vector3 expectedAngularTwist{};
-  expectedAngularTwist.x = 63.6399;
-  expectedAngularTwist.y = 99.8136;
-  expectedAngularTwist.z = -56.0109;
+  expectedAngularTwist.x = 35;
+  expectedAngularTwist.y = -115.56;
+  expectedAngularTwist.z = 50.7035;
 
   geometry_msgs::msg::Vector3 expectedLinearTwist{};
-  expectedLinearTwist.x = 1.6275;
-  expectedLinearTwist.y = -176.2732;
-  expectedLinearTwist.z = 62.6507;
+  expectedLinearTwist.x = 50;
+  expectedLinearTwist.y = 165.086;
+  expectedLinearTwist.z = -72.4335;
 
   BOOST_CHECK(approxEqual(msg.pose.pose.position, expectedPosition));
   BOOST_CHECK(approxEqual(msg.pose.pose.orientation, expectedOrientation));
