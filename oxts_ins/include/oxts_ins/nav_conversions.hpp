@@ -88,10 +88,10 @@ public:
   void heading(double heading) { this->heading_ = heading; }
 
   Point::Geodetic origin() { return this->origin_; }
-  double lat() { return this->origin_.lat(); }
-  double lon() { return this->origin_.lon(); }
-  double alt() { return this->origin_.alt(); }
-  double heading() const { return this->heading_; }
+  [[nodiscard]] double lat() const { return this->origin_.lat(); }
+  [[nodiscard]] double lon() const { return this->origin_.lon(); }
+  [[nodiscard]] double alt() const { return this->origin_.alt(); }
+  [[nodiscard]] double heading() const { return this->heading_; }
 };
 
 /**
