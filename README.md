@@ -10,7 +10,7 @@ The ROS driver has been built with ROS release Foxy Fitzroy as a pre-built binar
 
 Dependencies:
 
-- ROS2 (Foxy Fitzroy). For an install guide, see the bottom of this README for a link to ROS documentation.
+- ROS2 (Foxy Fitzroy). (See [here](https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/) for an installation guide.)
 
 ```bash
 sudo apt install doxygen
@@ -29,23 +29,25 @@ rosdep update
 rosdep install --from-path .
 cd ../..
 colcon build
-. install/setup.bash
+. install/setup.sh
 ```
 
-## Configuring and Launching the Driver
+**NOTE:** The `rosdep install` command may fail, because the modules in this repository are not yet available as packages in any official repositories. This is fine, and error messages mentioning missing packages (`oxts`, `oxts_driver` and `oxts_ins`) can be ignored.
+
+## Configuring and launching the driver
 
 The driver is configured using .yaml files, as is the norm for ROS2 nodes. The default files in this folder contain lists of all configurable parameters for the nodes. These can be deleted to make the file smaller / tidier. Values not in the config file will remain as defaults.
 
 Launch files can be used from /launch. Launch files are created in Python3 for ROS2, so be aware that Python3 will need to be installed on the machine. They can be use like so:
 
 ```bash
-    ros2 launch oxts run.py
+ros2 launch oxts run.py
 ```
 
 or, to replay from an ncom file:
 
 ```bash
-    ros2 launch oxts run.py ncom:=<path_to_ncom> # absolute or relative
+ros2 launch oxts run.py ncom:=<path_to_ncom> # absolute or relative
 ```
 
 To view the Odometry and Tf data from the INS, use the `visualise.py` launch file. This requires RViz to be installed. There is also the option to start publishing before the NCOM has initialised (not recommended) `wait_for_init:=false`.
@@ -59,11 +61,14 @@ The currently available launch files are as follows:
 
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network. Reference frames for each message can be found in headers. Where NCom is typically vehicle frame, ROS messages are output in INS/IMU frame.
 
+**NOTE:** There are `*_rate` parameters in the YAML configuration, which prevent these topics from being published when set to 0. If topics are missing, ensure that rates have been configured for them.
+
 * **ins/debug_string_pos** [std_msgs/msg/String](http://docs.ros.org/en/noetic/api/std_msgs/html/msg/String.html)
     This message is not useful for general use. It is currently included for debug purposes. It contains a timestamp from NCom (`TimeWeekSecond`) and WGS84 coordinates (`Lat`, `Lon`, `Alt`) in string form, which is output to the console.
 
 * **ins/ecef_pos** [geometry_msgs/msg/PointStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PointStamped.html)
     Contains a timestamped position of the INS in the ECEF reference frame (derived from `Lat`, `Lon` and `Alt` from NCOM).
+
 * **ins/nav_sat_fix** [sensor_msgs/msg/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)
     Contains a WGS84 position of the INS. This differs from standard use of the NavSatFix message in that the position is not taken directly from a GNSS receiver. It is instead taken from the INS output (`Lat`, `Lon` and `Alt`) and as a result, this message can be output at a higher rate than is typical with GNSS receivers. Covariance is derived from `EastAcc`, `NorthAcc` and `AltAcc`.
 
@@ -88,8 +93,8 @@ The publisher node included in this driver opens a socket to receive NCOM messag
         - The first NCom packet (`Lat`, `Lon`, `Alt` and `Heading`).
         - The first NCom packet, aligned to ENU.
     - Orientation: Rotation of the INS relative to the alignment of the LRF (computed from `Roll`, `Pitch` and `Heading`)
-    - Linear Velocity: _Future_
-    - Angular Velocity: _Future_
+    - Linear Velocity: In the above reference frame, computed from `IsoVoX`, `IsoVoY` and `IsoVoZ`. (Does not yet have variances.)
+    - Angular Velocity: In the above reference frame, computed from `Wx`, `Wy` and `Wz`. (Does not yet have variances.)
 
 * **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Path.msg)
     Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic.
@@ -106,22 +111,16 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 * **ins/ncom** [oxts_msgs/msg/Ncom](./oxts_msgs/msg/Ncom.msg)
     Raw NCOM data, output by the `/oxts_driver` node, to be subsequently split by the `/oxts_ins` node into all the messages listed here (besides this one).
 
-\* links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doesn't exist yet
+\* Links are for ROS1 messages, which are largely unchanged, but equivalent documentation for ROS2 doesn't exist yet.
 
 Useful sources of information around frames used for these messages can be found in:
 
 - [REP103](https://www.ros.org/reps/rep-0103.html)
 - [REP105](https://www.ros.org/reps/rep-0105.html#id8)
 
-## Input ROS messages
-
-Subscriber node not yet created.
-
-The subscriber node included in this driver listens for particular ROS topics to be sent from external aiding devices. These messages are converted from ROS to Generic Aiding messages, which are then sent to an INS. This allows straightforward integration of ROS devices as aiding sources to an OxTS INS.
-
 ## ROS1 compatibility
 
-ROS1 and ROS2 are not directly compatible, as a result of breaking changes between the two. As such, ROS2 messages cannot be consumed directly by ROS1 nodes. To get around this, the ROS1 bridge can be used to convert messages and send them on.
+ROS1 and ROS2 are not directly compatible, as a result of breaking changes between the two. As such, ROS2 messages cannot be consumed directly by ROS1 nodes. To get around this, the [ROS1 bridge](https://github.com/ros2/ros1_bridge) can be used to convert messages and send them on.
 
 LINK - https://github.com/ros2/ros1_bridge
 
@@ -196,9 +195,6 @@ You may want to configure your editor to format changes when you save. The [Clan
 
 ROS2 has some really nice intro documentation, and it should only improve over time.
 
-- Installation: https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
-- Create a workspace: https://index.ros.org/doc/ros2/Tutorials/Workspace/Creating-A-Workspace/
-- Create your first package: https://index.ros.org/doc/ros2/Tutorials/Creating-Your-First-ROS2-Package/
-- Create a simple publisher/subscriber pair: https://index.ros.org/doc/ros2/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber/#cpppubsub
+## Contributing
 
-These tutorials don't take long and provide a pretty good introduction to get you set up and making very simple ROS packages. There are plenty more after these, depending how far you want to go.
+Contributions to this project are welcome. Information on making contributions can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
