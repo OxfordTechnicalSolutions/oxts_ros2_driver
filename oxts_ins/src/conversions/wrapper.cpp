@@ -57,7 +57,7 @@ Lrf getNcomLrf(const NComRxC *nrx) {
   // Origin to use for map frame
   return Lrf(nrx->mRefLat, nrx->mRefLon, nrx->mRefAlt,
              // mRefHeading is in NED. Get angle between ENU and LRF
-             (90.0 + nrx->mRefHeading) * NAV_CONST::DEG2RADS);
+             (nrx->mRefHeading - 90) * NAV_CONST::DEG2RADS);
 }
 
 sensor_msgs::msg::NavSatStatus nav_sat_status(const NComRxC *nrx) {
