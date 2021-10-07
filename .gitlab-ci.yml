@@ -49,4 +49,5 @@ compile:
   script:
    - mkdir -p src/oxts
    - mv oxts*/ src/oxts
+   - touch src/oxts/tests/COLCON_IGNORE
    - colcon build
