@@ -188,7 +188,7 @@ void OxtsIns::getLrf() {
   else if (!this->lrf_valid && this->lrf_source == LRF_SOURCE::NCOM_FIRST) {
     this->lrf.origin(nrx->mLat, nrx->mLon, nrx->mAlt);
     // mHeading is in NED. Get angle between LRF and ENU
-    this->lrf.heading((90.0 + nrx->mHeading) * NAV_CONST::DEG2RADS);
+    this->lrf.heading((nrx->mHeading - 90) * NAV_CONST::DEG2RADS);
     this->lrf_valid = true;
   } else if (!this->lrf_valid &&
              this->lrf_source == LRF_SOURCE::NCOM_FIRST_ENU) {
