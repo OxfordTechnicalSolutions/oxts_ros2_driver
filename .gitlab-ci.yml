@@ -48,6 +48,6 @@ compile:
   stage: Build
   script:
    - mkdir -p src/oxts
-   - mv oxts*/ src/oxts
+   - mv oxts*/ tests/ src/oxts
    - touch src/oxts/tests/COLCON_IGNORE
    - colcon build
