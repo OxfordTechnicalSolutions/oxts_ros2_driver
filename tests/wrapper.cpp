@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(getNcomLrf) {
   nrx.mRefLon = 2;
   nrx.mRefAlt = 3;
   nrx.mRefHeading = 180;
-  BOOST_CHECK(approxEqual(::getNcomLrf(&nrx), (Lrf{1, 2, 3, 4.71239})));
+  BOOST_CHECK(approxEqual(::getNcomLrf(&nrx), (Lrf{1, 2, 3, 1.570796})));
 }
 
 BOOST_AUTO_TEST_CASE(nav_sat_fix) {
