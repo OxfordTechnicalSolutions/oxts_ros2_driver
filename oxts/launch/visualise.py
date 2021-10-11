@@ -24,7 +24,7 @@ def generate_launch_description():
     with open(urdf_path, "r") as f:
         robot_desc = f.read()
 
-    use_sim_time = LaunchConfiguration("use_tim_time", default="False")
+    use_sim_time = LaunchConfiguration("use_sim_time", default="False")
     use_rviz = LaunchConfiguration("use_rviz", default="True")
     wait_for_init = LaunchConfiguration("wait_for_init", default="True")
     ncom = LaunchConfiguration("ncom", default="")
