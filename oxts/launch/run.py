@@ -28,7 +28,7 @@ def generate_launch_description():
     with open(ins_param_path, "r") as f:
         ins_params = yaml.safe_load(f)["oxts_ins"]["ros__parameters"]
 
-    use_sim_time = LaunchConfiguration("use_tim_time", default="False")
+    use_sim_time = LaunchConfiguration("use_sim_time", default="False")
     wait_for_init = LaunchConfiguration("wait_for_init", default="True")
     ncom = LaunchConfiguration("ncom", default=yaml_ncom)
     topic_prefix = LaunchConfiguration("topic_prefix", default=yaml_prefix)
