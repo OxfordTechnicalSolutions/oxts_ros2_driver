@@ -288,7 +288,7 @@ public:
     if (pubStringInterval) {
       // Throw an error if ncom_rate / String_rate is not an integer
       if (ncom_rate % pubStringInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "String" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("String" + notFactorError).c_str(),
                      pub_string_rate);
         return;
       }
@@ -299,7 +299,7 @@ public:
     if (pubNavSatFixInterval) {
       // Throw an error if ncom_rate / NavSatFix_rate is not an integer
       if (ncom_rate % pubNavSatFixInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "NavSatFix" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("NavSatFix" + notFactorError).c_str(),
                      pub_nav_sat_fix_rate);
         return;
       }
@@ -310,7 +310,7 @@ public:
     if (pubVelocityInterval) {
       // Throw an error if ncom_rate / Velocity_rate is not an integer
       if (ncom_rate % pubVelocityInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "Velocity" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("Velocity" + notFactorError).c_str(),
                      pub_velocity_rate);
         return;
       }
@@ -321,7 +321,7 @@ public:
     if (pubOdometryInterval) {
       // Throw an error if ncom_rate / Odometry_rate is not an integer
       if (ncom_rate % pubOdometryInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "Odometry" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("Odometry" + notFactorError).c_str(),
                      pub_odometry_rate);
         return;
       }
@@ -332,7 +332,7 @@ public:
     if (pubPathInterval) {
       // Throw an error if ncom_rate / Path_rate is not an integer
       if (ncom_rate % pubPathInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "Path" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("Path" + notFactorError).c_str(),
                      pub_path_rate);
         return;
       }
@@ -343,7 +343,7 @@ public:
     if (pubTimeReferenceInterval) {
       // Throw an error if ncom_rate / TimeReference_rate is not an integer
       if (ncom_rate % pubTimeReferenceInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "TimeReference" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("TimeReference" + notFactorError).c_str(),
                      pub_time_reference_rate);
         return;
       }
@@ -355,7 +355,7 @@ public:
     if (pubEcefPosInterval) {
       // Throw an error if ncom_rate / EcefPos_rate is not an integer
       if (ncom_rate % pubEcefPosInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "EcefPos" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("EcefPos" + notFactorError).c_str(),
                      pub_ecef_pos_rate);
         return;
       }
@@ -366,7 +366,7 @@ public:
     if (pubNavSatRefInterval) {
       // Throw an error if ncom_rate / NavSatRef_rate is not an integer
       if (ncom_rate % pubNavSatRefInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "NavSatRef" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("NavSatRef" + notFactorError).c_str(),
                      pub_nav_sat_ref_rate);
         return;
       }
@@ -377,7 +377,7 @@ public:
     if (pubLeverArmInterval) {
       // Throw an error if ncom_rate / LeverArm_rate is not an integer
       if (ncom_rate % pubLeverArmInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "LeverArm" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("LeverArm" + notFactorError).c_str(),
                      pub_lever_arm_rate);
         return;
       }
@@ -388,7 +388,7 @@ public:
     if (pubIMUBiasInterval) {
       // Throw an error if ncom_rate / LeverArm_rate is not an integer
       if (ncom_rate % pubIMUBiasInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), "IMUBias" + notFactorError,
+        RCLCPP_ERROR(this->get_logger(), ("IMUBias" + notFactorError).c_str(),
                      pub_imu_bias_rate);
         return;
       }
