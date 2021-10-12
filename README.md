@@ -57,6 +57,9 @@ The currently available launch files are as follows:
 * `visualise.py` - Launches the driver, as well as `robot_state_publisher` and `rviz2` (the latter can be disabled with `use_rviz:=False`)
 * `run.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
+## Getting started
+For a basic tutorial on using this driver, see the ["getting started" guide](./Getting Started.md).
+
 ## Output ROS messages
 
 The publisher node included in this driver opens a socket to receive NCOM messages from an INS. Data from the NCOM messages are then converted into ROS messages and published to ROS topics for consumption in a wider ROS network. Reference frames for each message can be found in headers. Where NCom is typically vehicle frame, ROS messages are output in INS/IMU frame.
