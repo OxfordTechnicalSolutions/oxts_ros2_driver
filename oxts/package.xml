@@ -10,8 +10,8 @@
     <author>Someone else maybe</author>
     <license>Apache 2.0</license>
     <url type="website">http://www.ros.org/wiki/velodyne</url>
-    <url type="repository">https://gitlab.com/oxts/navigation/generic-aiding/oxts</url>
-    <url type="bugtracker">https://gitlab.com/oxts/navigation/generic-aiding/oxts/-/issues</url> -->
+    <url type="repository">https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver</url>
+    <url type="bugtracker">https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver/issues</url> -->
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 

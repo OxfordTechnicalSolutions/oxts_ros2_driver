@@ -84,7 +84,7 @@ To format all the files recursively under `/path/to/project/`:
 find /path/to/project/ -iname '*.h' -or -iname '*.hpp' -or -iname '*.cpp' | xargs clang-format -i -style=file $1
 ```
 
-**BEWARE** when doing this that some parts of your code, which you've formatted in a particular way on purpose, will get mangled. (See [this commit](https://gitlab.com/oxts/navigation/ros/oxts/-/commit/48b62a91bab3b6dc5fba81f93a748a1377050d35) for a good example of this problem being undone.) *So be careful to only format files which you've changed*, and check that the changes are sane before you commit.
+**BEWARE** when doing this that some parts of your code, which you've formatted in a particular way on purpose, will get mangled. (See [this commit](https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver/commit/48b62a91bab3b6dc5fba81f93a748a1377050d35) for a good example of this problem being undone.) *So be careful to only format files which you've changed*, and check that the changes are sane before you commit.
 
 You may want to configure your editor to format changes when you save. The [Clang-Format extension to Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) is a good example; see its about page for how to configure it to do this (in particular adding `"editor.formatOnSave": true` to your `settings.json`).
 

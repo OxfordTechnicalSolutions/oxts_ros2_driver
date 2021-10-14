@@ -1,7 +1,5 @@
 # ROS2 Driver
 
-[![pipeline status](https://gitlab.com/oxts/navigation/ros/oxts/badges/master/pipeline.svg)](https://gitlab.com/oxts/navigation/ros/oxts/-/commits/master)
-
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Where ROS is mentioned in this document, this is in reference to ROS2. References to ROS1 will be explicit.
 
 The ROS driver has been built with ROS release Foxy Fitzroy.
@@ -23,7 +21,7 @@ To build the driver:
 . /opt/ros/foxy/setup.bash # "." and "source" are interchangeable (unix)
 mkdir -p ros_ws/src
 cd ros_ws/src
-git clone https://gitlab.com/oxts/navigation/ros/oxts.git
+git clone https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver
 cd oxts
 rosdep update
 rosdep install --from-path .
@@ -58,7 +56,7 @@ The currently available launch files are as follows:
 * `run.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
 ## Getting started
-For a basic tutorial on using this driver, see the ["getting started" guide](./Getting Started.md).
+For a basic tutorial on using this driver, see the ["getting started" guide](./Getting%20Started.md).
 
 ## Output ROS messages
 
