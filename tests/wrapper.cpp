@@ -20,7 +20,8 @@
 
 using namespace RosNComWrapper;
 
-namespace tests::wrapper {
+namespace tests::wrapper
+{
 
 BOOST_AUTO_TEST_SUITE(wrapper)
 
@@ -30,7 +31,7 @@ BOOST_AUTO_TEST_CASE(getVat) {
   nrx.mImu2VehPitch = 180;
   nrx.mImu2VehHeading = 270;
   BOOST_CHECK(
-      approxEqual(::getVat(&nrx), (tf2::Quaternion{-0.5, -0.5, 0.5, 0.5})));
+    approxEqual(::getVat(&nrx), (tf2::Quaternion{-0.5, -0.5, 0.5, 0.5})));
 }
 
 BOOST_AUTO_TEST_CASE(getNsp) {
@@ -46,8 +47,10 @@ BOOST_AUTO_TEST_CASE(getVehRPY) {
   nrx.mRoll = 90;
   nrx.mPitch = 180;
   nrx.mHeading = 270;
-  BOOST_CHECK(approxEqual(::getVehRPY(&nrx),
-                          (tf2::Quaternion{0.707107, 0, 0, 0.707107})));
+  BOOST_CHECK(
+    approxEqual(
+      ::getVehRPY(&nrx),
+      (tf2::Quaternion{0.707107, 0, 0, 0.707107})));
 }
 
 BOOST_AUTO_TEST_CASE(getBodyRPY) {
@@ -58,8 +61,10 @@ BOOST_AUTO_TEST_CASE(getBodyRPY) {
   nrx.mImu2VehRoll = 200;
   nrx.mImu2VehRoll = 150;
   nrx.mImu2VehRoll = 100;
-  BOOST_CHECK(approxEqual(::getBodyRPY(&nrx),
-                          (tf2::Quaternion{0.7044, 0.7044, -0.0616, 0.0616})));
+  BOOST_CHECK(
+    approxEqual(
+      ::getBodyRPY(&nrx),
+      (tf2::Quaternion{0.7044, 0.7044, -0.0616, 0.0616})));
 }
 
 BOOST_AUTO_TEST_CASE(getNcomLrf) {
@@ -263,21 +268,26 @@ BOOST_AUTO_TEST_CASE(odometry) {
 
   BOOST_REQUIRE(msg.pose.covariance.size() >= 15);
 
-  BOOST_CHECK(approxEqual(
+  BOOST_CHECK(
+    approxEqual(
       std::vector<double>{&msg.pose.covariance[0], &msg.pose.covariance[3]},
       std::vector<double>{216.165, -116.455, -131.085}));
 
-  BOOST_CHECK(approxEqual(
+  BOOST_CHECK(
+    approxEqual(
       std::vector<double>{&msg.pose.covariance[6], &msg.pose.covariance[9]},
       std::vector<double>{-116.455, 330.424, -130.945}));
 
-  BOOST_CHECK(approxEqual(
+  BOOST_CHECK(
+    approxEqual(
       std::vector<double>{&msg.pose.covariance[12], &msg.pose.covariance[15]},
       std::vector<double>{-131.085, -130.945, 853.41}));
 }
 
-geometry_msgs::msg::PoseStamped makePose(int ox, int oy, int oz, int px, int py,
-                                         int pz) {
+geometry_msgs::msg::PoseStamped makePose(
+  int ox, int oy, int oz, int px, int py,
+  int pz)
+{
   geometry_msgs::msg::PoseStamped pose{};
   pose.pose.orientation.x = ox;
   pose.pose.orientation.y = oy;
@@ -290,10 +300,10 @@ geometry_msgs::msg::PoseStamped makePose(int ox, int oy, int oz, int px, int py,
 
 BOOST_AUTO_TEST_CASE(path) {
   std::vector<geometry_msgs::msg::PoseStamped> poses{
-      makePose(1, 2, 3, 4, 5, 6),       makePose(7, 8, 9, 10, 11, 12),
-      makePose(13, 14, 15, 16, 17, 18), makePose(19, 20, 21, 22, 23, 24),
-      makePose(25, 26, 27, 28, 29, 30), makePose(31, 32, 33, 34, 35, 36),
-      makePose(37, 38, 39, 40, 41, 42)};
+    makePose(1, 2, 3, 4, 5, 6), makePose(7, 8, 9, 10, 11, 12),
+    makePose(13, 14, 15, 16, 17, 18), makePose(19, 20, 21, 22, 23, 24),
+    makePose(25, 26, 27, 28, 29, 30), makePose(31, 32, 33, 34, 35, 36),
+    makePose(37, 38, 39, 40, 41, 42)};
 
   auto msg = ::path(poses, std_msgs::msg::Header{});
 

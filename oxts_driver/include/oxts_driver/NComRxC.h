@@ -3,18 +3,18 @@
 //! The software is protected by copyright of Oxford Technical Solutions at oxts.com.
 //! © 2008 - 2017, Oxford Technical Solutions Ltd.
 //! Unauthorised use, copying or distribution is not permitted.
-//! 
-//! Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
-//! associated documentation files (the "Software"), to deal in the Software without restriction, including 
-//! without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//! copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
+//!
+//! Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+//! associated documentation files (the "Software"), to deal in the Software without restriction, including
+//! without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//! copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
 //! following conditions:
 //!
-//! All copies or substantial portions of the software must reproduce the above copyright notices, this list 
+//! All copies or substantial portions of the software must reproduce the above copyright notices, this list
 //! of conditions and the following disclaimer in the software documentation and/or other materials provided
 //! with the distribution.
 //!
-//! The software is provided by the copyright holders "as is" without any warranty of any kind, express or 
+//! The software is provided by the copyright holders "as is" without any warranty of any kind, express or
 //! implied, including, but not limited to, warranties of merchantability or fitness for a particular purpose.
 //! In no event shall the copyright holders be liable for any direct, indirect, incidental, special,
 //! exemplary, or consequential damages however caused and on any liability, whether in contract, strict
@@ -62,30 +62,30 @@
 #endif
 
 
-#if(_MSC_VER)
-#if(__cplusplus)
+#if (_MSC_VER)
+#if (__cplusplus)
 #include <climits>
 #else
 #include <limits.h>
 #endif
-#if(_MSC_VER < 1300)
-  typedef signed   char     int8_t;
-  typedef signed   short    int16_t;
-  typedef signed   int      int32_t;
-  typedef signed   __int64  int64_t;
-  typedef unsigned char     uint8_t;
-  typedef unsigned short    uint16_t;
-  typedef unsigned int      uint32_t;
-  typedef unsigned __int64  uint64_t;
-#elif(_MSC_VER < 1600)
-  typedef signed   __int8   int8_t;          //!< Standard signed integer basic type of 8 bits.
-  typedef signed   __int16  int16_t;         //!< Standard signed integer basic type of 16 bits.
-  typedef signed   __int32  int32_t;         //!< Standard signed integer basic type of 32 bits.
-  typedef signed   __int64  int64_t;         //!< Standard signed integer basic type of 64 bits.
-  typedef unsigned __int8   uint8_t;         //!< Standard unsigned integer basic type of 8 bits.
-  typedef unsigned __int16  uint16_t;        //!< Standard unsigned integer basic type of 16 bits.
-  typedef unsigned __int32  uint32_t;        //!< Standard unsigned integer basic type of 32 bits.
-  typedef unsigned __int64  uint64_t;        //!< Standard unsigned integer basic type of 64 bits.
+#if (_MSC_VER < 1300)
+typedef signed char int8_t;
+typedef signed short int16_t;
+typedef signed int int32_t;
+typedef signed __int64 int64_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned __int64 uint64_t;
+#elif (_MSC_VER < 1600)
+typedef signed __int8 int8_t;                //!< Standard signed integer basic type of 8 bits.
+typedef signed __int16 int16_t;              //!< Standard signed integer basic type of 16 bits.
+typedef signed __int32 int32_t;              //!< Standard signed integer basic type of 32 bits.
+typedef signed __int64 int64_t;              //!< Standard signed integer basic type of 64 bits.
+typedef unsigned __int8 uint8_t;             //!< Standard unsigned integer basic type of 8 bits.
+typedef unsigned __int16 uint16_t;           //!< Standard unsigned integer basic type of 16 bits.
+typedef unsigned __int32 uint32_t;           //!< Standard unsigned integer basic type of 32 bits.
+typedef unsigned __int64 uint64_t;           //!< Standard unsigned integer basic type of 64 bits.
   #define INT8_MIN      ((int8_t)  _I8_MIN)  //!< Limit macro for the most negative value of the standard signed integer type of 8 bits.
   #define INT16_MIN     ((int16_t) _I16_MIN) //!< Limit macro for the most negative value of the standard signed integer type of 16 bits.
   #define INT32_MIN     ((int32_t) _I32_MIN) //!< Limit macro for the most negative value of the standard signed integer type of 32 bits.
@@ -98,16 +98,16 @@
   #define UINT16_MAX    (_UI16_MAX)          //!< Limit macro for the most positive value of the standard unsigned integer type of 16 bits.
   #define UINT32_MAX    (_UI32_MAX)          //!< Limit macro for the most positive value of the standard unsigned integer type of 32 bits.
   #define UINT64_MAX    (_UI64_MAX)          //!< Limit macro for the most positive value of the standard unsigned integer type of 64 bits.
-  #define INT8_C(val)   val##i8              //!< Literal constant macro for the standard signed integer type of 8 bits.
-  #define INT16_C(val)  val##i16             //!< Literal constant macro for the standard signed integer type of 16 bits.
-  #define INT32_C(val)  val##i32             //!< Literal constant macro for the standard signed integer type of 32 bits.
-  #define INT64_C(val)  val##i64             //!< Literal constant macro for the standard signed integer type of 64 bits.
-  #define UINT8_C(val)  val##ui8             //!< Literal constant macro for the standard unsigned integer type of 8 bits.
-  #define UINT16_C(val) val##ui16            //!< Literal constant macro for the standard unsigned integer type of 16 bits.
-  #define UINT32_C(val) val##ui32            //!< Literal constant macro for the standard unsigned integer type of 32 bits.
-  #define UINT64_C(val) val##ui64            //!< Literal constant macro for the standard unsigned integer type of 64 bits.
+  #define INT8_C(val)   val ## i8              //!< Literal constant macro for the standard signed integer type of 8 bits.
+  #define INT16_C(val)  val ## i16             //!< Literal constant macro for the standard signed integer type of 16 bits.
+  #define INT32_C(val)  val ## i32             //!< Literal constant macro for the standard signed integer type of 32 bits.
+  #define INT64_C(val)  val ## i64             //!< Literal constant macro for the standard signed integer type of 64 bits.
+  #define UINT8_C(val)  val ## ui8             //!< Literal constant macro for the standard unsigned integer type of 8 bits.
+  #define UINT16_C(val) val ## ui16            //!< Literal constant macro for the standard unsigned integer type of 16 bits.
+  #define UINT32_C(val) val ## ui32            //!< Literal constant macro for the standard unsigned integer type of 32 bits.
+  #define UINT64_C(val) val ## ui64            //!< Literal constant macro for the standard unsigned integer type of 64 bits.
 #else
-#if(__cplusplus)
+#if (__cplusplus)
 #include <cstdint>
 #else
 #include <stdint.h>
@@ -122,17 +122,17 @@
   #define PRIu32        "I32u"               //!< Printing unsigned decimal format macro for the standard unsigned integer type of 32 bits.
   #define PRIu64        "I64u"               //!< Printing unsigned decimal format macro for the standard unsigned integer type of 64 bits.
 #else
-#if(__cplusplus && (__cplusplus > 199711L))
+#if (__cplusplus && (__cplusplus > 199711L))
 #include <cstdint>
 #include <cinttypes>
-  using std::int8_t;
-  using std::int16_t;
-  using std::int32_t;
-  using std::int64_t;
-  using std::uint8_t;
-  using std::uint16_t;
-  using std::uint32_t;
-  using std::uint64_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
+using std::int64_t;
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::uint64_t;
 #else
 #include <stdint.h>
 #include <inttypes.h>
@@ -155,18 +155,18 @@ typedef double MatElement;  // Use double numbers for the matrix type.
 
 typedef struct
 {
-    MatElement *m; //!< Pointer to the matrix data.
-    long r;        //!< Rows of the matrix.
-    long c;        //!< Columns of the matrix.
-    long tr;       //!< Number of allocated rows.
-    long tc;       //!< Number of allocated columns.
+  MatElement * m;  //!< Pointer to the matrix data.
+  long r;          //!< Rows of the matrix.
+  long c;          //!< Columns of the matrix.
+  long tr;         //!< Number of allocated rows.
+  long tc;         //!< Number of allocated columns.
 } Mat;
 
 
 //============================================================================================================
 //! \brief Macro providing easy access to matrix elements.
 
-#define ele(A,r,c) ((A)->m[c+(r)*(int)(A)->tc])
+#define ele(A, r, c) ((A)->m[c + (r) * (int)(A)->tc])
 
 
 //============================================================================================================
@@ -334,7 +334,6 @@ typedef enum
 } PacketChecksumRanges;
 
 
-
 //############################################################################################################
 //##                                                                                                        ##
 //##  Filt2ndOrder                                                                                          ##
@@ -365,11 +364,9 @@ typedef struct
   double mT0, mT1, mT2;      //!< Time stamps of past inputs.
   double mX0, mX1, mX2;      //!< Past inputs.
   double mU0, mU1, mU2;      //!< Past outputs.
-  int    mOutputValid;       //!< Is current output valid?
+  int mOutputValid;          //!< Is current output valid?
 
 } Filt2ndOrder;
-
-
 
 
 //############################################################################################################
@@ -396,11 +393,11 @@ typedef struct
   int mHoldDistWhenSlow;  //!< Distance hold when Slow.
 
   // Buffer items.
-  unsigned char  mCurPkt[NCOMRX_BUFFER_SIZE]; //!< Holds the incoming data.
-  unsigned char *mCurStatus;                  //!< Direct acccess to the raw status byte data.
-  int            mCurChannel;                 //!< Direct acccess to the raw status channel number.
-  int            mCurLen;                     //!< Length of data in buffer.
-  int            mPktProcessed;               //!< Flag indicates processed packet.
+  unsigned char mCurPkt[NCOMRX_BUFFER_SIZE];  //!< Holds the incoming data.
+  unsigned char * mCurStatus;                  //!< Direct acccess to the raw status byte data.
+  int mCurChannel;                            //!< Direct acccess to the raw status channel number.
+  int mCurLen;                                //!< Length of data in buffer.
+  int mPktProcessed;                          //!< Flag indicates processed packet.
 
   // Byte counters.
   uint64_t mNumChars;     //!< Number of bytes.
@@ -417,11 +414,11 @@ typedef struct
   unsigned char mDigitalOutCount;
 
   // To compute distance travelled.
-  int    mPrevDist2dValid;
+  int mPrevDist2dValid;
   double mPrevDist2dTime;
   double mPrevDist2dSpeed;
   double mPrevDist2d;
-  int    mPrevDist3dValid;
+  int mPrevDist3dValid;
   double mPrevDist3dTime;
   double mPrevDist3dSpeed;
   double mPrevDist3d;
@@ -457,9 +454,9 @@ typedef struct
   int mMatrixHold; //!< Prevents matrix calculations when 1 (say for slow computers), normally 0.
 
   // Filters for linear acceleration.
-  int          mIsLinAccFiltFixed;    //!< Filter flags.
-  int          mHasLinAccFiltChanged; //!< Filter flags.
-  int          mIsLinAccFiltOff;      //!< Filter flags.
+  int mIsLinAccFiltFixed;             //!< Filter flags.
+  int mHasLinAccFiltChanged;          //!< Filter flags.
+  int mIsLinAccFiltOff;               //!< Filter flags.
   Filt2ndOrder FiltForAx;             //!< Filter for X-axis linear acceleration.
   Filt2ndOrder FiltForAy;             //!< Filter for Y-axis linear acceleration.
   Filt2ndOrder FiltForAz;             //!< Filter for Z-axis linear acceleration.
@@ -471,16 +468,14 @@ typedef struct
   double mPrevWbTime;  //!< Time corresponding to previous values of Wx, Wy and Wz. [s]
 
   // Filters for angular acceleration.
-  int          mIsAngAccFiltFixed;    //!< Filter flags.
-  int          mHasAngAccFiltChanged; //!< Filter flags.
-  int          mIsAngAccFiltOff;      //!< Filter flags.
+  int mIsAngAccFiltFixed;             //!< Filter flags.
+  int mHasAngAccFiltChanged;          //!< Filter flags.
+  int mIsAngAccFiltOff;               //!< Filter flags.
   Filt2ndOrder FiltForYx;             //!< Filter for X-axis angular acceleration.
   Filt2ndOrder FiltForYy;             //!< Filter for Y-axis angular acceleration.
   Filt2ndOrder FiltForYz;             //!< Filter for Z-axis angular acceleration.
 
 } NComRxCInternal;
-
-
 
 
 //############################################################################################################
@@ -542,7 +537,6 @@ typedef struct
 } NComRxCGps;
 
 
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -561,18 +555,18 @@ extern "C"
 
 // System information
 
-extern const char *NComGpsGetTypeString(const NComRxCGps *Com);
-extern const char *NComGpsGetFormatString(const NComRxCGps *Com);
+extern const char * NComGpsGetTypeString(const NComRxCGps * Com);
+extern const char * NComGpsGetFormatString(const NComRxCGps * Com);
 
-extern const char *NComGpsGetRawRateString(const NComRxCGps *Com);
-extern const char *NComGpsGetPosRateString(const NComRxCGps *Com);
-extern const char *NComGpsGetVelRateString(const NComRxCGps *Com);
+extern const char * NComGpsGetRawRateString(const NComRxCGps * Com);
+extern const char * NComGpsGetPosRateString(const NComRxCGps * Com);
+extern const char * NComGpsGetVelRateString(const NComRxCGps * Com);
 
-extern const char *NComGpsGetAntStatusString(const NComRxCGps *Com);
-extern const char *NComGpsGetAntPowerString(const NComRxCGps *Com);
-extern const char *NComGpsGetPosModeString(const NComRxCGps *Com);
+extern const char * NComGpsGetAntStatusString(const NComRxCGps * Com);
+extern const char * NComGpsGetAntPowerString(const NComRxCGps * Com);
+extern const char * NComGpsGetPosModeString(const NComRxCGps * Com);
 
-extern const char *NComGpsGetSerBaudString(const NComRxCGps *Com);
+extern const char * NComGpsGetSerBaudString(const NComRxCGps * Com);
 
 // *** Code Generation End - NComRxCGps External String Functions ***
 
@@ -580,16 +574,14 @@ extern const char *NComGpsGetSerBaudString(const NComRxCGps *Com);
 //============================================================================================================
 // General function declarations.
 
-extern NComRxCGps *NComGpsCreate();
-extern void        NComGpsDestroy(NComRxCGps *Com);
-extern void        NComGpsCopy(NComRxCGps *ComDestination, const NComRxCGps *ComSource);
+extern NComRxCGps * NComGpsCreate();
+extern void        NComGpsDestroy(NComRxCGps * Com);
+extern void        NComGpsCopy(NComRxCGps * ComDestination, const NComRxCGps * ComSource);
 
 
 #ifdef __cplusplus
 }
 #endif
-
-
 
 
 //############################################################################################################
@@ -612,9 +604,9 @@ typedef struct
   //--------------------------------------------------------------------------------------------------------
   // Other structures.
 
-  NComRxCGps *mGpsPrimary;      //!< Primary internal GPS receiver.
-  NComRxCGps *mGpsSecondary;    //!< Secondary internal GPS receiver.
-  NComRxCGps *mGpsExternal;     //!< External GPS receiver.
+  NComRxCGps * mGpsPrimary;      //!< Primary internal GPS receiver.
+  NComRxCGps * mGpsSecondary;    //!< Secondary internal GPS receiver.
+  NComRxCGps * mGpsExternal;     //!< External GPS receiver.
 
   // *** Code Generation Begin - NComRxC Structure ***
 
@@ -629,12 +621,12 @@ typedef struct
   // System information
 
   int mIsSerialNumberValid; int mSerialNumber; //!< Unit serial number.
-  int mIsDevIdValid; char mDevId[DEV_ID_STRLEN+1]; //!< Development ID.
+  int mIsDevIdValid; char mDevId[DEV_ID_STRLEN + 1]; //!< Development ID.
 
   int mIsOsVersion1Valid; int mOsVersion1; //!< Operating system major version.
   int mIsOsVersion2Valid; int mOsVersion2; //!< Operating system minor version.
   int mIsOsVersion3Valid; int mOsVersion3; //!< Operating system revision version.
-  int mIsOsScriptIdValid; char mOsScriptId[OS_SCRIPT_ID_STRLEN+1]; //!< Operating system boot up script ID.
+  int mIsOsScriptIdValid; char mOsScriptId[OS_SCRIPT_ID_STRLEN + 1]; //!< Operating system boot up script ID.
 
   int mIsImuTypeValid; uint8_t mImuType; //!< Type of IMU fitted.
   int mIsCpuPcbTypeValid; uint8_t mCpuPcbType; //!< Type of CPU PCB fitted.
@@ -683,7 +675,7 @@ typedef struct
   int mIsGpsNumObsValid; int mGpsNumObs; //!< Number of satellites.
   int mIsUndulationValid; double mUndulation; //!< Difference between ellipsoidal altitude and geoidal altitude. [m]
 
-  int mIsBaseStationIdValid; char mBaseStationId[BASE_STATION_ID_STRLEN+1]; //!< Differential base station ID.
+  int mIsBaseStationIdValid; char mBaseStationId[BASE_STATION_ID_STRLEN + 1]; //!< Differential base station ID.
   int mIsGpsDiffAgeValid; double mGpsDiffAge; //!< Differential corrections age to GPS. [s]
 
   // Heading computation status
@@ -705,7 +697,7 @@ typedef struct
 
   // OmniSTAR information
 
-  int mIsOmniStarSerialValid; char mOmniStarSerial[OMNISTAR_SERIAL_STRLEN+1]; //!< OmniSTAR serial string.
+  int mIsOmniStarSerialValid; char mOmniStarSerial[OMNISTAR_SERIAL_STRLEN + 1]; //!< OmniSTAR serial string.
   int mIsOmniStarFreqValid; double mOmniStarFreq; //!< OmniSTAR frequency. [Hz]
   int mIsOmniStarSNRValid; double mOmniStarSNR; //!< OmniSTAR signal to noise ratio. [dB]
   int mIsOmniStarLockTimeValid; double mOmniStarLockTime; //!< OmniSTAR lock time. [s]
@@ -1208,10 +1200,9 @@ typedef struct
   //--------------------------------------------------------------------------------------------------------
   // Decoder private area.
 
-  NComRxCInternal *mInternal;  //!< Private decoder state and work space.
+  NComRxCInternal * mInternal;  //!< Private decoder state and work space.
 
 } NComRxC;
-
 
 
 #ifdef __cplusplus
@@ -1232,60 +1223,60 @@ extern "C"
 
 // Status
 
-extern const char *NComGetOutputPacketTypeString(const NComRxC *Com);
-extern const char *NComGetInsNavModeString(const NComRxC *Com);
+extern const char * NComGetOutputPacketTypeString(const NComRxC * Com);
+extern const char * NComGetInsNavModeString(const NComRxC * Com);
 
 // System information
 
-extern const char *NComGetImuTypeString(const NComRxC *Com);
-extern const char *NComGetCpuPcbTypeString(const NComRxC *Com);
-extern const char *NComGetInterPcbTypeString(const NComRxC *Com);
-extern const char *NComGetFrontPcbTypeString(const NComRxC *Com);
-extern const char *NComGetInterSwIdString(const NComRxC *Com);
-extern const char *NComGetHwConfigString(const NComRxC *Com);
+extern const char * NComGetImuTypeString(const NComRxC * Com);
+extern const char * NComGetCpuPcbTypeString(const NComRxC * Com);
+extern const char * NComGetInterPcbTypeString(const NComRxC * Com);
+extern const char * NComGetFrontPcbTypeString(const NComRxC * Com);
+extern const char * NComGetInterSwIdString(const NComRxC * Com);
+extern const char * NComGetHwConfigString(const NComRxC * Com);
 
-extern const char *NComGetDualPortRamStatusString(const NComRxC *Com);
+extern const char * NComGetDualPortRamStatusString(const NComRxC * Com);
 
 // IMU information
 
-extern const char *NComGetUmacStatusString(const NComRxC *Com);
+extern const char * NComGetUmacStatusString(const NComRxC * Com);
 
 // Global Navigation Satellite System (GNSS) information
 
-extern const char *NComGetGpsPosModeString(const NComRxC *Com);
-extern const char *NComGetGpsVelModeString(const NComRxC *Com);
-extern const char *NComGetGpsAttModeString(const NComRxC *Com);
+extern const char * NComGetGpsPosModeString(const NComRxC * Com);
+extern const char * NComGetGpsVelModeString(const NComRxC * Com);
+extern const char * NComGetGpsAttModeString(const NComRxC * Com);
 
 // Heading computation status
 
-extern const char *NComGetHeadQualityString(const NComRxC *Com);
-extern const char *NComGetHeadSearchTypeString(const NComRxC *Com);
-extern const char *NComGetHeadSearchStatusString(const NComRxC *Com);
-extern const char *NComGetHeadSearchReadyString(const NComRxC *Com);
+extern const char * NComGetHeadQualityString(const NComRxC * Com);
+extern const char * NComGetHeadSearchTypeString(const NComRxC * Com);
+extern const char * NComGetHeadSearchStatusString(const NComRxC * Com);
+extern const char * NComGetHeadSearchReadyString(const NComRxC * Com);
 
 //------------------------------------------------------------------------------------------------------------
 // General user options
 
 // General options
 
-extern const char *NComGetOptionLevelString(const NComRxC *Com);
-extern const char *NComGetOptionVibrationString(const NComRxC *Com);
-extern const char *NComGetOptionGpsAccString(const NComRxC *Com);
-extern const char *NComGetOptionUdpString(const NComRxC *Com);
-extern const char *NComGetOptionSer1String(const NComRxC *Com);
-extern const char *NComGetOptionSer2String(const NComRxC *Com);
-extern const char *NComGetOptionSer3String(const NComRxC *Com);
-extern const char *NComGetOptionHeadingString(const NComRxC *Com);
+extern const char * NComGetOptionLevelString(const NComRxC * Com);
+extern const char * NComGetOptionVibrationString(const NComRxC * Com);
+extern const char * NComGetOptionGpsAccString(const NComRxC * Com);
+extern const char * NComGetOptionUdpString(const NComRxC * Com);
+extern const char * NComGetOptionSer1String(const NComRxC * Com);
+extern const char * NComGetOptionSer2String(const NComRxC * Com);
+extern const char * NComGetOptionSer3String(const NComRxC * Com);
+extern const char * NComGetOptionHeadingString(const NComRxC * Com);
 
 // Output baud rate settings
 
-extern const char *NComGetOptionSer1BaudString(const NComRxC *Com);
+extern const char * NComGetOptionSer1BaudString(const NComRxC * Com);
 
-extern const char *NComGetOptionSer2BaudString(const NComRxC *Com);
+extern const char * NComGetOptionSer2BaudString(const NComRxC * Com);
 
-extern const char *NComGetOptionSer3BaudString(const NComRxC *Com);
+extern const char * NComGetOptionSer3BaudString(const NComRxC * Com);
 
-extern const char *NComGetOptionCanBaudString(const NComRxC *Com);
+extern const char * NComGetOptionCanBaudString(const NComRxC * Com);
 
 // *** Code Generation End - NComRxC External String Functions ***
 
@@ -1293,29 +1284,29 @@ extern const char *NComGetOptionCanBaudString(const NComRxC *Com);
 //============================================================================================================
 // General function declarations.
 
-extern void                 NComInvalidate(NComRxC *Com);
-extern NComRxC             *NComCreateNComRxC();
-extern void                 NComDestroyNComRxC(NComRxC *Com);
-extern void                 NComCopy(NComRxC *ComDestination, const NComRxC *ComSource);
-extern ComResponse          NComNewChar(NComRxC *Com, unsigned char c);
-extern ComResponse          NComNewChars(NComRxC *Com, const unsigned char *data, int num);
-extern uint64_t             NComNumChars(const NComRxC *Com);
-extern uint64_t             NComSkippedChars(const NComRxC *Com);
-extern uint64_t             NComNumPackets(const NComRxC *Com);
-extern unsigned int         NComGetCurrentPacketSize(const NComRxC *Com);
-extern const unsigned char *NComGetCurrentPacketData(const NComRxC *Com);
-extern int                  NComGetCurrentStatusChannel(const NComRxC *Com);
-extern unsigned int         NComGetCurrentStatusPacketSize(const NComRxC *Com);
-extern const unsigned char *NComGetCurrentStatusPacketData(const NComRxC *Com);
-extern void                 NComUpdateInnAge(NComRxC *Com);
-extern void                 NComInterpolate(NComRxC *Com, double a, const NComRxC *A, double b, const NComRxC *B);
+extern void                 NComInvalidate(NComRxC * Com);
+extern NComRxC * NComCreateNComRxC();
+extern void                 NComDestroyNComRxC(NComRxC * Com);
+extern void                 NComCopy(NComRxC * ComDestination, const NComRxC * ComSource);
+extern ComResponse          NComNewChar(NComRxC * Com, unsigned char c);
+extern ComResponse          NComNewChars(NComRxC * Com, const unsigned char * data, int num);
+extern uint64_t             NComNumChars(const NComRxC * Com);
+extern uint64_t             NComSkippedChars(const NComRxC * Com);
+extern uint64_t             NComNumPackets(const NComRxC * Com);
+extern unsigned int         NComGetCurrentPacketSize(const NComRxC * Com);
+extern const unsigned char * NComGetCurrentPacketData(const NComRxC * Com);
+extern int                  NComGetCurrentStatusChannel(const NComRxC * Com);
+extern unsigned int         NComGetCurrentStatusPacketSize(const NComRxC * Com);
+extern const unsigned char * NComGetCurrentStatusPacketData(const NComRxC * Com);
+extern void                 NComUpdateInnAge(NComRxC * Com);
+extern void                 NComInterpolate(
+  NComRxC * Com, double a, const NComRxC * A, double b,
+  const NComRxC * B);
 
 
 #ifdef __cplusplus
 }
 #endif
-
-
 
 
 //============================================================================================================

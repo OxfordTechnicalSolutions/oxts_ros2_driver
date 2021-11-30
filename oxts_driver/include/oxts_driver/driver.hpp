@@ -42,12 +42,14 @@
 
 using namespace std::chrono_literals;
 
-namespace oxts_driver {
+namespace oxts_driver
+{
 
 /**
  * Enumeration of timestamp modes for published topics
  */
-enum PUB_TIMESTAMP_MODE {
+enum PUB_TIMESTAMP_MODE
+{
   /** Use ROS time. */
   ROS = 0,
   /** Use NCom time. */
@@ -60,7 +62,8 @@ enum PUB_TIMESTAMP_MODE {
  * @todo Add config struct to hold data which will hold config parsed from the
  *       .yaml file.
  */
-class OxtsDriver : public rclcpp::Node {
+class OxtsDriver : public rclcpp::Node
+{
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
@@ -77,9 +80,9 @@ private:
     in real time. */
   std::string ncom_path;
   /*! Function pointer to the necesary NCom file/socket callback */
-  void (oxts_driver::OxtsDriver::*timer_ncom_callback)();
+  void (oxts_driver::OxtsDriver::* timer_ncom_callback)();
   /*! Function pointer to the necesary NCom updater */
-  void (oxts_driver::OxtsDriver::*update_ncom)();
+  void (oxts_driver::OxtsDriver::* update_ncom)();
   /*! Whether ot not to wait for NCom initialisation before publishing messages.
    */
   bool wait_for_init;
@@ -115,8 +118,9 @@ public:
    * Default constructor for the OxtsDriver. Parses options from the
    * .yaml params/config file, sets up UDP connection to unit.
    */
-  explicit OxtsDriver(const rclcpp::NodeOptions &options)
-      : Node("oxts_driver", options) {
+  explicit OxtsDriver(const rclcpp::NodeOptions & options)
+  : Node("oxts_driver", options)
+  {
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate = this->declare_parameter("ncom_rate", 100);
@@ -134,7 +138,7 @@ public:
     // Initialise publishers for each message - all are initialised, even if not
     // configured
     pubNCom_ = this->create_publisher<oxts_msgs::msg::Ncom>(
-        topic_prefix + "/" + ncom_topic, 10);
+      topic_prefix + "/" + ncom_topic, 10);
 
     nrx = NComCreateNComRxC();
 
@@ -142,20 +146,22 @@ public:
       ncom_path = std::filesystem::canonical(ncom_path);
       inFileNCom.open(ncom_path);
       if (!inFileNCom.is_open()) {
-        RCLCPP_ERROR(this->get_logger(), "Unable to open NCOM: %s",
-                     ncom_path.c_str());
+        RCLCPP_ERROR(
+          this->get_logger(), "Unable to open NCOM: %s",
+          ncom_path.c_str());
         return;
       } else {
         RCLCPP_INFO(this->get_logger(), "Opened NCOM: %s", ncom_path.c_str());
       }
     } else {
       unitEndpointNCom = boost::asio::ip::udp::endpoint(
-          boost::asio::ip::address::from_string(this->unit_ip),
-          this->unit_port);
+        boost::asio::ip::address::from_string(this->unit_ip),
+        this->unit_port);
 
       this->udpClient.set_local_port(this->unit_port);
-      RCLCPP_INFO(this->get_logger(), "Connecting: %s:%d",
-                  this->unit_ip.c_str(), this->unit_port);
+      RCLCPP_INFO(
+        this->get_logger(), "Connecting: %s:%d",
+        this->unit_ip.c_str(), this->unit_port);
     }
 
     // Assign callback functions to timers (callbacks are called at a rate
@@ -180,9 +186,10 @@ public:
       RCLCPP_INFO(this->get_logger(), "Waiting for initialisation...");
       // Only block things that are required for 100% of OxTS navigation
       while (nrx->mInsNavMode != NAV_CONST::NAV_MODE::REAL_TIME &&
-             nrx->mIsLatValid == 0 && nrx->mIsLonValid == 0 &&
-             nrx->mIsAltValid == 0 && nrx->mIsHeadingValid == 0 &&
-             nrx->mIsPitchValid == 0 && nrx->mIsRollValid == 0) {
+        nrx->mIsLatValid == 0 && nrx->mIsLonValid == 0 &&
+        nrx->mIsAltValid == 0 && nrx->mIsHeadingValid == 0 &&
+        nrx->mIsPitchValid == 0 && nrx->mIsRollValid == 0)
+      {
         (*this.*update_ncom)();
       }
       RCLCPP_INFO(this->get_logger(), "INS initialised");
@@ -191,23 +198,27 @@ public:
       // Wait for a approximate position (while uninitialised, orientation is
       // never approx/valid)
       while (nrx->mIsLatApprox == 0 && nrx->mIsLonApprox == 0 &&
-             nrx->mIsAltApprox == 0 && nrx->mIsLatValid == 0 &&
-             nrx->mIsLonValid == 0 && nrx->mIsAltValid == 0) {
+        nrx->mIsAltApprox == 0 && nrx->mIsLatValid == 0 &&
+        nrx->mIsLonValid == 0 && nrx->mIsAltValid == 0)
+      {
         (*this.*update_ncom)();
       }
-      RCLCPP_INFO(this->get_logger(),
-                  "Publishing before/without INS initialisation");
+      RCLCPP_INFO(
+        this->get_logger(),
+        "Publishing before/without INS initialisation");
     }
 
-    timer_ncom_ = this->create_wall_timer(ncomInterval,
-                                          std::bind(timer_ncom_callback, this));
+    timer_ncom_ = this->create_wall_timer(
+      ncomInterval,
+      std::bind(timer_ncom_callback, this));
 
-    RCLCPP_INFO(this->get_logger(), "Publishing NCom packets at: %uHz",
-                ncom_rate);
+    RCLCPP_INFO(
+      this->get_logger(), "Publishing NCom packets at: %uHz",
+      ncom_rate);
   }
 
   /** NCom decoder instance */
-  NComRxC *nrx;
+  NComRxC * nrx;
   /** Buffer for UDP data */
   unsigned char buff[1024];
   /** UDP Client to receive data from the device */
@@ -225,7 +236,7 @@ public:
    *
    * @param nrx Pointer to the decoded NCom data
    */
-  rclcpp::Time getNcomTime(const NComRxC *nrx);
+  rclcpp::Time getNcomTime(const NComRxC * nrx);
   /**
    * Get the IP address of the OxTS unit, as set in the .yaml params file
    *
