@@ -23,13 +23,30 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
-
-add_executable(oxts_ins
+add_library(oxts_ins_lib SHARED
   src/conversions/convert.cpp
-  src/conversions/convert_node.cpp
   src/conversions/wrapper.cpp
   src/lib/NComRxC.c
   src/lib/nav_conversions.cpp
+)
+
+ament_target_dependencies(oxts_ins_lib
+  rclcpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  tf2
+  tf2_kdl
+  oxts_msgs)
+
+target_include_directories(oxts_ins_lib PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE ${Boost_INCLUDE_DIRS}
+  $<INSTALL_INTERFACE:include>)
+
+add_executable(oxts_ins
+  src/conversions/convert_node.cpp
 )
 
 ament_target_dependencies(oxts_ins
@@ -46,6 +63,13 @@ target_include_directories(oxts_ins PUBLIC
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
+target_link_libraries(oxts_ins oxts_ins_lib)
+
+ament_export_include_directories(include)
+ament_export_libraries(oxts_ins_lib)
+
+install(TARGETS oxts_ins_lib
+  DESTINATION lib)
 
 install(TARGETS oxts_ins
   DESTINATION lib/${PROJECT_NAME})
@@ -53,6 +77,9 @@ install(TARGETS oxts_ins
 install(DIRECTORY
   config urdf rviz
   DESTINATION share/${PROJECT_NAME})
+
+install(DIRECTORY include/
+  DESTINATION include)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

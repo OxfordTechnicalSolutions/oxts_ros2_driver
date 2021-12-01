@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(tests VERSION 0.1.0)
+project(oxts_tests VERSION 0.1.0)
 
 set(Boost_USE_STATIC_LIBS OFF)
 
@@ -22,6 +22,8 @@ find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
+find_package(oxts_driver REQUIRED)
+find_package(oxts_ins REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
 add_executable(tests
@@ -30,12 +32,7 @@ add_executable(tests
   udp_server_client.cpp
   convert.cpp
   nav_conversions.cpp
-  wrapper.cpp
-  ../oxts_driver/src/driver/driver.cpp
-  ../oxts_driver/src/lib/NComRxC.c
-  ../oxts_ins/src/conversions/convert.cpp
-  ../oxts_ins/src/conversions/wrapper.cpp
-  ../oxts_ins/src/lib/nav_conversions.cpp)
+  wrapper.cpp)
 
 ament_target_dependencies(tests
   rclcpp
@@ -45,11 +42,11 @@ ament_target_dependencies(tests
   nav_msgs
   tf2
   tf2_kdl
+  oxts_driver
+  oxts_ins
   oxts_msgs)
 
 target_include_directories(tests PUBLIC
-  ../oxts_driver/include
-  ../oxts_ins/include
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
@@ -57,3 +54,5 @@ target_link_libraries (tests ${Boost_LIBRARIES})
 
 install(TARGETS tests
   DESTINATION lib/${PROJECT_NAME})
+
+ament_package()
