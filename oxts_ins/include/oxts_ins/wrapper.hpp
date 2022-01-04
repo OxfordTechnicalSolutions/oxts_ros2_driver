@@ -58,6 +58,17 @@
 namespace RosNComWrapper {
 
 /**
+ * Helper function for constructing a quaternion from Euler angles, where the
+ * rotations are applied in the order qx(roll), qy(pitch), qz(yaw)
+ * 
+ * @param roll Roll angle in radians.
+ * @param pitch Pitch angle in radians.
+ * @param yaw Yaw angle in radians.
+ * @return A quaternion representing a roll-pitch-yaw rotation.
+ */
+tf2::Quaternion fromEulerYPR(const double roll, const double pitch, const double yaw);
+  
+/**
  * Calculate the rotational component of the transform from frame1 to frame2
  * based on Euler angles
  *
