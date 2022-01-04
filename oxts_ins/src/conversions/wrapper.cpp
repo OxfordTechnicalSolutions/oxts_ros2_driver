@@ -18,11 +18,30 @@
 
 namespace RosNComWrapper {
 
+**
+ * Helper function for constructing a quaternion from Euler angles, where the
+ * rotations are applied in the order qx(roll), qy(pitch), qz(yaw)
+ * 
+ * @param roll Roll angle in radians.
+ * @param pitch Pitch angle in radians.
+ * @param yaw Yaw angle in radians.
+ * @return A quaternion representing a roll-pitch-yaw rotation.
+ */
+tf2::Quaternion fromEulerYPR(const double roll, const double pitch, const double yaw)
+{
+  // Construct the individual rotations
+  tf2::Quaternion qx(std::cos(roll / 2.0), std::sin(roll / 2.0), 0.0, 0.0);
+  tf2::Quaternion qy(std::cos(pitch / 2.0), 0.0, std::sin(pitch / 2.0), 0.0);
+  tf2::Quaternion qz(std::cos(yaw / 2.0), 0.0, 0.0, std::sin(yaw / 2.0));
+  // Return the compound rotation in the correct order
+  return qz * qy * qx;
+}
+  
 tf2::Quaternion getVat(const NComRxC *nrx) {
-  tf2::Quaternion vat;
-  vat.setRPY(NAV_CONST::DEG2RADS * nrx->mImu2VehRoll,
-             NAV_CONST::DEG2RADS * nrx->mImu2VehPitch,
-             NAV_CONST::DEG2RADS * nrx->mImu2VehHeading);
+  tf2::Quaternion vat = RosNComWrapper::fromEulerYPR(
+    NAV_CONST::DEG2RADS * nrx->mImu2VehRoll, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehPitch, 
+    NAV_CONST::DEG2RADS * nrx->mImu2VehHeading);
   return vat;
 }
 
@@ -44,15 +63,17 @@ tf2::Vector3 getNsp(const NComRxC *nrx) {
 tf2::Quaternion getVehRPY(const NComRxC *nrx) {
   auto rpyVehNED = tf2::Quaternion(); // Orientation of the vehicle (NED frame)
   auto rpyVehENU = tf2::Quaternion(); // Orientation of the vehicle (ENU frame)
-  auto ned2enu = tf2::Quaternion();   // NED to ENU rotation
+  auto ned2enu = tf2::Quaternion(); // NED to ENU rotation
 
-  rpyVehNED.setRPY(NAV_CONST::DEG2RADS * nrx->mRoll,
-                   NAV_CONST::DEG2RADS * nrx->mPitch,
-                   NAV_CONST::DEG2RADS * nrx->mHeading);
+  rpyVehNED = RosNComWrapper::fromEulerYPR(
+    NAV_CONST::DEG2RADS * nrx->mRoll,
+    NAV_CONST::DEG2RADS * nrx->mPitch,
+    NAV_CONST::DEG2RADS * nrx->mHeading
+  );
   // NED to ENU rotation
-  ned2enu.setRPY(180.0 * NAV_CONST::DEG2RADS, 0, 90.0 * NAV_CONST::DEG2RADS);
+  //ned2enu.setRPY(180.0*NAV_CONST::DEG2RADS,0,90.0*NAV_CONST::DEG2RADS);
   // transform from NED to ENU
-  rpyVehENU = ned2enu * rpyVehNED;
+  rpyVehENU = rpyVehNED;// ned2enu * rpyVehNED;
   return rpyVehENU;
 }
 
