@@ -50,12 +50,14 @@
 
 using std::placeholders::_1;
 
-namespace oxts_ins {
+namespace oxts_ins
+{
 
 /**
  * Enumeration of LRF sources
  */
-enum LRF_SOURCE {
+enum LRF_SOURCE
+{
   /** Use the LRF from NCom. */
   NCOM_LRF = 0,
   /** Use the position and heading of first NCom packet as LRF. */
@@ -71,7 +73,8 @@ enum LRF_SOURCE {
  * @todo Add config struct to hold data which will hold config parsed from the
  *       .yaml file.
  */
-class OxtsIns : public rclcpp::Node {
+class OxtsIns : public rclcpp::Node
+{
 private:
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
@@ -146,7 +149,7 @@ private:
   /** Callback function for Imu message. Wraps message and publishes. */
   void imu(std_msgs::msg::Header header);
   /** Callback function for Tf messages. Wraps messages and broadcasts. */
-  void tf(const std_msgs::msg::Header &header);
+  void tf(const std_msgs::msg::Header & header);
   /** Callback function for TimeReference message. Wraps message and publishes.
    */
   void time_reference(std_msgs::msg::Header header);
@@ -188,7 +191,7 @@ private:
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr pubPath_;
   /** Publisher for /sensor_msgs/msg/TimeReference */
   rclcpp::Publisher<sensor_msgs::msg::TimeReference>::SharedPtr
-      pubTimeReference_;
+    pubTimeReference_;
   /** Publisher for /geometry_msgs/msg/PointStamped */
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr pubEcefPos_;
   /** Publisher for /oxts_msgs/msg/NavSatRef */
@@ -201,15 +204,16 @@ private:
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   /** Error strings */
   std::string notFactorError = " publish rate is not a factor of NCom rate, "
-                               "true output rate would not be %dHz.";
+    "true output rate would not be %dHz.";
 
 public:
   /**
    * Default constructor for the OxtsIns. Parses options from the
    * .yaml params/config file, sets up UDP connection to unit.
    */
-  explicit OxtsIns(const rclcpp::NodeOptions &options)
-      : Node("oxts_ins", options) {
+  explicit OxtsIns(const rclcpp::NodeOptions & options)
+  : Node("oxts_ins", options)
+  {
     // Get parameters (from config, command line, or from default)
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate = this->declare_parameter("ncom_rate", 100);
@@ -220,10 +224,10 @@ public:
     pub_velocity_rate = this->declare_parameter("pub_velocity_rate", 0);
     pub_odometry_rate = this->declare_parameter("pub_odometry_rate", 0);
     pub_odometry_frame_id =
-        this->declare_parameter("pub_odometry_frame_id", "map");
+      this->declare_parameter("pub_odometry_frame_id", "map");
     pub_path_rate = this->declare_parameter("pub_path_rate", 0);
     pub_time_reference_rate =
-        this->declare_parameter("pub_time_reference_rate", 0);
+      this->declare_parameter("pub_time_reference_rate", 0);
     pub_ecef_pos_rate = this->declare_parameter("pub_ecef_pos_rate", 0);
     pub_nav_sat_ref_rate = this->declare_parameter("pub_nav_sat_ref_rate", 0);
     pub_tf_flag = this->declare_parameter("pub_tf_flag", true);
@@ -234,15 +238,15 @@ public:
     ncom_topic = this->declare_parameter("ncom_topic", "ncom");
     string_topic = this->declare_parameter("string_topic", "debug_string_pos");
     nav_sat_fix_topic =
-        this->declare_parameter("nav_sat_fix_topic", "nav_sat_fix");
+      this->declare_parameter("nav_sat_fix_topic", "nav_sat_fix");
     velocity_topic = this->declare_parameter("velocity_topic", "velocity");
     odometry_topic = this->declare_parameter("odometry_topic", "odometry");
     path_topic = this->declare_parameter("path_topic", "path");
     time_reference_topic =
-        this->declare_parameter("time_reference_topic", "time_reference");
+      this->declare_parameter("time_reference_topic", "time_reference");
     ecef_pos_topic = this->declare_parameter("ecef_pos_topic", "ecef_pos");
     nav_sat_ref_topic =
-        this->declare_parameter("nav_sat_ref_topic", "nav_sat_ref");
+      this->declare_parameter("nav_sat_ref_topic", "nav_sat_ref");
     lever_arm_topic = this->declare_parameter("lever_arm_topic", "lever_arm");
     imu_bias_topic = this->declare_parameter("imu_bias_topic", "imu_bias");
     imu_topic = this->declare_parameter("imu_topic", "imu");
@@ -250,157 +254,168 @@ public:
     /** @todo Improve error handling */
     if (ncom_rate == 0) {
       RCLCPP_ERROR(
-          this->get_logger(),
-          "NCom publish rate is set to zero. No messages will be output.");
+        this->get_logger(),
+        "NCom publish rate is set to zero. No messages will be output.");
       return;
     }
 
     pubStringInterval =
-        (pub_string_rate == 0) ? 0 : ncom_rate / pub_string_rate;
+      (pub_string_rate == 0) ? 0 : ncom_rate / pub_string_rate;
     pubNavSatFixInterval =
-        (pub_nav_sat_fix_rate == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
+      (pub_nav_sat_fix_rate == 0) ? 0 : ncom_rate / pub_nav_sat_fix_rate;
     pubVelocityInterval =
-        (pub_velocity_rate == 0) ? 0 : ncom_rate / pub_velocity_rate;
+      (pub_velocity_rate == 0) ? 0 : ncom_rate / pub_velocity_rate;
     pubOdometryInterval =
-        (pub_odometry_rate == 0) ? 0 : ncom_rate / pub_odometry_rate;
+      (pub_odometry_rate == 0) ? 0 : ncom_rate / pub_odometry_rate;
     pubPathInterval = (pub_path_rate == 0) ? 0 : ncom_rate / pub_path_rate;
-    pubTimeReferenceInterval = (pub_time_reference_rate == 0)
-                                   ? 0
-                                   : ncom_rate / pub_time_reference_rate;
+    pubTimeReferenceInterval = (pub_time_reference_rate == 0) ?
+      0 :
+      ncom_rate / pub_time_reference_rate;
     pubEcefPosInterval =
-        (pub_ecef_pos_rate == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
+      (pub_ecef_pos_rate == 0) ? 0 : ncom_rate / pub_ecef_pos_rate;
     pubNavSatRefInterval =
-        (pub_nav_sat_ref_rate == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
+      (pub_nav_sat_ref_rate == 0) ? 0 : ncom_rate / pub_nav_sat_ref_rate;
     pubLeverArmInterval =
-        (pub_lever_arm_rate == 0) ? 0 : ncom_rate / pub_lever_arm_rate;
+      (pub_lever_arm_rate == 0) ? 0 : ncom_rate / pub_lever_arm_rate;
     pubIMUBiasInterval =
-        (pub_imu_bias_rate == 0) ? 0 : ncom_rate / pub_imu_bias_rate;
+      (pub_imu_bias_rate == 0) ? 0 : ncom_rate / pub_imu_bias_rate;
 
     // Initilize tf broadcaster if configured to broadcast
     if (pub_tf_flag) {
       tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
     }
     // Initialise publishers for each message if configured to publish
-    if (pub_imu_flag)
+    if (pub_imu_flag) {
       pubImu_ = this->create_publisher<sensor_msgs::msg::Imu>(
-          topic_prefix + "/" + imu_topic, 10);
+        topic_prefix + "/" + imu_topic, 10);
+    }
 
     if (pubStringInterval) {
       // Throw an error if ncom_rate / String_rate is not an integer
       if (ncom_rate % pubStringInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("String" + notFactorError).c_str(),
-                     pub_string_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("String" + notFactorError).c_str(),
+          pub_string_rate);
         return;
       }
       // Create publisher
       pubString_ = this->create_publisher<std_msgs::msg::String>(
-          topic_prefix + "/" + string_topic, 10);
+        topic_prefix + "/" + string_topic, 10);
     }
     if (pubNavSatFixInterval) {
       // Throw an error if ncom_rate / NavSatFix_rate is not an integer
       if (ncom_rate % pubNavSatFixInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("NavSatFix" + notFactorError).c_str(),
-                     pub_nav_sat_fix_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("NavSatFix" + notFactorError).c_str(),
+          pub_nav_sat_fix_rate);
         return;
       }
       // Create publisher
       pubNavSatFix_ = this->create_publisher<sensor_msgs::msg::NavSatFix>(
-          topic_prefix + "/" + nav_sat_fix_topic, 10);
+        topic_prefix + "/" + nav_sat_fix_topic, 10);
     }
     if (pubVelocityInterval) {
       // Throw an error if ncom_rate / Velocity_rate is not an integer
       if (ncom_rate % pubVelocityInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("Velocity" + notFactorError).c_str(),
-                     pub_velocity_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("Velocity" + notFactorError).c_str(),
+          pub_velocity_rate);
         return;
       }
       // Create publisher
       pubVelocity_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
-          topic_prefix + "/" + velocity_topic, 10);
+        topic_prefix + "/" + velocity_topic, 10);
     }
     if (pubOdometryInterval) {
       // Throw an error if ncom_rate / Odometry_rate is not an integer
       if (ncom_rate % pubOdometryInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("Odometry" + notFactorError).c_str(),
-                     pub_odometry_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("Odometry" + notFactorError).c_str(),
+          pub_odometry_rate);
         return;
       }
       // Create publisher
       pubOdometry_ = this->create_publisher<nav_msgs::msg::Odometry>(
-          topic_prefix + "/" + odometry_topic, 10);
+        topic_prefix + "/" + odometry_topic, 10);
     }
     if (pubPathInterval) {
       // Throw an error if ncom_rate / Path_rate is not an integer
       if (ncom_rate % pubPathInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("Path" + notFactorError).c_str(),
-                     pub_path_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("Path" + notFactorError).c_str(),
+          pub_path_rate);
         return;
       }
       // Create publisher
       pubPath_ = this->create_publisher<nav_msgs::msg::Path>(
-          topic_prefix + "/" + path_topic, 10);
+        topic_prefix + "/" + path_topic, 10);
     }
     if (pubTimeReferenceInterval) {
       // Throw an error if ncom_rate / TimeReference_rate is not an integer
       if (ncom_rate % pubTimeReferenceInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("TimeReference" + notFactorError).c_str(),
-                     pub_time_reference_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("TimeReference" + notFactorError).c_str(),
+          pub_time_reference_rate);
         return;
       }
       // Create publisher
       pubTimeReference_ =
-          this->create_publisher<sensor_msgs::msg::TimeReference>(
-              topic_prefix + "/" + time_reference_topic, 10);
+        this->create_publisher<sensor_msgs::msg::TimeReference>(
+        topic_prefix + "/" + time_reference_topic, 10);
     }
     if (pubEcefPosInterval) {
       // Throw an error if ncom_rate / EcefPos_rate is not an integer
       if (ncom_rate % pubEcefPosInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("EcefPos" + notFactorError).c_str(),
-                     pub_ecef_pos_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("EcefPos" + notFactorError).c_str(),
+          pub_ecef_pos_rate);
         return;
       }
       // Create publisher
       pubEcefPos_ = this->create_publisher<geometry_msgs::msg::PointStamped>(
-          topic_prefix + "/" + ecef_pos_topic, 10);
+        topic_prefix + "/" + ecef_pos_topic, 10);
     }
     if (pubNavSatRefInterval) {
       // Throw an error if ncom_rate / NavSatRef_rate is not an integer
       if (ncom_rate % pubNavSatRefInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("NavSatRef" + notFactorError).c_str(),
-                     pub_nav_sat_ref_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("NavSatRef" + notFactorError).c_str(),
+          pub_nav_sat_ref_rate);
         return;
       }
       // Create publisher
       pubNavSatRef_ = this->create_publisher<oxts_msgs::msg::NavSatRef>(
-          topic_prefix + "/" + nav_sat_ref_topic, 10);
+        topic_prefix + "/" + nav_sat_ref_topic, 10);
     }
     if (pubLeverArmInterval) {
       // Throw an error if ncom_rate / LeverArm_rate is not an integer
       if (ncom_rate % pubLeverArmInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("LeverArm" + notFactorError).c_str(),
-                     pub_lever_arm_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("LeverArm" + notFactorError).c_str(),
+          pub_lever_arm_rate);
         return;
       }
       // Create publisher
       pubLeverArm_ = this->create_publisher<oxts_msgs::msg::LeverArm>(
-          topic_prefix + "/" + lever_arm_topic, 10);
+        topic_prefix + "/" + lever_arm_topic, 10);
     }
     if (pubIMUBiasInterval) {
       // Throw an error if ncom_rate / LeverArm_rate is not an integer
       if (ncom_rate % pubIMUBiasInterval != 0) {
-        RCLCPP_ERROR(this->get_logger(), ("IMUBias" + notFactorError).c_str(),
-                     pub_imu_bias_rate);
+        RCLCPP_ERROR(
+          this->get_logger(), ("IMUBias" + notFactorError).c_str(),
+          pub_imu_bias_rate);
         return;
       }
       // Create publisher
       pubIMUBias_ = this->create_publisher<oxts_msgs::msg::ImuBias>(
-          topic_prefix + "/" + imu_bias_topic, 10);
+        topic_prefix + "/" + imu_bias_topic, 10);
     }
 
     // Initialise subscriber for regular ncom packet message
     subNCom_ = this->create_subscription<oxts_msgs::msg::Ncom>(
-        topic_prefix + "/" + ncom_topic, 10,
-        std::bind(&OxtsIns::ncomCallbackRegular, this, _1));
+      topic_prefix + "/" + ncom_topic, 10,
+      std::bind(&OxtsIns::ncomCallbackRegular, this, _1));
 
     nrx = NComCreateNComRxC();
 
@@ -408,7 +423,7 @@ public:
   }
 
   /** NCom decoder instance */
-  NComRxC *nrx;
+  NComRxC * nrx;
   /** Local reference frame validity flag */
   bool lrf_valid;
   /** Local reference frame */

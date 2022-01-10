@@ -25,35 +25,35 @@ find_package(tf2_kdl REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
 add_executable(tests
-               tests.cpp
-               oxts_driver.cpp
-               udp_server_client.cpp
-               convert.cpp
-               nav_conversions.cpp
-               wrapper.cpp
-               ../oxts_driver/src/driver/driver.cpp
-               ../oxts_driver/src/lib/NComRxC.c
-               ../oxts_ins/src/conversions/convert.cpp
-               ../oxts_ins/src/conversions/wrapper.cpp
-               ../oxts_ins/src/lib/nav_conversions.cpp)
+  tests.cpp
+  oxts_driver.cpp
+  udp_server_client.cpp
+  convert.cpp
+  nav_conversions.cpp
+  wrapper.cpp
+  ../oxts_driver/src/driver/driver.cpp
+  ../oxts_driver/src/lib/NComRxC.c
+  ../oxts_ins/src/conversions/convert.cpp
+  ../oxts_ins/src/conversions/wrapper.cpp
+  ../oxts_ins/src/lib/nav_conversions.cpp)
 
 ament_target_dependencies(tests
-        rclcpp
-        std_msgs
-        sensor_msgs
-        geometry_msgs
-        nav_msgs
-        tf2
-        tf2_kdl
-        oxts_msgs)
+  rclcpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  tf2
+  tf2_kdl
+  oxts_msgs)
 
 target_include_directories(tests PUBLIC
-        ../oxts_driver/include
-        ../oxts_ins/include
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        PRIVATE ${Boost_INCLUDE_DIRS}
-        $<INSTALL_INTERFACE:include>)
+  ../oxts_driver/include
+  ../oxts_ins/include
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE ${Boost_INCLUDE_DIRS}
+  $<INSTALL_INTERFACE:include>)
 target_link_libraries (tests ${Boost_LIBRARIES})
 
 install(TARGETS tests
-        DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME})
