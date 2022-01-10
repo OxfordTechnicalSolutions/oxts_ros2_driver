@@ -22,18 +22,22 @@
 
 using namespace oxts_driver;
 
-namespace tests::oxts_driver {
+namespace tests::oxts_driver
+{
 
 std::shared_ptr<OxtsDriver> driver;
 
-struct Fixture {
-  Fixture() {
+struct Fixture
+{
+  Fixture()
+  {
     rclcpp::init(0, nullptr);
     driver = tests::newDriver();
-    std::thread{[]() { rclcpp::spin(driver); }}.detach();
+    std::thread{[]() {rclcpp::spin(driver);}}.detach();
   }
 
-  ~Fixture() {
+  ~Fixture()
+  {
     driver.reset();
     rclcpp::shutdown();
   }
@@ -59,20 +63,22 @@ BOOST_AUTO_TEST_CASE(getNcomTime) {
   BOOST_CHECK(ncomTime.nanoseconds() >= 0);
 
   std::chrono::milliseconds packet_duration{
-      long(1000 / driver->get_parameter("ncom_rate").get_value<long>()) + 100};
+    long(1000 / driver->get_parameter("ncom_rate").get_value<long>()) + 100};
 
   std::this_thread::sleep_for(packet_duration);
   BOOST_CHECK(ncomTime <= driver->getNcomTime(driver->nrx));
 }
 
 BOOST_AUTO_TEST_CASE(getUnitIp) {
-  BOOST_CHECK(driver->getUnitIp() ==
-              driver->get_parameter("unit_ip").get_value<std::string>());
+  BOOST_CHECK(
+    driver->getUnitIp() ==
+    driver->get_parameter("unit_ip").get_value<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(getUnitPort) {
-  BOOST_CHECK(driver->getUnitPort() ==
-              driver->get_parameter("unit_port").get_value<long>());
+  BOOST_CHECK(
+    driver->getUnitPort() ==
+    driver->get_parameter("unit_port").get_value<long>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

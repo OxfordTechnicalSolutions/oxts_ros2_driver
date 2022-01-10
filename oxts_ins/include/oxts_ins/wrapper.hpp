@@ -55,7 +55,8 @@
 /**
  * Functions to convert data from the NCom decoder to ROS messages
  */
-namespace RosNComWrapper {
+namespace RosNComWrapper
+{
 
 /**
  * Calculate the rotational component of the transform from frame1 to frame2
@@ -65,7 +66,7 @@ namespace RosNComWrapper {
  * @return A quaternion representing the rotation between vehicle frame and imu
  * frame
  */
-tf2::Quaternion getVat(const NComRxC *nrx);
+tf2::Quaternion getVat(const NComRxC * nrx);
 /**
  * Calculate the lateral no slip component of the transform from frame1 to
  * frame2
@@ -74,7 +75,7 @@ tf2::Quaternion getVat(const NComRxC *nrx);
  * @return A transform representing the translation between the vehicle rear
  * axle and the imu frame
  */
-tf2::Vector3 getNsp(const NComRxC *nrx);
+tf2::Vector3 getNsp(const NComRxC * nrx);
 /**
  * Get the NCOM orientation in body (IMU) frame
  *
@@ -82,7 +83,7 @@ tf2::Vector3 getNsp(const NComRxC *nrx);
  * @return A quaterntion representing the rotation between the vehicle frame and
  * NED
  */
-tf2::Quaternion getBodyRPY(const NComRxC *nrx);
+tf2::Quaternion getBodyRPY(const NComRxC * nrx);
 /**
  * Get the NCOM orientation in vehicle frame
  *
@@ -90,33 +91,35 @@ tf2::Quaternion getBodyRPY(const NComRxC *nrx);
  * @return A quaterntion representing the rotation between the vehicle frame and
  * NED
  */
-tf2::Quaternion getVehRPY(const NComRxC *nrx);
+tf2::Quaternion getVehRPY(const NComRxC * nrx);
 /**
  * Get the LRF from the NCOM decoder
  */
-Lrf getNcomLrf(const NComRxC *nrx);
+Lrf getNcomLrf(const NComRxC * nrx);
 /**
  * Wrap data from NCom decoder to std_msgs/msg/NavSatStatus
  *
  * @param nrx Pointer to the decoded NCom data
  */
-sensor_msgs::msg::NavSatStatus nav_sat_status(const NComRxC *nrx);
+sensor_msgs::msg::NavSatStatus nav_sat_status(const NComRxC * nrx);
 /**
  * Wrap data from NCom decoder to sensor_msgs/msg/NavSatFix
  *
  * @param nrx Pointer to the decoded NCom data
  * @param head Header to be added to the published message
  */
-sensor_msgs::msg::NavSatFix nav_sat_fix(const NComRxC *nrx,
-                                        std_msgs::msg::Header head);
+sensor_msgs::msg::NavSatFix nav_sat_fix(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 /**
  * Wrap data for local reference point using oxts_msgs/msg/NavSatRef
  *
  * @param nrx Pointer to the decoded NCom data
  * @param head Header to be added to the published message
  */
-oxts_msgs::msg::NavSatRef nav_sat_ref(const Lrf lrf,
-                                      std_msgs::msg::Header head);
+oxts_msgs::msg::NavSatRef nav_sat_ref(
+  const Lrf lrf,
+  std_msgs::msg::Header head);
 
 /**
  * @brief Wrap data for GAP (primary GPS to IMU offset) using
@@ -126,8 +129,9 @@ oxts_msgs::msg::NavSatRef nav_sat_ref(const Lrf lrf,
  * @param head Header to be added to the published message
  * @return oxts_msgs::msgs::LeverArm
  */
-oxts_msgs::msg::LeverArm lever_arm_gap(const NComRxC *nrx,
-                                       std_msgs::msg::Header head);
+oxts_msgs::msg::LeverArm lever_arm_gap(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 
 /**
  * @brief Wrap data for IMU biases (accelerometer and gyro)
@@ -136,8 +140,9 @@ oxts_msgs::msg::LeverArm lever_arm_gap(const NComRxC *nrx,
  * @param head Header to be added to the published message
  * @return oxts_msgs::msg::ImuBias
  */
-oxts_msgs::msg::ImuBias imu_bias(const NComRxC *nrx,
-                                 std_msgs::msg::Header head);
+oxts_msgs::msg::ImuBias imu_bias(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 
 /**
  * Wrap data from the NCom decoder to
@@ -147,15 +152,16 @@ oxts_msgs::msg::ImuBias imu_bias(const NComRxC *nrx,
  * @param head Header to be added to the published message.
  * @return Position of the IMU in the ECEF coordinate frame.
  */
-geometry_msgs::msg::PointStamped ecef_pos(const NComRxC *nrx,
-                                          std_msgs::msg::Header head);
+geometry_msgs::msg::PointStamped ecef_pos(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 /**
  * Wrap position data from NCom decoder to std_msgs/msg/String
  * Not really a permanent function, more for easy testing.
  *
  * @param nrx Pointer to the decoded NCom data
  */
-std_msgs::msg::String string(const NComRxC *nrx);
+std_msgs::msg::String string(const NComRxC * nrx);
 /**
  * Wrap IMU data from NCom decoder to sensor_msgs/msg/Imu
  *
@@ -164,7 +170,7 @@ std_msgs::msg::String string(const NComRxC *nrx);
  *
  * \todo Covariances
  */
-sensor_msgs::msg::Imu imu(const NComRxC *nrx, std_msgs::msg::Header head);
+sensor_msgs::msg::Imu imu(const NComRxC * nrx, std_msgs::msg::Header head);
 /**
  * Wrap velocity data from NCom decoder to sensor_msgs/msg/Imu
  *
@@ -174,8 +180,9 @@ sensor_msgs::msg::Imu imu(const NComRxC *nrx, std_msgs::msg::Header head);
  * @returns Linear velocity forward, lateral, down.
  *          Angular velocity forward, lateral, down.
  */
-geometry_msgs::msg::TwistStamped velocity(const NComRxC *nrx,
-                                          std_msgs::msg::Header head);
+geometry_msgs::msg::TwistStamped velocity(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 /**
  * Wrap navigation data from NCom decoder to nav_msgs/msg/Odometry
  *
@@ -183,8 +190,9 @@ geometry_msgs::msg::TwistStamped velocity(const NComRxC *nrx,
  * @param head Header to be added to the published message
  * @returns
  */
-nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
-                                 const std_msgs::msg::Header &head, Lrf lrf);
+nav_msgs::msg::Odometry odometry(
+  const NComRxC * nrx,
+  const std_msgs::msg::Header & head, Lrf lrf);
 /**
  * Wrap navigation data from NCom decoder to nav_msgs/msg/Path
  *
@@ -193,8 +201,9 @@ nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
  * @returns
  */
 nav_msgs::msg::Path
-path(const std::vector<geometry_msgs::msg::PoseStamped> &poses,
-     std_msgs::msg::Header head);
+path(
+  const std::vector<geometry_msgs::msg::PoseStamped> & poses,
+  std_msgs::msg::Header head);
 /**
  * Wrap time data from NCom decoder to sensor_msgs/msg/TimeReference
  *
@@ -204,8 +213,9 @@ path(const std::vector<geometry_msgs::msg::PoseStamped> &poses,
  * @param head Header to be added to the published message
  *
  */
-sensor_msgs::msg::TimeReference time_reference(const NComRxC *nrx,
-                                               std_msgs::msg::Header head);
+sensor_msgs::msg::TimeReference time_reference(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 /**
  * Wrap tf data from NCom decoder to sensor_msgs/msg/TimeReference
  *
@@ -215,8 +225,9 @@ sensor_msgs::msg::TimeReference time_reference(const NComRxC *nrx,
  * @param head Header to be added to the published message
  *
  */
-geometry_msgs::msg::TransformStamped tf2(const NComRxC *nrx,
-                                         std_msgs::msg::Header head);
+geometry_msgs::msg::TransformStamped tf2(
+  const NComRxC * nrx,
+  std_msgs::msg::Header head);
 } // namespace RosNComWrapper
 
 #endif // ROS_NCOM_WRAPPER

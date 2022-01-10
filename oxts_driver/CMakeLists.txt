@@ -23,32 +23,57 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(oxts_msgs REQUIRED)
 
+add_library(oxts_driver_lib SHARED
+  src/lib/NComRxC.c
+  src/driver/driver.cpp)
 
-add_executable(oxts_driver 
-               src/driver/oxts_node.cpp 
-               src/lib/NComRxC.c 
-               src/driver/driver.cpp)
+ament_target_dependencies(oxts_driver_lib
+  rclcpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  tf2
+  tf2_kdl
+  oxts_msgs)
+target_include_directories(oxts_driver_lib PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  PRIVATE ${Boost_INCLUDE_DIRS}
+  $<INSTALL_INTERFACE:include>)
 
-ament_target_dependencies(oxts_driver 
-                          rclcpp
-                          std_msgs
-                          sensor_msgs
-                          geometry_msgs
-                          nav_msgs
-                          tf2
-                          tf2_kdl
-                          oxts_msgs)
+add_executable(oxts_driver
+  src/driver/oxts_node.cpp)
+
+ament_target_dependencies(oxts_driver
+  rclcpp
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  tf2
+  tf2_kdl
+  oxts_msgs)
 target_include_directories(oxts_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
 
+target_link_libraries(oxts_driver oxts_driver_lib)
+
+ament_export_include_directories(include)
+ament_export_libraries(oxts_driver_lib)
+
+install(TARGETS oxts_driver_lib
+  DESTINATION lib)
 
 install(TARGETS oxts_driver
-        DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY config 
-        DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY config
+  DESTINATION share/${PROJECT_NAME})
+
+install(DIRECTORY include/
+  DESTINATION include)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

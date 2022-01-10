@@ -25,7 +25,8 @@
 /**
  * Collection of useful constants
  */
-namespace NAV_CONST {
+namespace NAV_CONST
+{
 /**
  * Offset to convert from GPS epoch to Unix epoch
  */
@@ -62,7 +63,8 @@ const double FLAT_FACTOR2 = std::pow((1.0 - FLAT_FACTOR), 2);
 /**
  * Enumeration of GNSS position modes
  */
-enum GNSS_POS_MODE {
+enum GNSS_POS_MODE
+{
   NONE = 0,
   SEARCH = 1,
   DOPPLER = 2,
@@ -102,7 +104,8 @@ enum GNSS_POS_MODE {
   UNKNOWN = 36
 };
 
-enum NAV_MODE {
+enum NAV_MODE
+{
   RAW_INERTIAL_DATA = 1,
   READY_TO_INITIALISE = 2,
   LOCKING_ON = 3,
