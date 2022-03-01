@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>oxts_driver</name>
+  <name>tests</name>
   <version>0.0.0</version>
-  <description>A ROS2 Driver to allow an OxTS INS to interact with a wider ROS network.</description>
+  <description>A ROS2 node that runs unit tests.</description>
   <maintainer email="smccarthy@oxts.com">smccarthy</maintainer>
   <license>Apache 2.0</license>
 
