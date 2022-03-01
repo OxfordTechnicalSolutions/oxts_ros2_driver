@@ -32,7 +32,7 @@ The following VS Code `tasks.json` file was used:
         {
             "type": "shell",
             "label": "colcon build",
-            "args":["source /opt/ros/foxy/setup.bash  && cd ~/code/ros2_ws/ && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash"],
+            "args":["source /opt/ros/galactic/setup.bash  && cd ~/code/ros2_ws/ && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash"],
         },
     ]
 }
@@ -60,7 +60,7 @@ This project is split into numerous modules, each in their own directory:
 A list of ROS topics published by this driver can be found in [the README](./README.md).
 
 ### Releases
-* Release versions of this driver reside in branches corresponding to the distribution of ROS they are designed for use with, e.g. `foxy` or `eloquent`.
+* Release versions of this driver reside in branches corresponding to the distribution of ROS they are designed for use with, e.g. `galactic` or `eloquent`.
 * Branches which are under development, and in the progress of updating the code for use with a new distribution of ROS, are suffixed with `-devel`, e.g. `galactic-devel`.
 * The `master` branch contains a release for the latest distribution of ROS.
 * The ROS driver uses [semantic versioning](https://semver.org/) for its version number.
@@ -112,7 +112,7 @@ Building the test program requires something like:
 
 ```bash
 # In the root directory of the compiled package, e.g. ~/ros_ws/
-. /opt/ros/foxy/setup.bash
+. /opt/ros/galactic/setup.bash
 . install/setup.sh
 colcon build
 ```
@@ -131,9 +131,9 @@ This driver uses the `Boost.Test` framework for its unit tests. Each file in the
 Documentation on this unit testing framework, including an API reference and user's guide, can be found [here](https://www.boost.org/doc/libs/1_77_0/libs/test/doc/html/index.html).
 
 ## Learning ROS 2
-See the following short tutorials for a quality introduction to package development for ROS 2 (Foxy Fitzroy):
+See the following short tutorials for a quality introduction to package development for ROS 2 (Galactic Geochelone):
 
-- [Installation](https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/).
+- [Installation](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html).
 - [Create a workspace](https://index.ros.org/doc/ros2/Tutorials/Workspace/Creating-A-Workspace/).
 - [Create your first package](https://index.ros.org/doc/ros2/Tutorials/Creating-Your-First-ROS2-Package/).
 - [Create a simple publisher/subscriber pair](https://index.ros.org/doc/ros2/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber/#cpppubsub).

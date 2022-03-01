@@ -38,11 +38,11 @@ ament_target_dependencies(oxts_driver
                           tf2
                           tf2_kdl
                           oxts_msgs)
+
 target_include_directories(oxts_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE ${Boost_INCLUDE_DIRS}
   $<INSTALL_INTERFACE:include>)
-
 
 install(TARGETS oxts_driver
         DESTINATION lib/${PROJECT_NAME})

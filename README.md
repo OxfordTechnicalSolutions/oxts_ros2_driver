@@ -1,14 +1,16 @@
 # ROS2 Driver
 
+[![Pipeline_Status](https://gitlab.com/oxts/navigation/ros/oxts/badges/Galactic/pipeline.svg)](https://gitlab.com/oxts/navigation/ros/oxts/-/commits/Galactic)
+
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Where ROS is mentioned in this document, this is in reference to ROS2. References to ROS1 will be explicit.
 
-The ROS driver has been built with ROS release Foxy Fitzroy.
+The ROS driver has been built with ROS release Galactic Geochelone.
 
 ## Build from source
 
 Dependencies:
 
-- ROS2 (Foxy Fitzroy). (See [here](https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/) for an installation guide.)
+- ROS2 (Galactic Geochelone). (See [here](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html) for an installation guide.)
 
 ```bash
 sudo apt install doxygen
@@ -18,7 +20,7 @@ pip3 install sphinx breathe sphinx_rtd_theme
 To build the driver:
 
 ```bash
-. /opt/ros/foxy/setup.bash # "." and "source" are interchangeable (unix)
+. /opt/ros/galactic/setup.bash # "." and "source" are interchangeable (unix)
 mkdir -p ros_ws/src
 cd ros_ws/src
 git clone https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver
@@ -55,6 +57,14 @@ The currently available launch files are as follows:
 * `visualise.py` - Launches the driver, as well as `robot_state_publisher` and `rviz2` (the latter can be disabled with `use_rviz:=False`)
 * `run.py` - Only launches the driver, without `robot_state_publisher` and no `use_rviz` option
 
+You can also override options from the configuration file at the command-line, e.g.:
+
+```bash
+ros2 launch oxts run.py topic_prefix:=myprefix
+```
+
+**Be aware that currently, this only works for some options.**
+
 ## Getting started
 For a basic tutorial on using this driver, see the ["getting started" guide](./Getting%20Started.md).
 
@@ -87,7 +97,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
 * **ins/velocity** [geometry_msgs/msg/TwistStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/TwistStamped.html)
     Velocity of the INS, in the INS frame. (Linear velocity corresponds to measurements `IsoVoX`, `IsoVoY` and `IsoVoZ`, while angular velocity is `Wx`, `Wy` and `Wz`.)
 
-* **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Odometry.msg)
+* **ins/odometry** [nav_msgs/msg/Odometry](https://github.com/ros2/common_interfaces/blob/galactic/nav_msgs/msg/Odometry.msg)
     Odometry data from the INS.
     - Position: In a local reference frame which, depending on your configuration, is defined either by:
         - The LRF in NCom (`RefLat`, `RefLon`, `RefAlt` and `RefHeading`).
@@ -97,7 +107,7 @@ The publisher node included in this driver opens a socket to receive NCOM messag
     - Linear Velocity: In the above reference frame, computed from `IsoVoX`, `IsoVoY` and `IsoVoZ`. (Does not yet have variances.)
     - Angular Velocity: In the above reference frame, computed from `Wx`, `Wy` and `Wz`. (Does not yet have variances.)
 
-* **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/foxy/nav_msgs/msg/Path.msg)
+* **ins/path** [nav_msgs/msg/Path](https://github.com/ros2/common_interfaces/blob/galactic/nav_msgs/msg/Path.msg)
     Path taken by the INS, this path contains all historical positions and orientations from the **ins/odometry** topic.
 
 * **ins/time_reference** [sensor_msgs/msg/TimeReference](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/TimeReference.html)
