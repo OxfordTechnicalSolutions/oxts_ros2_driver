@@ -16,6 +16,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <memory>
+#include <filesystem>
 
 #include "oxts_driver/driver.hpp"
 #include "tests.h"
@@ -25,7 +26,7 @@ namespace tests {
 std::unique_ptr<oxts_driver::OxtsDriver> newDriver() {
   rclcpp::NodeOptions options;
   options.append_parameter_override(
-      "ncom", std::filesystem::path{__FILE__}.replace_filename("test.ncom"));
+      "ncom", std::filesystem::canonical(std::filesystem::path{"./test.ncom"}));
   options.append_parameter_override("ncom_rate", 250);
   return std::make_unique<oxts_driver::OxtsDriver>(options);
 }
