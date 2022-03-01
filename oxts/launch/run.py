@@ -26,7 +26,7 @@ def generate_launch_description():
     yaml_ip = driver_params.pop("unit_ip","0.0.0.0")
     yaml_port = driver_params.pop("unit_port",3000)
     yaml_rate = driver_params.pop("ncom_rate",100)
-    yaml_mode = driver_params.pop("timestamp_mode",0)
+    yaml_timestamp = driver_params.pop("timestamp_mode",0)
     
     ins_param_path = os.path.join(ins_dir, "config", parameters_file_name)
     with open(ins_param_path, "r") as f:
