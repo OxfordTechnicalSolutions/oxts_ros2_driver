@@ -287,9 +287,9 @@ geometry_msgs::msg::TwistStamped velocity(const NComRxC *nrx,
   msg.twist.linear.x = imu_v.getX();
   msg.twist.linear.y = imu_v.getY();
   msg.twist.linear.z = imu_v.getZ();
-  msg.twist.angular.x = imu_w.getX();
-  msg.twist.angular.y = imu_w.getY();
-  msg.twist.angular.z = imu_w.getZ();
+  msg.twist.angular.x = NAV_CONST::DEG2RADS * imu_w.getX();
+  msg.twist.angular.y = NAV_CONST::DEG2RADS * imu_w.getY();
+  msg.twist.angular.z = NAV_CONST::DEG2RADS * imu_w.getZ();
 
   return msg;
 }
