@@ -44,8 +44,8 @@
 #include <oxts_msgs/msg/nav_sat_ref.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
-#include "tf2_kdl/tf2_kdl.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+#include "tf2_kdl/tf2_kdl.hpp"
 
 // OxTS includes
 #include "oxts_ins/NComRxC.h"
