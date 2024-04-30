@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(odometry) {
   nrx.mWy = 70;
   nrx.mWz = 105;
 
-  auto msg = ::odometry(&nrx, std_msgs::msg::Header{}, Lrf{25, 45, 65, 123});
+  auto msg = ::odometry(&nrx, std_msgs::msg::Header{}, Lrf{25, 45, 65, 123}, "oxts_link");
 
   geometry_msgs::msg::Point expectedPosition{};
   expectedPosition.x = -979434.4658;

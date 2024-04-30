@@ -39,6 +39,8 @@
 #include <geometry_msgs/msg/transform_stamped.h>
 #include <oxts_msgs/msg/ncom.hpp>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
 // Boost includes
 #include <boost/asio.hpp>
 
@@ -82,6 +84,8 @@ private:
   /*! Frame ID of outgoing packets. @todo Having a general frame ID may not
     make sense. This isn't implemented. */
   std::string frame_id;
+
+  std::string base_link_frame_id;
   /*! Publishing rate for debug String message. */
   uint8_t pub_string_rate;
   /*! Publishing rate for NavSatFix message. */
@@ -135,6 +139,10 @@ private:
   std::string lever_arm_topic;
   std::string imu_bias_topic;
   std::string imu_topic;
+
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer;
+
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener;
   // ...
 
   void ncomCallbackRegular(const oxts_msgs::msg::Ncom::SharedPtr msg);
@@ -147,6 +155,8 @@ private:
   void imu(std_msgs::msg::Header header);
   /** Callback function for Tf messages. Wraps messages and broadcasts. */
   void tf(const std_msgs::msg::Header &header);
+
+  void tf_world_to_base_link(const std_msgs::msg::Header &header);
   /** Callback function for TimeReference message. Wraps message and publishes.
    */
   void time_reference(std_msgs::msg::Header header);
@@ -214,6 +224,7 @@ public:
     // Initialise configurable parameters (all params should have defaults)
     ncom_rate = this->declare_parameter("ncom_rate", 100);
     frame_id = this->declare_parameter("frame_id", "oxts_link");
+    base_link_frame_id = this->declare_parameter("base_link_frame_id", "base_link");
     pub_string_rate = this->declare_parameter("pub_string_rate", 0);
     pub_nav_sat_fix_rate = this->declare_parameter("pub_nav_sat_fix_rate", 0);
     pub_imu_flag = this->declare_parameter("pub_imu_flag", true);
@@ -403,6 +414,9 @@ public:
         std::bind(&OxtsIns::ncomCallbackRegular, this, _1));
 
     nrx = NComCreateNComRxC();
+
+    tf_buffer = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+    tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer, this);
 
     lrf_valid = false;
   }

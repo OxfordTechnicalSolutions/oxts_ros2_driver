@@ -320,10 +320,11 @@ tf2::Matrix3x3 getRotEnuToLrf(double theta) {
 }
 
 nav_msgs::msg::Odometry odometry(const NComRxC *nrx,
-                                 const std_msgs::msg::Header &head, Lrf lrf) {
+                                 const std_msgs::msg::Header &head, Lrf lrf, 
+                                 const std::string &frame_id) {
   auto msg = nav_msgs::msg::Odometry();
   msg.header = head;
-  msg.child_frame_id = "oxts_link";
+  msg.child_frame_id = frame_id;
   // pose with covariance ======================================================
 
   Point::Cart p_enu;
