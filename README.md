@@ -2,13 +2,13 @@
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Where ROS is mentioned in this document, this is in reference to ROS2. References to ROS1 will be explicit.
 
-The ROS driver has been built with ROS release Galactic Geochelone.
+The ROS driver has been built with ROS release Humble Hawksbill (Beta)
 
 ## Build from source
 
 Dependencies:
 
-- ROS2 (Galactic Geochelone). (See [here](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html) for an installation guide.)
+- ROS2 (Humble Hawksbill). (See [here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) for an installation guide)
 
 ```bash
 sudo apt install doxygen
@@ -18,11 +18,11 @@ pip3 install sphinx breathe sphinx_rtd_theme
 To build the driver:
 
 ```bash
-. /opt/ros/galactic/setup.bash # "." and "source" are interchangeable (unix)
+. /opt/ros/humble/setup.bash # "." and "source" are interchangeable (unix)
 mkdir -p ros_ws/src
 cd ros_ws/src
 git clone https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver
-cd oxts
+cd oxts_ros2_driver
 rosdep update
 rosdep install --from-path .
 cd ../..
