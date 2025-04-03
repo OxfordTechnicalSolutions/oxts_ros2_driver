@@ -170,8 +170,21 @@ public:
 
     // Wait for config to be populated in NCOM packets
     RCLCPP_INFO(this->get_logger(), "Waiting for INS config information...");
+    bool informedSerialNumber = false;
+    bool informedImu2Veh = false;
     while (nrx->mSerialNumber == 0 || nrx->mIsImu2VehHeadingValid == 0) {
       (*this.*update_ncom)();
+      
+      if (nrx->mSerialNumber != 0 && !informedSerialNumber)
+      {
+        RCLCPP_INFO(this->get_logger(), "Got serial number: %d", nrx->mSerialNumber);
+        informedSerialNumber = true;
+      }
+      if (nrx->mIsImu2VehHeadingValid != 0 && !informedImu2Veh)
+      {
+        RCLCPP_INFO(this->get_logger(), "Got IMU to Vehicle frame heading");
+        informedImu2Veh = true;
+      }
     }
     RCLCPP_INFO(this->get_logger(), "INS config information received");
 
