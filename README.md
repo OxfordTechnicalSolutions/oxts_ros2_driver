@@ -2,13 +2,13 @@
 
 A ROS2 driver which allows an OxTS INS to interact with a wider ROS network. Where ROS is mentioned in this document, this is in reference to ROS2. References to ROS1 will be explicit.
 
-The ROS driver has been built with ROS release Humble Hawksbill (Beta)
+The ROS driver has been built with ROS release Jazzy Jalisco (Beta)
 
 ## Build from source
 
 Dependencies:
 
-- ROS2 (Humble Hawksbill). (See [here](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) for an installation guide)
+- ROS2 (Jazzy Jalisco). (See [here](https://docs.ros.org/en/jazzy/Releases/Release-Jazzy-Jalisco.html) for an installation guide)
 
 ```bash
 sudo apt install doxygen
@@ -18,7 +18,7 @@ pip3 install sphinx breathe sphinx_rtd_theme
 To build the driver:
 
 ```bash
-. /opt/ros/humble/setup.bash # "." and "source" are interchangeable (unix)
+. /opt/ros/jazzy/setup.bash # "." and "source" are interchangeable (unix)
 mkdir -p ros_ws/src
 cd ros_ws/src
 git clone https://github.com/OxfordTechnicalSolutions/oxts_ros2_driver
