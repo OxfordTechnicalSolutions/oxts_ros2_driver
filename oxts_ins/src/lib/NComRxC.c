@@ -275,6 +275,7 @@ static void DecodeExtra36(NComRxC *Com);
 static void DecodeExtra37(NComRxC *Com);
 static void DecodeExtra38(NComRxC *Com);
 static void DecodeExtra39(NComRxC *Com);
+static void DecodeExtra40(NComRxC *Com);
 static void DecodeExtra41(NComRxC *Com);
 static void DecodeExtra42(NComRxC *Com);
 static void DecodeExtra43(NComRxC *Com);
@@ -4036,6 +4037,7 @@ static void DecodeStatusMsg(NComRxC *Com)
 		case 37: DecodeExtra37(Com); break;
 		case 38: DecodeExtra38(Com); break;
 		case 39: DecodeExtra39(Com); break;
+		case 40: DecodeExtra40(Com); break;
 		case 41: DecodeExtra41(Com); break;
 		case 42: DecodeExtra42(Com); break;
 		case 43: DecodeExtra43(Com); break;
@@ -4830,7 +4832,7 @@ static void DecodeExtra30(NComRxC *Com)
 	}
 
 	// Serial Number
-	if ((mCurStatus[6] != 0xFF) || (mCurStatus[7] != 0xFF))
+	if ((mCurStatus[6] != 0xFF) && (mCurStatus[7] != 0xFF))
 	{
 		NComSetSerialNumber(Com, cast_2_byte_LE_to_uint16(mCurStatus+6));
 	}
@@ -5136,8 +5138,25 @@ static void DecodeExtra39(NComRxC *Com)
 	}
 }
 
-
 //============================================================================================================
+//! \brief 40. Extended serial number (24-bit).
+
+static void DecodeExtra40(NComRxC *Com)
+{
+	const unsigned char *mCurStatus = Com->mInternal->mCurStatus;
+
+	// TODO: NCOM version ID
+	// TODO: Output latency
+	
+	// Extended serial number
+	if (!(mCurStatus[4] == 0xFF && mCurStatus[5] == 0xFF && mCurStatus[6] == 0xFF))
+	{
+		// Extract serial number
+		const int serialNumber = cast_3_byte_LE_to_int32(mCurStatus + 4);
+		// Set serial number
+		NComSetSerialNumber(Com, serialNumber);
+	}
+}
 
 
 //============================================================================================================
