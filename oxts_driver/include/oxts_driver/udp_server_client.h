@@ -101,6 +101,7 @@ public:
       // opens a IPv4 socket then binds to it - uses local system ip and port
       // specified in constructor
       socket.open(udp::v4(), error_code);
+      socket.set_option(udp::socket::reuse_address(true));
       socket.bind(local_endpoint, error_code);
       do {
         bytes_received = socket.receive_from(
