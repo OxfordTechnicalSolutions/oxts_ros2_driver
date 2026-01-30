@@ -73,6 +73,9 @@ enum LRF_SOURCE {
  */
 class OxtsIns : public rclcpp::Node {
 private:
+
+  double prev_time = 0.0;
+  
   /*! Rate at which to sample NCom. Expected that this will typically match
     the rate of NCom itself, though can be set lower to save computation. */
   uint8_t ncom_rate;

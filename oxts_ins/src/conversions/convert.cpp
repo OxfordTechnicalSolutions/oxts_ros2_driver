@@ -20,8 +20,33 @@ void OxtsIns::ncomCallbackRegular(const oxts_msgs::msg::Ncom::SharedPtr msg) {
   // Add data to decoder
   if (NComNewChars(this->nrx, msg->raw_packet.data(), NCOM_PACKET_LENGTH) ==
       COM_NEW_UPDATE) {
-    double current_time = rclcpp::Time(msg->header.stamp).seconds();
+    
+
+    double current_time = rclcpp::Time(msg->header.stamp).seconds(); //ncom time
+    double present_time =  this->now().seconds(); //current system time
+
     int sec_idx = round((current_time - floor(current_time)) * this->ncom_rate);
+
+    // Check NCOM ROS2 messages are not being dropped between oxts_driver and oxts_ins nodes
+    double ncom_diff = current_time - this->prev_time;
+    
+    // Checks the time difference between subsequent NCOM messages
+    if(this->prev_time > 0 && ncom_diff > 1.0/this->ncom_rate*1.1)
+    {
+        RCLCPP_WARN(this->get_logger(), "Error: ROS2 NCOM message drop detected!");
+        std::cout << "Time diff since last NCOM message: " << ncom_diff << "s" << std::endl;
+    }
+
+    double lag = present_time - current_time;
+
+    // Checks the time difference between NCOM message time and present time
+    if (lag > 0.1)
+     {
+        RCLCPP_WARN(this->get_logger(), "Error: oxts_ins node lagging behind!");
+        std::cout << "oxts_ins node lag: " << lag << "s" << std::endl;
+    }
+
+    this->prev_time = current_time;
 
     // Publish IMU message if being subscribed to and enabled in config
     if (this->pub_imu_flag)
